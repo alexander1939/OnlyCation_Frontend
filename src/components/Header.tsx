@@ -55,17 +55,19 @@ const Header: React.FC = () => {
               { name: '¿Ser docente?' },
               { name: 'Sobre nosotros' }
             ].map((item, index) => (
-              <span 
+              <a 
                 key={index} 
+                href="#"
                 className="font-semibold text-lg"
                 style={{
                   color: '#294954',
                   fontFamily: 'Inter, sans-serif',
-                  padding: '10px'
+                  padding: '10px',
+                  textDecoration: 'none'
                 }}
               >
                 {item.name}
-              </span>
+              </a>
             ))}
           </nav>
 

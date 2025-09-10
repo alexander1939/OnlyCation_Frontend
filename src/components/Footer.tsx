@@ -51,34 +51,33 @@ const Footer: React.FC = () => {
             </p>
             
             {/* Redes sociales integradas */}
-            <div className="flex space-x-3">
+            <div className="flex space-x-4">
               {[
-                { name: 'Facebook', icon: '📘' },
-                { name: 'Twitter', icon: '🐦' },
-                { name: 'Instagram', icon: '📷' },
-                { name: 'LinkedIn', icon: '💼' }
+                { name: 'Email', src: '/email_icon.png' },
+                { name: 'YouTube', src: '/youtube_icon.png' }
               ].map((social, index) => (
                 <a
                   key={index}
                   href="#"
-                  className="w-11 h-11 rounded-xl flex items-center justify-center text-lg transition-all duration-300"
+                  className="flex items-center justify-center transition-all duration-300"
                   style={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                    color: '#FFFFFF',
-                    border: '1px solid rgba(255, 255, 255, 0.1)'
+                    padding: '10px'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#68B2C9';
-                    e.currentTarget.style.borderColor = '#68B2C9';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.transform = 'scale(1.1)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.transform = 'scale(1)';
                   }}
                 >
-                  {social.icon}
+                  <img 
+                    src={social.src}
+                    alt={social.name}
+                    className="w-[30px] h-[30px]"
+                    style={{ 
+                      objectFit: 'contain',
+                     }}
+                  />
                 </a>
               ))}
             </div>

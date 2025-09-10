@@ -81,7 +81,6 @@ const Header: React.FC = () => {
                className="w-[30px] h-[30px]"
                style={{
                 objectFit: 'contain',
-                padding: '5px'
               }}
               />
             </button>

@@ -1,9 +1,10 @@
 import React from 'react';
 import { Header } from '../components';
+import Footer from '../components/Footer';
 
 const Home: React.FC = () => {
   return (
-    <div className="min-h-screen" style={{backgroundColor: '#FAF9F5'}}>
+    <div className="min-h-screen w-full" style={{backgroundColor: '#FAF9F5', margin: 0, padding: 0}}>
       <Header />
       
       {/* Hero Section - Replicando el diseño Flutter exacto */}
@@ -168,78 +169,7 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Footer - Replicando Flutter exacto */}
-      <footer className="bg-gradient-to-b from-petroleum-blue to-petroleum-blue/90 text-white">
-        <div className="px-8 py-12">
-          <div className="max-w-[1200px] mx-auto">
-            <div className="grid grid-cols-4 gap-12">
-              {/* Logo y descripción */}
-              <div className="col-span-2">
-                <div className="flex items-center mb-4">
-                  <div className="w-[70px] h-[70px] bg-white rounded-full p-[6px]">
-                    <div className="w-full h-full bg-petroleum-blue rounded-full flex items-center justify-center">
-                      <span className="text-white font-bold text-2xl">O</span>
-                    </div>
-                  </div>
-                  <span className="text-white font-bold text-[28px] ml-4">OnlyCation</span>
-                </div>
-                <p className="text-white/70 text-[14px] leading-[1.5] mb-6 max-w-md">
-                  La plataforma educativa que conecta estudiantes con los mejores profesores. Aprende de manera personalizada y alcanza tus metas académicas.
-                </p>
-                <div className="flex gap-3">
-                  {['📘', '🐦', '📷', '▶️'].map((icon, i) => (
-                    <div key={i} className="w-10 h-10 bg-mint-green/20 border border-mint-green/50 rounded-[10px] flex items-center justify-center cursor-pointer hover:bg-mint-green/30 transition-colors">
-                      <span className="text-mint-green">{icon}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Enlaces Rápidos */}
-              <div>
-                <h4 className="text-sky-blue font-bold text-[18px] mb-4">Enlaces Rápidos</h4>
-                <ul className="space-y-2">
-                  {['Inicio', 'Profesores', 'Materias', 'Precios', 'Contacto'].map((link) => (
-                    <li key={link}>
-                      <a href="#" className="text-white/70 text-[14px] hover:text-white transition-colors">
-                        {link}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              
-              {/* Soporte */}
-              <div>
-                <h4 className="text-sky-blue font-bold text-[18px] mb-4">Soporte</h4>
-                <ul className="space-y-2">
-                  {['Centro de Ayuda', 'FAQ', 'Términos y Condiciones', 'Política de Privacidad', 'Reportar Problema'].map((link) => (
-                    <li key={link}>
-                      <a href="#" className="text-white/70 text-[14px] hover:text-white transition-colors">
-                        {link}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Copyright */}
-        <div className="border-t border-white/20">
-          <div className="px-8 py-6 max-w-[1200px] mx-auto flex justify-between items-center">
-            <p className="text-white/70 text-[12px]">
-              © 2024 OnlyCation. Todos los derechos reservados.
-            </p>
-            <div className="flex items-center text-white/70 text-[12px]">
-              <span>Hecho con </span>
-              <span className="text-coral-orange mx-1">♥</span>
-              <span> en México</span>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

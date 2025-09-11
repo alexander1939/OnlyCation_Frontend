@@ -1,11 +1,11 @@
 import { AuthProvider, ThemeProvider } from './context';
-import Home from './pages/Home';
+import AppRouter from './app/router';
 
 function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <Home />
+        <AppRouter />
       </AuthProvider>
     </ThemeProvider>
   );

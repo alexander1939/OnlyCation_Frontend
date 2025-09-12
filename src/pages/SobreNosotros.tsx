@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import Ribbon from '../components/Ribbon';
 
 const SobreNosotros: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -80,20 +81,7 @@ const SobreNosotros: React.FC = () => {
             <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px', alignItems: 'center'}}>
               {/* Left side - Mission content */}
               <div>
-                <div style={{
-                  display: 'inline-block',
-                  padding: '8px 24px',
-                  borderRadius: '25px',
-                  backgroundColor: '#68B2C9',
-                  color: 'white',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  marginBottom: '24px',
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px'
-                }}>
-                  Nuestra Misión
-                </div>
+              <Ribbon text="Nuestra Misión" backgroundColor="#68B2C9" textColor="#ffffff" fontSize="13px" padding="6px 20px" />
                 
                 <h2 style={{
                   fontSize: '48px',
@@ -233,21 +221,9 @@ const SobreNosotros: React.FC = () => {
                   }}></div>
                   
                   <div style={{position: 'relative', zIndex: 2}}>
-                    <div style={{
-                      display: 'inline-block',
-                      padding: '8px 20px',
-                      borderRadius: '20px',
-                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                      color: 'white',
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      marginBottom: '24px',
-                      textTransform: 'uppercase',
-                      letterSpacing: '1px'
-                    }}>
-                      ¿Por qué OnlyCation?
-                    </div>
-                    
+
+                    <Ribbon text="¿Por qué OnlyCation?" backgroundColor="rgba(255, 255, 255, 0.2)" />
+
                     <h3 style={{
                       fontSize: '36px',
                       fontWeight: 'bold',
@@ -309,20 +285,8 @@ const SobreNosotros: React.FC = () => {
         {/* Values Section */}
         <section style={{padding: '100px 50px', backgroundColor: '#FAF9F5'}}>
           <div style={{maxWidth: '1200px', margin: '0 auto', textAlign: 'center'}}>
-            <div style={{
-              display: 'inline-block',
-              padding: '8px 24px',
-              borderRadius: '25px',
-              backgroundColor: '#68B2C9',
-              color: 'white',
-              fontSize: '14px',
-              fontWeight: '600',
-              marginBottom: '24px',
-              textTransform: 'uppercase',
-              letterSpacing: '1px'
-            }}>
-              Nuestros Valores
-            </div>
+
+          <Ribbon text="Nuestros Valores" backgroundColor="#68B2C9"/>
             
             <h2 style={{
               fontSize: '48px',
@@ -444,21 +408,9 @@ const SobreNosotros: React.FC = () => {
         {/* Vision Section */}
         <section style={{padding: '100px 50px', backgroundColor: '#FFFFFF'}}>
           <div style={{maxWidth: '1200px', margin: '0 auto', textAlign: 'center'}}>
-            <div style={{
-              display: 'inline-block',
-              padding: '8px 24px',
-              borderRadius: '25px',
-              backgroundColor: '#8ED4BE',
-              color: 'white',
-              fontSize: '14px',
-              fontWeight: '600',
-              marginBottom: '24px',
-              textTransform: 'uppercase',
-              letterSpacing: '1px'
-            }}>
-              Nuestra Visión
-            </div>
-            
+
+            <Ribbon text="Nuestros Valores" backgroundColor="#8ED4BE"/>
+
             <h2 style={{
               fontSize: '48px',
               fontWeight: 'bold',
@@ -567,20 +519,8 @@ const SobreNosotros: React.FC = () => {
         <section style={{padding: '100px 50px', backgroundColor: '#FAF9F5'}}>
           <div style={{maxWidth: '1400px', margin: '0 auto'}}>
             <div style={{textAlign: 'center', marginBottom: '60px'}}>
-              <div style={{
-                display: 'inline-block',
-                padding: '8px 24px',
-                borderRadius: '25px',
-                backgroundColor: '#68B2C9',
-                color: 'white',
-                fontSize: '14px',
-                fontWeight: '600',
-                marginBottom: '24px',
-                textTransform: 'uppercase',
-                letterSpacing: '1px'
-              }}>
-                Nuestro Equipo
-              </div>
+
+              <Ribbon text="Nuestro Equipo" backgroundColor="#68B2C9"/>
               
               <h2 style={{
                 fontSize: '48px',
@@ -806,7 +746,7 @@ const SobreNosotros: React.FC = () => {
                             fontSize: '12px',
                             fontWeight: '600',
                             background: `linear-gradient(135deg, ${index % 3 === 0 ? '#68B2C9' : index % 3 === 1 ? '#8ED4BE' : '#FFDE97'}15, ${index % 3 === 0 ? '#8ED4BE' : index % 3 === 1 ? '#68B2C9' : '#FF9978'}15)`,
-                            color: index % 3 === 0 ? '#68B2C9' : index % 3 === 1 ? '#8ED4BE' : '#FFDE97',
+                            color: index % 3 === 0 ? '#68B2C9' : index % 3 === 1 ? '#8ED4BE' : '#B88010',
                             border: `2px solid ${index % 3 === 0 ? '#68B2C9' : index % 3 === 1 ? '#8ED4BE' : '#FFDE97'}20`,
                             transition: 'all 0.3s ease'
                           }}

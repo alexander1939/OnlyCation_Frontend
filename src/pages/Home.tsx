@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
 const Home: React.FC = () => {
   const [playingVideo, setPlayingVideo] = useState<number | null>(null);
-  const [currentCard, setCurrentCard] = useState(0);
-  const intervalRef = useRef<number | null>(null);
+  const sectionRef = useRef<HTMLElement | null>(null);
   const [showMorePreparatoria, setShowMorePreparatoria] = useState(false);
   const [showMoreUniversidad, setShowMoreUniversidad] = useState(false);
   const [showMorePosgrado, setShowMorePosgrado] = useState(false);
@@ -41,35 +40,16 @@ const Home: React.FC = () => {
     }
   ];
 
-  const nextCard = () => {
-    setCurrentCard((prev) => (prev + 1) % steps.length);
-  };
 
-  const prevCard = () => {
-    setCurrentCard((prev) => (prev - 1 + steps.length) % steps.length);
-  };
-
-  useEffect(() => {
-    // Iniciar autoplay automáticamente cada 5 segundos
-    intervalRef.current = window.setInterval(() => {
-      setCurrentCard((prev) => (prev + 1) % steps.length);
-    }, 5000);
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, []);
 
   return (
-    <div className="min-h-screen w-full" style={{backgroundColor: '#FAF9F5', margin: 0, padding: 0}}>
+    <div className="min-h-screen w-full snap-y snap-mandatory overflow-y-scroll" style={{backgroundColor: '#FAF9F5', margin: 0, padding: 0}}>
       <Header />
       
       {/* Hero Section - Replicando el diseño Flutter exacto */}
-      <section className="w-full h-[600px] pt-[100px]" style={{backgroundColor: '#FAF9F5'}}>
-        <div className="max-w-[1200px] mx-auto px-10 h-full">
-          <div className="grid grid-cols-2 gap-0 h-full items-center">
+      <section className="w-full  snap-start" style={{backgroundColor: '#FAF9F5'}}>
+        <div className="max-w-[1200px] py-[100px] mx-auto px-10 h-full flex items-center">
+          <div className="grid grid-cols-2 gap-0 w-full items-center">
             {/* Left side - Content (exacto como Flutter) */}
             <div className="flex flex-col justify-center">
               <h1 className="text-[48px] font-bold leading-[1.2] tracking-[-0.5px] mb-6" style={{color: '#294954', padding: '0 0 0 100px'}}>
@@ -99,47 +79,59 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
-
-      {/* Sección Cómo funciona OnlyCation */}
-      <section className="py-[80px] px-[50px]" style={{backgroundColor: '#FAF9F5'}}>
-        <div className="max-w-[1400px] mx-auto">
-          <div className="grid grid-cols-2 gap-[40px] items-center">
-            {/* Contenido izquierdo - Texto */}
-            <div className="flex flex-col justify-center items-center text-center">
-              <h2 className="text-[42px] font-bold mb-6 leading-tight" style={{color: '#294954'}}>
-                La química perfecta<br />
-                para tu aprendizaje 
-              </h2>
-              <p className="text-[18px]  py-[10px] px-[50px] leading-relaxed max-w-lg" style={{color: '#6B7280'}}>
-                Sigue estos pasos para reservar tu tutoría <br />
-                y aprovechar al máximo la plataforma:
-              </p>
+      {/* Sección Cómo funciona OnlyCation - Scroll Snap que ocupa toda la pantalla */}
+      <section 
+        ref={sectionRef} 
+        className="h-[100vh] snap-start flex items-center justify-center px-[50px]" 
+        style={{backgroundColor: '#FAF9F5'}}
+      >
+        <div className="max-w-[1400px] mx-auto w-full">
+          {/* Container principal con scroll snap interno */}
+          <div 
+            className="h-[80vh] overflow-y-auto [&::-webkit-scrollbar]:hidden"
+            style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}
+          >
+            {/* Snap Point 1 - Introducción */}
+            <div className="h-[80vh] flex items-center justify-center">
+              <div className="grid grid-cols-2 gap-[40px] items-center w-full">
+                <div className="flex flex-col justify-center items-center text-center">
+                  <h2 className="text-[42px] font-bold mb-6 leading-tight" style={{color: '#294954'}}>
+                    La química perfecta<br />
+                    para tu aprendizaje 
+                  </h2>
+                  <p className="text-[18px] py-[10px] px-[50px] leading-relaxed max-w-lg" style={{color: '#6B7280'}}>
+                    Sigue estos pasos para reservar tu tutoría <br />
+                    y aprovechar al máximo la plataforma:
+                  </p>
+                </div>
+                <div className="flex items-center justify-center">
+                  <div className="w-full h-[400px] bg-gray-100 rounded-lg flex items-center justify-center">
+                    <img 
+                      src="/buscando_zorro.png"
+                      alt="Buscando zorro"
+                      className="w-[700px] h-[700px] object-contain"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-            
-            {/* Contenido derecho - Carrusel con superposición */}
-            <div className="relative w-full h-[400px] overflow-hidden">
-              {/* Container de cards */}
-              <div className="relative w-full h-full">
-                {steps.map((step, index) => (
-                  <div
-                    key={step.id}
-                    className={`absolute inset-0 transition-all duration-700 ease-in-out`}
-                    style={{
-                      zIndex: index + 1,
-                      transform: index <= currentCard 
-                        ? `translateX(${index * 15}px) translateY(${index * 10}px)` 
-                        : index === currentCard + 1
-                          ? `translateX(${350 + (currentCard * 15)}px)`
-                          : 'translateX(100%)',
-                      opacity: index <= currentCard 
-                        ? (index === currentCard ? 1 : 0.9) 
-                        : index === currentCard + 1 
-                          ? 0.6 
-                          : 0
-                    }}
-                  >
+
+            {/* Snap Points 2-5 - Cada paso */}
+            {steps.map((step) => (
+              <div key={step.id} className="h-[80vh] flex items-center justify-center">
+                <div className="grid grid-cols-2 gap-[40px] items-center w-full">
+                  <div className="flex flex-col justify-center items-center text-center">
+                    <h2 className="text-[42px] font-bold mb-6 leading-tight" style={{color: '#294954'}}>
+                      Paso {step.id}<br />
+                      {step.title}
+                    </h2>
+                    <p className="text-[18px] py-[10px] px-[50px] leading-relaxed max-w-lg" style={{color: '#6B7280'}}>
+                      {step.description}
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-center">
                     <div 
-                      className="rounded-[20px] p-[30px] text-center shadow-xl border border-gray-100 w-[300px] h-full mx-auto"
+                      className="rounded-[20px] p-[30px] text-center shadow-xl border border-gray-100 w-[350px] h-[450px]"
                       style={{backgroundColor: step.color}}
                     >
                       <div 
@@ -166,51 +158,12 @@ const Home: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                ))}
+                </div>
               </div>
-              
-              {/* Botones de navegación */}
-              <button
-                onClick={prevCard}
-                className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
-                style={{color: '#294954'}}
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              
-              <button
-                onClick={nextCard}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
-                style={{color: '#294954'}}
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-              
-              
-              {/* Indicadores de posición */}
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
-                {steps.map((_, index) => (
-                  <button
-                    key={index}
-                    className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                      index === currentCard 
-                        ? 'bg-[#294954] scale-125' 
-                        : 'bg-gray-300 hover:bg-gray-400'
-                    }`}
-                    onClick={() => setCurrentCard(index)}
-                  />
-                ))}
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
-
-     
       {/* Sección de mejores docentes */}
       <section className="px-[20px] mb-[100px]" style={{backgroundColor: '#FAF9F5'}}>
         <div className="max-w-[1000px] mx-auto">
@@ -1021,9 +974,9 @@ const Home: React.FC = () => {
  {/* Sección Quiero ser docente */}
  <section className="py-[30px] px-[50px] bg-soft-white">
         <div className="max-w-[1200px] mx-auto">
-          <div className="flex items-center gap-[20px]">
+          <div className="flex items-center gap-[10px]">
             {/* Imagen del zorro docente a la izquierda */}
-            <div className="flex-shrink-0 -ml-[100px] overflow-hidden rounded-[20px]">
+            <div className="flex-shrink-0 -ml-[50px] overflow-hidden rounded-[20px]">
               <img 
                 src="/zorro_docnte_.png" 
                 alt="Zorro docente" 
@@ -1033,7 +986,7 @@ const Home: React.FC = () => {
             </div>
             
             {/* Contenido de texto a la derecha en card */}
-            <div className="flex-1">
+            <div className="flex-1 ">
               <div className="rounded-[20px] p-[40px] shadow-2xl hover:shadow-3xl transition-all duration-500 w-[500px] h-[600px]" style={{backgroundColor: '#8ED4BE', border: '2px solid #8ED4BE', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'}}>
                 <h2 className="text-[72px] font-bold" style={{color: '#294954', padding: '0 0 20px 0'}}>
                   Conviértete en profesor
@@ -1080,6 +1033,69 @@ const Home: React.FC = () => {
         </div>
       </section>
 
+      {/* Sección Conviértete en estudiante */}
+      <section className="py-[80px] px-[50px] bg-soft-white">
+        <div className="max-w-[1200px] mx-auto">
+          <div className="flex items-center gap-[10px]">
+            {/* Contenido de texto a la izquierda en card */}
+            <div className="flex-1 " style={{padding: '0 0 0 120px'}}>
+              <div className="rounded-[20px] p-[40px] shadow-2xl hover:shadow-3xl transition-all duration-500 w-[500px] h-[600px]" style={{backgroundColor: '#FFD97D', border: '2px solid #FFD97D', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'}}>
+                <h2 className="text-[72px] font-bold" style={{color: '#294954', padding: '0 0 20px 0'}}>
+                  Conviértete en estudiante
+                </h2>
+                <p className="text-[18px] leading-relaxed" style={{color: '#294954', padding: '0 0 20px 0'}}>
+                  Aprende nuevas habilidades y mejora tus conocimientos con la ayuda de tutores en línea. 
+                  Regístrate y empieza a recibir clases personalizadas en Preply.
+                </p>
+                
+                {/* Lista de beneficios */}
+                <ul className="space-y-3" style={{padding: '0 0 40px 0'}}>
+                  <li className="text-[16px]" style={{color: '#294954'}}>
+                    <strong>Encuentra profesores expertos</strong>
+                  </li>
+                  <li className="text-[16px]" style={{color: '#294954'}}>
+                    <strong>Aprende a tu propio ritmo</strong>
+                  </li>
+                  <li className="text-[16px]" style={{color: '#294954'}}>
+                    <strong>Usa la herramienta de videoconferencia integrada</strong>
+                  </li>
+                  <li className="text-[16px]" style={{color: '#294954'}}>
+                    <strong>Paga de forma segura y sin riesgos</strong>
+                  </li>
+                </ul>
+
+                {/* Botón Ver más centrado */}
+                <div className="text-center">
+                  <button 
+                    onClick={() => window.location.href = '/estudiante'}
+                    className="text-[18px] font-semibold tracking-[0.5px] transition-colors" 
+                    style={{
+                      backgroundColor: '#294954', 
+                      color: '#FAF9F5', 
+                      padding: '12px 24px', 
+                      borderRadius: '20px', 
+                      border: '2px solid #294954'
+                    }} 
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1e3a42'} 
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#294954'}>
+                    Ver más
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            {/* Imagen del zorro estudiante a la derecha */}
+            <div className="flex-shrink-0 -mr-[50px] overflow-hidden rounded-[20px]">
+              <img 
+                src="/buscando_zorro.png" 
+                alt="Zorro estudiante" 
+                className="w-[600px] h-[600px] object-cover scale-150"
+                style={{objectPosition: 'center'}}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
 
       <Footer />
     </div>

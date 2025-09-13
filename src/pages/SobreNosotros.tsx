@@ -16,28 +16,28 @@ const SobreNosotros: React.FC = () => {
       name: "Gael Espinosa Fernandez",
       role: "Frontend Developer",
       email: "fernandezgael707@gmail.com",
-      image: "/usuario.png",
+      image: "/yo.jpg",
       skills: ["React", "TypeScript", "TailwindCSS", "Vite", "UI/UX"]
     },
     {
       name: "Jesus Guzman Jimenez",
       role: "Backend Developer",
       email: "jesusguzmanjimenez53@gmail.com",
-      image: "/usuario.png",
+      image: "/chus.jpeg",
       skills: ["React", "Express", "Docker", "PostgreSQL", "Node.js"]
     },
     {
       name: "Gustavo Alexander Medina Cifuentes",
       role: "Full Stack Developer",
       email: "Alexcifuentes72818@gmail.com",
-      image: "/usuario.png",
+      image: "/tavazo.jpeg",
       skills: ["React", "Node.js", "AWS", "Docker", "DevOps"]
     },
     {
       name: "Roberto Carlos Nuñez Cruz",
       role: "Frontend Developer",
       email: "robertocarlosnunezcruz9@gmail.com",
-      image: "/usuario.png",
+      image: "/rober.jpeg",
       skills: ["React", "TypeScript", "TailwindCSS", "Vite", "UI/UX"]
     },
   ];

@@ -1,18 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
 const Home: React.FC = () => {
   const [playingVideo, setPlayingVideo] = useState<number | null>(null);
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const [showMorePreparatoria, setShowMorePreparatoria] = useState(false);
+  const [showMoreUniversidad, setShowMoreUniversidad] = useState(false);
+  const [showMorePosgrado, setShowMorePosgrado] = useState(false);
+
+  const steps = [
+    {
+      id: 1,
+      title: "Encuentra a tu profesor",
+      description: "El alumno elige en la plataforma el nivel educativo y la materia que necesita, para que se le muestren los tutores disponibles.",
+      image: "/buscando_zorro.png",
+      color: "#A8E6CF"
+    },
+    {
+      id: 2,
+      title: "Selecciona disponibilidad",
+      description: "Revisa el calendario de cada docente y selecciona el día y la hora que mejor se adapten a tus necesidades.",
+      image: "/Penzando_zorro.png",
+      color: "#FFD97D"
+    },
+    {
+      id: 3,
+      title: "Asiste a tu tutoría",
+      description: "Conéctate a la sesión en línea a través de la herramienta de videoconferencia que ofrece la plataforma.",
+      image: "/zorro_Turoria.png",
+      color: "#87CEEB"
+    },
+    {
+      id: 4,
+      title: "Confirma tu asistencia",
+      description: "Al finalizar la sesión, confirma tu participación directamente en la plataforma para llevar un registro de tus tutorías.",
+      image: "/zorro_confiormando.png",
+      color: "#DDA0DD"
+    }
+  ];
+
+
 
   return (
-    <div className="min-h-screen w-full" style={{backgroundColor: '#FAF9F5', margin: 0, padding: 0}}>
+    <div className="min-h-screen w-full snap-y snap-mandatory overflow-y-scroll" style={{backgroundColor: '#FAF9F5', margin: 0, padding: 0}}>
       <Header />
       
       {/* Hero Section - Replicando el diseño Flutter exacto */}
-      <section className="w-full h-[600px] pt-[100px]" style={{backgroundColor: '#FAF9F5'}}>
-        <div className="max-w-[1200px] mx-auto px-10 h-full">
-          <div className="grid grid-cols-2 gap-0 h-full items-center">
+      <section className="w-full  snap-start" style={{backgroundColor: '#FAF9F5'}}>
+        <div className="max-w-[1200px] py-[100px] mx-auto px-10 h-full flex items-center">
+          <div className="grid grid-cols-2 gap-0 w-full items-center">
             {/* Left side - Content (exacto como Flutter) */}
             <div className="flex flex-col justify-center">
               <h1 className="text-[48px] font-bold leading-[1.2] tracking-[-0.5px] mb-6" style={{color: '#294954', padding: '0 0 0 100px'}}>
@@ -42,115 +79,94 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
-
-      {/* Sección Cómo funciona OnlyCation */}
-      <section className="py-[80px] px-[50px]" style={{backgroundColor: '#FAF9F5'}}>
-        <div className="max-w-[1200px] mx-auto">
-          <div className="text-center mb-[60px]">
-            <h2 className="text-[42px] font-bold mb-4" style={{color: '#294954'}}>
-              Cómo funciona OnlyCation
-            </h2>
-          </div>
-          
-          <div className="grid grid-cols-4 gap-[30px]">
-            {/* Card 1 - Encuentra a tu profesor */}
-            <div className="bg-white rounded-[20px] p-[30px] text-center shadow-lg border border-gray-100">
-              <div className="w-[60px] h-[60px] rounded-full flex items-center justify-center mx-auto mb-6"
-                style={{backgroundColor: '#A8E6CF'}}
-              >
-                <span className="text-[24px] font-bold text-white">1</span>
-              </div>
-              <h3 className="text-[20px] font-bold mb-4" style={{color: '#294954'}}>
-                Encuentra a tu profesor
-              </h3>
-              <p className="text-[14px] leading-relaxed mb-6" style={{color: '#6B7280'}}>
-                El alumno elige en la plataforma el nivel educativo y la materia que necesita, para que se le muestren los tutores disponibles.
-              </p>
-              <div className="bg-gray-50 rounded-[15px] p-4 h-[120px] flex items-center justify-center">
-                <img 
-                  src="/buscando_zorro.png" 
-                  alt="Buscando profesor" 
-                  className="w-[150px] h-[150px] object-contain"
-                />
-              </div>
-            </div>
-
-            {/* Card 2 - Selecciona disponibilidad */}
-            <div className="bg-white rounded-[20px] p-[30px] text-center shadow-lg border border-gray-100">
-              <div className="w-[60px] h-[60px] rounded-full flex items-center justify-center mx-auto mb-6"
-                style={{backgroundColor: '#FFD97D'}}
-              >
-                <span className="text-[24px] font-bold text-white">2</span>
-              </div>
-              <h3 className="text-[20px] font-bold mb-4" style={{color: '#294954'}}>
-                Selecciona disponibilidad
-              </h3>
-              <p className="text-[14px] leading-relaxed mb-6" style={{color: '#6B7280'}}>
-                Revisa el calendario de cada docente y selecciona el día y la hora que mejor se adapten a tus necesidades.
-              </p>
-              <div className="bg-gray-50 rounded-[15px] p-4 h-[120px] flex items-center justify-center">
-                <img 
-                  src="/Penzando_zorro.png" 
-                  alt="Pensando disponibilidad" 
-                  className="w-[150px] h-[150px] object-contain"
-                />
+      {/* Sección Cómo funciona OnlyCation - Scroll Snap que ocupa toda la pantalla */}
+      <section 
+        ref={sectionRef} 
+        className="h-[100vh] snap-start flex items-center justify-center px-[50px]" 
+        style={{backgroundColor: '#FAF9F5'}}
+      >
+        <div className="max-w-[1400px] mx-auto w-full">
+          {/* Container principal con scroll snap interno */}
+          <div 
+            className="h-[80vh] overflow-y-auto [&::-webkit-scrollbar]:hidden"
+            style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}
+          >
+            {/* Snap Point 1 - Introducción */}
+            <div className="h-[80vh] flex items-center justify-center">
+              <div className="grid grid-cols-2 gap-[40px] items-center w-full">
+                <div className="flex flex-col justify-center items-center text-center">
+                  <h2 className="text-[42px] font-bold mb-6 leading-tight" style={{color: '#294954'}}>
+                    La química perfecta<br />
+                    para tu aprendizaje 
+                  </h2>
+                  <p className="text-[18px] py-[10px] px-[50px] leading-relaxed max-w-lg" style={{color: '#6B7280'}}>
+                    Sigue estos pasos para reservar tu tutoría <br />
+                    y aprovechar al máximo la plataforma:
+                  </p>
+                </div>
+                <div className="flex items-center justify-center">
+                  <div className="w-full h-[400px] bg-gray-100 rounded-lg flex items-center justify-center">
+                    <img 
+                      src="/buscando_zorro.png"
+                      alt="Buscando zorro"
+                      className="w-[700px] h-[700px] object-contain"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Card 3 - Asiste a tu tutoría */}
-            <div className="bg-white rounded-[20px] p-[30px] text-center shadow-lg border border-gray-100">
-              <div className="w-[60px] h-[60px] rounded-full flex items-center justify-center mx-auto mb-6"
-                style={{backgroundColor: '#87CEEB'}}
-              >
-                <span className="text-[24px] font-bold text-white">3</span>
+            {/* Snap Points 2-5 - Cada paso */}
+            {steps.map((step) => (
+              <div key={step.id} className="h-[80vh] flex items-center justify-center">
+                <div className="grid grid-cols-2 gap-[40px] items-center w-full">
+                  <div className="flex flex-col justify-center items-center text-center">
+                    <h2 className="text-[42px] font-bold mb-6 leading-tight" style={{color: '#294954'}}>
+                      Paso {step.id}<br />
+                      {step.title}
+                    </h2>
+                    <p className="text-[18px] py-[10px] px-[50px] leading-relaxed max-w-lg" style={{color: '#6B7280'}}>
+                      {step.description}
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-center">
+                    <div 
+                      className="rounded-[20px] p-[30px] text-center shadow-xl border border-gray-100 w-[350px] h-[450px]"
+                      style={{backgroundColor: step.color}}
+                    >
+                      <div 
+                        className="w-[60px] h-[60px] rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg"
+                        style={{backgroundColor: '#294954'}}
+                      >
+                        <span className="text-[24px] font-bold text-white">{step.id}</span>
+                      </div>
+                      <h3 className="text-[20px] font-bold mb-4" style={{color: '#294954'}}>
+                        {step.title}
+                      </h3>
+                      <p className="text-[14px] leading-relaxed mb-6" style={{color: '#294954'}}>
+                        {step.description}
+                      </p>
+                      <div 
+                        className="rounded-[15px] p-4 h-[120px] flex items-center justify-center"
+                        style={{backgroundColor: 'rgba(255, 255, 255, 0.3)'}}
+                      >
+                        <img 
+                          src={step.image}
+                          alt={step.title}
+                          className="w-[100px] h-[100px] object-contain"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <h3 className="text-[20px] font-bold mb-4" style={{color: '#294954'}}>
-                Asiste a tu tutoría
-              </h3>
-              <p className="text-[14px] leading-relaxed mb-6" style={{color: '#6B7280'}}>
-                Conéctate a la sesión en línea a través de la herramienta de videoconferencia que ofrece la plataforma.
-              </p>
-              <div className="bg-gray-50 rounded-[15px] p-4 h-[120px] flex items-center justify-center">
-                <img 
-                  src="/zorro_Turoria.png" 
-                  alt="Asistiendo a tutoría" 
-                  className="w-[150px] h-[150px] object-contain"
-                  style={{
-                    padding: '20px'
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Card 4 - Confirma tu asistencia */}
-            <div className="bg-white rounded-[20px] p-[30px] text-center shadow-lg border border-gray-100">
-              <div className="w-[60px] h-[60px] rounded-full flex items-center justify-center mx-auto mb-6"
-                style={{backgroundColor: '#DDA0DD'}}
-              >
-                <span className="text-[24px] font-bold text-white">4</span>
-              </div>
-              <h3 className="text-[20px] font-bold mb-4" style={{color: '#294954'}}>
-                Confirma tu asistencia
-              </h3>
-              <p className="text-[14px] leading-relaxed mb-6" style={{color: '#6B7280'}}>
-                Al finalizar la sesión, confirma tu participación directamente en la plataforma para llevar un registro de tus tutorías.
-              </p>
-              <div className="bg-gray-50 rounded-[15px] p-4 h-[120px] flex items-center justify-center">
-                <img 
-                  src="/zorro_confiormando.png" 
-                  alt="Confirmando asistencia" 
-                  className="w-[150px] h-[150px] object-contain"
-                />
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
-
-     
       {/* Sección de mejores docentes */}
       <section className="px-[20px] mb-[100px]" style={{backgroundColor: '#FAF9F5'}}>
-        <div className="max-w-[1200px] mx-auto">
+        <div className="max-w-[1000px] mx-auto">
           <div className="text-center mb-[60px]">
             <h2 className="text-[42px] font-bold mb-4" style={{color: '#294954'}}>
               Los Mejores Docentes
@@ -160,7 +176,8 @@ const Home: React.FC = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-3 gap-[50px]">
+          <div className="flex justify-center">
+            <div className="grid grid-cols-3 gap-[100px]">
             {[
               {
                 name: 'Prof. Carlos Mendoza',
@@ -190,13 +207,12 @@ const Home: React.FC = () => {
                 videoUrl: 'https://www.youtube.com/embed/yQhQnyhzC6s'
               }
             ].map((teacher, index) => (
-              <div key={index} className="group relative overflow-hidden transition-all duration-500 hover:transform hover:scale-[1.02] cursor-pointer h-[520px] flex flex-col" 
+              <div key={index} className="group relative overflow-hidden transition-all duration-500 hover:transform hover:scale-[1.02] cursor-pointer h-[320px] flex flex-col" 
                 style={{
                   backgroundColor: '#FFFFFF',
-                  borderRadius: '28px',
-                  boxShadow: '0 12px 40px rgba(41, 73, 84, 0.08), 0 4px 16px rgba(41, 73, 84, 0.04)',
-                  border: '2px solid rgba(104, 178, 201, 0.08)',
-                  backdropFilter: 'blur(10px)'
+                  borderRadius: '16px',
+                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+                  border: '1px solid rgba(0, 0, 0, 0.05)'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.boxShadow = '0 24px 64px rgba(41, 73, 84, 0.15), 0 8px 32px rgba(104, 178, 201, 0.1)';
@@ -210,9 +226,9 @@ const Home: React.FC = () => {
                 }}
               >
                 {/* Video del docente premium */}
-                <div className="h-[250px] relative overflow-hidden cursor-pointer" 
+                <div className="h-[140px] relative overflow-hidden cursor-pointer" 
                   style={{
-                    borderRadius: '28px 28px 0 0'
+                    borderRadius: '16px 16px 0 0'
                   }}
                   onClick={() => setPlayingVideo(playingVideo === index ? null : index)}
                 >
@@ -221,7 +237,7 @@ const Home: React.FC = () => {
                     <iframe
                       src={`${teacher.videoUrl}?autoplay=1&rel=0&modestbranding=1`}
                       className="w-full h-full"
-                      style={{borderRadius: '28px 28px 0 0'}}
+                      style={{borderRadius: '16px 16px 0 0'}}
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
                       title={`Video de ${teacher.name}`}
@@ -277,30 +293,30 @@ const Home: React.FC = () => {
                   )}
                 </div>
                 
-                {/* Información del docente premium */}
-<div className="p-10 flex-1 flex flex-col">
+                {/* Información del docente */}
+                <div className="p-4 flex-1 flex flex-col">
                   {/* Header con nombre y materia */}
-                  <div className="mb-4">
-                    <h3 className="text-lg font-bold mb-3 transition-colors duration-300 group-hover:text-opacity-80" 
-                      style={{color: '#294954', fontFamily: 'Inter, sans-serif', padding: '20px 10px 10px 10px'}}
+                  <div className="mb-2">
+                    <h3 className="text-xs font-bold mb-1 transition-colors duration-300 group-hover:text-opacity-80" 
+                      style={{color: '#294954', fontFamily: 'Inter, sans-serif', padding: '5px 5px 5px 5px'}}
                     >
                       {teacher.name}
                     </h3>
-                    <div className="flex items-center gap-2" style={{padding: '0 10px 10px 10px'}}>
+                    <div className="flex items-center gap-2" style={{padding: '0 5px 5px 5px'}}>
                       <div className="w-1 h-4 rounded-full" style={{backgroundColor: '#68B2C9'}}></div>
-                      <p className="text-sm font-semibold" style={{color: '#68B2C9'}}>
+                      <p className="text-[10px] font-semibold" style={{color: '#68B2C9'}}>
                         {teacher.subject}
                       </p>
                     </div>
                   </div>
                   
                   {/* Rating premium con animación */}
-                  <div className="flex items-center gap-3 mb-8 p-3 rounded-lg transition-all duration-300"
-                    style={{backgroundColor: 'rgba(250, 249, 245, 0.8)', padding: '0 10px 10px 10px'}}
+                  <div className="flex items-center gap-1 mb-2 transition-all duration-300"
+                    style={{padding: '0 5px 5px 5px'}}
                   >
                     <div className="flex items-center gap-1">
                       {[1,2,3,4,5].map((star) => (
-                        <span key={star} className="text-sm transition-all duration-300 hover:scale-125 cursor-pointer" 
+                        <span key={star} className="text-[10px] transition-all duration-300 hover:scale-125 cursor-pointer" 
                           style={{
                             color: star <= Math.floor(teacher.rating) ? '#FFDE97' : '#E5E7EB',
                             textShadow: star <= Math.floor(teacher.rating) ? '0 2px 4px rgba(255, 222, 151, 0.3)' : 'none',
@@ -312,19 +328,19 @@ const Home: React.FC = () => {
                       ))}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold" style={{color: '#294954'}}>
+                      <span className="text-[10px] font-bold" style={{color: '#294954'}}>
                         {teacher.rating}
                       </span>
                       <div className="w-1 h-1 rounded-full" style={{backgroundColor: '#68B2C9'}}></div>
-                      <span className="text-xs font-medium" style={{color: '#6B7280'}}>
+                      <span className="text-[8px] font-medium" style={{color: '#6B7280'}}>
                         {teacher.reviews} reseñas
                       </span>
                     </div>
                   </div>
                   
                   {/* Descripción con mejor tipografía */}
-                  <div className="flex-1 mb-8" style={{padding: '0 10px 10px 10px'}}>
-                    <p className="text-sm leading-relaxed text-justify" 
+                  <div className="flex-1 mb-2" style={{padding: '0 5px 5px 5px'}}>
+                    <p className="text-[10px] leading-relaxed text-justify" 
                       style={{
                         color: '#4B5563', 
                         lineHeight: '1.6',
@@ -346,7 +362,8 @@ const Home: React.FC = () => {
                     <div className="px-6 py-3 rounded-lg transition-all duration-300" 
                       style={{
                         backgroundColor: 'rgba(104, 178, 201, 0.08)',
-                        border: '1px solid rgba(104, 178, 201, 0.15)'
+                        border: '1px solid rgba(104, 178, 201, 0.15)',
+                        boxShadow: '0 4px 12px rgba(104, 178, 201, 0.25), 0 2px 6px rgba(0, 0, 0, 0.1)'
                       }}
                     >
                       <p className="text-base font-bold text-center" style={{color: '#294954'}}>
@@ -357,6 +374,7 @@ const Home: React.FC = () => {
                 </div>
               </div>
             ))}
+            </div>
           </div>
           
           {/* Botón Ver más centrado */}
@@ -392,150 +410,200 @@ const Home: React.FC = () => {
             <h3 className="text-[32px] font-bold mb-8 text-center text-white drop-shadow-lg">
               Preparatoria
             </h3>
-            <div className="relative group">
-              {/* Flecha Izquierda */}
-              <button 
-                onClick={() => {
-                  const container = document.querySelector('.preparatoria-scroll') as HTMLElement;
-                  if (container) {
-                    container.classList.add('scrolling');
-                    const currentTransform = container.style.transform || 'translateX(0px)';
-                    const currentX = parseInt(currentTransform.match(/-?\d+/)?.[0] || '0') || 0;
-                    const newX = Math.min(currentX + 330, 0);
-                    container.style.transform = `translateX(${newX}px)`;
-                    setTimeout(() => container.classList.remove('scrolling'), 800);
-                  }
-                }}
-                className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-16 h-16 rounded-full bg-white shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300 flex items-center justify-center border-2 border-sky-blue/20 hover:border-sky-blue/40">
-                <svg className="w-8 h-8" style={{color: '#68B2C9'}} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              
-              {/* Flecha Derecha */}
-              <button 
-                onClick={() => {
-                  const container = document.querySelector('.preparatoria-scroll') as HTMLElement;
-                  if (container) {
-                    container.classList.add('scrolling');
-                    const currentTransform = container.style.transform || 'translateX(0px)';
-                    const currentX = parseInt(currentTransform.match(/-?\d+/)?.[0] || '0') || 0;
-                    const newX = Math.max(currentX - 330, -990);
-                    container.style.transform = `translateX(${newX}px)`;
-                    setTimeout(() => container.classList.remove('scrolling'), 800);
-                  }
-                }}
-                className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-16 h-16 rounded-full bg-white shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300 flex items-center justify-center border-2 border-sky-blue/20 hover:border-sky-blue/40">
-                <svg className="w-8 h-8" style={{color: '#68B2C9'}} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-              
-              <div className="overflow-hidden transition-all duration-300" style={{padding: '20px 0'}}>
-                <div className="preparatoria-scroll scroll-container flex gap-[30px] py-8 px-16 transition-transform duration-500 ease-in-out" style={{minHeight: '320px'}}>
-                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[280px] flex-shrink-0 flex flex-col text-center cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
-                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mx-auto mb-8" style={{backgroundColor: '#A8E6CF'}}>
+            <div className="grid grid-cols-4 gap-[30px] justify-items-center" style={{padding: '20px 0'}}>
+              <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                <div className="flex items-center">
+                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#A8E6CF'}}>
                     <span className="text-[24px]">📊</span>
                   </div>
-                  <h4 className="text-[20px] font-bold mb-8" style={{color: '#294954'}}>Matemáticas</h4>
-                  <p className="text-[14px] leading-relaxed flex-1" style={{color: '#6B7280'}}>
-                    Sentar las bases con aritmética, geometría y álgebra básica para resolver problemas cotidianos.
-                  </p>
+                  <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                    <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Matemáticas</h4>
+                    <p className="text-[14px]" style={{color: '#6B7280'}}>1200 profesores</p>
+                  </div>
                 </div>
-                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[280px] flex-shrink-0 flex flex-col text-center cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
-                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mx-auto mb-8" style={{backgroundColor: '#8ED4BE'}}>
+                <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                  {'>'}
+                </div>
+              </div>
+              <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                <div className="flex items-center">
+                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#8ED4BE'}}>
                     <span className="text-[24px]">🧬</span>
                   </div>
-                  <h4 className="text-[20px] font-bold mb-8" style={{color: '#294954'}}>Biología</h4>
-                  <p className="text-[14px] leading-relaxed flex-1" style={{color: '#6B7280'}}>
-                    Conocer la estructura y funciones de los seres vivos, desde las células hasta los ecosistemas.
-                  </p>
+                  <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                    <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Biología</h4>
+                    <p className="text-[14px]" style={{color: '#6B7280'}}>850 profesores</p>
+                  </div>
                 </div>
-                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[280px] flex-shrink-0 flex flex-col text-center cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
-                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mx-auto mb-8" style={{backgroundColor: '#FFDE97'}}>
+                <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                  {'>'}
+                </div>
+              </div>
+              <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                <div className="flex items-center">
+                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#FFDE97'}}>
                     <span className="text-[24px]">🏛️</span>
                   </div>
-                  <h4 className="text-[20px] font-bold mb-8" style={{color: '#294954'}}>Historia</h4>
-                  <p className="text-[14px] leading-relaxed flex-1" style={{color: '#6B7280'}}>
-                    Comprender los procesos históricos más relevantes que han marcado el desarrollo de la sociedad.
-                  </p>
+                  <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                    <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Historia</h4>
+                    <p className="text-[14px]" style={{color: '#6B7280'}}>720 profesores</p>
+                  </div>
                 </div>
-                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[280px] flex-shrink-0 flex flex-col text-center cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
-                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mx-auto mb-8" style={{backgroundColor: '#FF9978'}}>
+                <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                  {'>'}
+                </div>
+              </div>
+              <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                <div className="flex items-center">
+                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#FF9978'}}>
                     <span className="text-[24px]">📚</span>
                   </div>
-                  <h4 className="text-[20px] font-bold mb-8" style={{color: '#294954'}}>Lengua y Literatura</h4>
-                  <p className="text-[14px] leading-relaxed flex-1" style={{color: '#6B7280'}}>
-                    Desarrollar habilidades de comunicación, lectura crítica y redacción mediante textos literarios.
-                  </p>
+                  <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                    <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Lengua y Literatura</h4>
+                    <p className="text-[14px]" style={{color: '#6B7280'}}>950 profesores</p>
+                  </div>
                 </div>
-                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[280px] flex-shrink-0 flex flex-col text-center cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
-                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mx-auto mb-8" style={{backgroundColor: '#68B2C9'}}>
+                <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                  {'>'}
+                </div>
+              </div>
+              <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                <div className="flex items-center">
+                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#68B2C9'}}>
                     <span className="text-[24px]">⚗️</span>
                   </div>
-                  <h4 className="text-[20px] font-bold mb-8" style={{color: '#294954'}}>Química</h4>
-                  <p className="text-[14px] leading-relaxed flex-1" style={{color: '#6B7280'}}>
-                    Introducirse en los principios de la materia, los elementos y las reacciones químicas básicas.
-                  </p>
+                  <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                    <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Química</h4>
+                    <p className="text-[14px]" style={{color: '#6B7280'}}>680 profesores</p>
+                  </div>
                 </div>
-                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[280px] flex-shrink-0 flex flex-col text-center cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
-                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mx-auto mb-8" style={{backgroundColor: '#294954'}}>
+                <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                  {'>'}
+                </div>
+              </div>
+              <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                <div className="flex items-center">
+                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#294954'}}>
                     <span className="text-[24px] text-white">🌍</span>
                   </div>
-                  <h4 className="text-[20px] font-bold mb-8" style={{color: '#294954'}}>Geografía</h4>
-                  <p className="text-[14px] leading-relaxed flex-1" style={{color: '#6B7280'}}>
-                    Analizar el espacio geográfico, los recursos naturales y la relación entre sociedad y entorno.
-                  </p>
+                  <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                    <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Geografía</h4>
+                    <p className="text-[14px]" style={{color: '#6B7280'}}>540 profesores</p>
+                  </div>
                 </div>
+                <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                  {'>'}
                 </div>
               </div>
-              {/* Progress Bar */}
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-white/30 rounded-full overflow-hidden">
-                <div className="h-full bg-white rounded-full transition-all duration-500" style={{width: '33%'}}></div>
+              <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                <div className="flex items-center">
+                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#294954'}}>
+                    <span className="text-[24px] text-white">🌍</span>
+                  </div>
+                  <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                    <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Geografía</h4>
+                    <p className="text-[14px]" style={{color: '#6B7280'}}>540 profesores</p>
+                  </div>
+                </div>
+                <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                  {'>'}
+                </div>
               </div>
-              
-              {/* Arrow Navigation */}
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex gap-4 items-center">
-                <img 
-                  onClick={() => {
-                    const container = document.querySelector('.preparatoria-scroll') as HTMLElement;
-                    if (container) {
-                      container.classList.add('scrolling');
-                      container.style.transform = `translateX(0px)`;
-                      setTimeout(() => container.classList.remove('scrolling'), 800);
-                    }
-                  }}
-                  src="/flecha_iz.png" 
-                  alt="Página 1" 
-                  className="cursor-pointer hover:scale-125 transition-transform duration-300" 
-                  style={{width: '20px', height: '20px'}} />
-                <img 
-                  onClick={() => {
-                    const container = document.querySelector('.preparatoria-scroll') as HTMLElement;
-                    if (container) {
-                      container.classList.add('scrolling');
-                      container.style.transform = `translateX(-330px)`;
-                      setTimeout(() => container.classList.remove('scrolling'), 800);
-                    }
-                  }}
-                  src="/flecha_cntro.png" 
-                  alt="Página 2" 
-                  className="cursor-pointer hover:scale-125 transition-transform duration-300" 
-                  style={{width: '20px', height: '20px'}} />
-                <img 
-                  onClick={() => {
-                    const container = document.querySelector('.preparatoria-scroll') as HTMLElement;
-                    if (container) {
-                      container.classList.add('scrolling');
-                      container.style.transform = `translateX(-660px)`;
-                      setTimeout(() => container.classList.remove('scrolling'), 800);
-                    }
-                  }}
-                  src="/fcha a la drechas.png" 
-                  alt="Página 3" 
-                  className="cursor-pointer hover:scale-125 transition-transform duration-300" 
-                  style={{width: '20px', height: '20px'}} />
+              <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                <div className="flex items-center">
+                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#294954'}}>
+                    <span className="text-[24px] text-white">🌍</span>
+                  </div>
+                  <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                    <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Geografía</h4>
+                    <p className="text-[14px]" style={{color: '#6B7280'}}>540 profesores</p>
+                  </div>
+                </div>
+                <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                  {'>'}
+                </div>
               </div>
+            </div>
+            
+            {/* Materias adicionales de Preparatoria */}
+            {showMorePreparatoria && (
+              <div className="grid grid-cols-4 gap-[30px] justify-items-center mb-6" style={{padding: '20px 0'}}>
+                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                  <div className="flex items-center">
+                    <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#FFB6C1'}}>
+                      <span className="text-[24px]">🎨</span>
+                    </div>
+                    <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                      <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Arte y Cultura</h4>
+                      <p className="text-[14px]" style={{color: '#6B7280'}}>420 profesores</p>
+                    </div>
+                  </div>
+                  <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                    {'>'}
+                  </div>
+                </div>
+                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                  <div className="flex items-center">
+                    <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#DDA0DD'}}>
+                      <span className="text-[24px]">🏃</span>
+                    </div>
+                    <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                      <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Educación Física</h4>
+                      <p className="text-[14px]" style={{color: '#6B7280'}}>380 profesores</p>
+                    </div>
+                  </div>
+                  <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                    {'>'}
+                  </div>
+                </div>
+                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                  <div className="flex items-center">
+                    <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#98FB98'}}>
+                      <span className="text-[24px]">🌱</span>
+                    </div>
+                    <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                      <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Ciencias Naturales</h4>
+                      <p className="text-[14px]" style={{color: '#6B7280'}}>590 profesores</p>
+                    </div>
+                  </div>
+                  <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                    {'>'}
+                  </div>
+                </div>
+                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                  <div className="flex items-center">
+                    <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#F0E68C'}}>
+                      <span className="text-[24px]">🌍</span>
+                    </div>
+                    <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                      <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Inglés</h4>
+                      <p className="text-[14px]" style={{color: '#6B7280'}}>820 profesores</p>
+                    </div>
+                  </div>
+                  <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                    {'>'}
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Botón Ver más/menos para Preparatoria */}
+            <div className="text-center">
+              <button 
+                onClick={() => setShowMorePreparatoria(!showMorePreparatoria)}
+                className="text-[18px] font-semibold tracking-[0.5px] transition-colors"
+                style={{
+                  backgroundColor: '#294954',
+                  color: '#FAF9F5',
+                  padding: '10px',
+                  borderRadius: '20px',
+                  border: '2px solid #294954'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1e3a42'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#294954'}
+              >
+                {showMorePreparatoria ? 'Ver menos' : 'Ver más materias'}
+              </button>
             </div>
           </div>
 
@@ -544,145 +612,172 @@ const Home: React.FC = () => {
             <h3 className="text-[32px] font-bold mb-8 text-center text-white drop-shadow-lg">
               Universidad
             </h3>
-            <div className="relative group">
-              {/* Flecha Izquierda */}
-              <button 
-                onClick={() => {
-                  const container = document.querySelector('.universidad-scroll') as HTMLElement;
-                  if (container) {
-                    container.classList.add('scrolling');
-                    const currentTransform = container.style.transform || 'translateX(0px)';
-                    const currentX = parseInt(currentTransform.match(/-?\d+/)?.[0] || '0') || 0;
-                    const newX = Math.min(currentX + 330, 0);
-                    container.style.transform = `translateX(${newX}px)`;
-                    setTimeout(() => container.classList.remove('scrolling'), 800);
-                  }
-                }}
-                className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-16 h-16 rounded-full bg-white shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300 flex items-center justify-center border-2 border-sky-blue/20 hover:border-sky-blue/40">
-                <svg className="w-8 h-8" style={{color: '#68B2C9'}} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              
-              {/* Flecha Derecha */}
-              <button 
-                onClick={() => {
-                  const container = document.querySelector('.universidad-scroll') as HTMLElement;
-                  if (container) {
-                    container.classList.add('scrolling');
-                    const currentTransform = container.style.transform || 'translateX(0px)';
-                    const currentX = parseInt(currentTransform.match(/-?\d+/)?.[0] || '0') || 0;
-                    const newX = Math.max(currentX - 330, -990);
-                    container.style.transform = `translateX(${newX}px)`;
-                    setTimeout(() => container.classList.remove('scrolling'), 800);
-                  }
-                }}
-                className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-16 h-16 rounded-full bg-white shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300 flex items-center justify-center border-2 border-sky-blue/20 hover:border-sky-blue/40">
-                <svg className="w-8 h-8" style={{color: '#68B2C9'}} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-              
-              <div className="overflow-hidden transition-all duration-300" style={{padding: '20px 0'}}>
-                <div className="universidad-scroll scroll-container flex gap-[30px] py-8 px-16 transition-transform duration-500 ease-in-out" style={{minHeight: '320px'}}>
-                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[280px] flex-shrink-0 flex flex-col text-center cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
-                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mx-auto mb-8" style={{backgroundColor: '#A8E6CF'}}>
+            <div className="grid grid-cols-4 gap-[30px] justify-items-center" style={{padding: '20px 0'}}>
+              <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                <div className="flex items-center">
+                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#A8E6CF'}}>
                     <span className="text-[24px]">📊</span>
                   </div>
-                  <h4 className="text-[20px] font-bold mb-8" style={{color: '#294954'}}>Cálculo y Estadística</h4>
-                  <p className="text-[14px] leading-relaxed flex-1" style={{color: '#6B7280'}}>
-                    Aplicación de herramientas matemáticas avanzadas para resolver problemas académicos y profesionales.
-                  </p>
+                  <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                    <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Cálculo y Estadística</h4>
+                    <p className="text-[14px]" style={{color: '#6B7280'}}>890 profesores</p>
+                  </div>
                 </div>
-                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[280px] flex-shrink-0 flex flex-col text-center cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
-                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mx-auto mb-8" style={{backgroundColor: '#FFDE97'}}>
+                <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                  {'>'}
+                </div>
+              </div>
+              <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                <div className="flex items-center">
+                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#FFDE97'}}>
                     <span className="text-[24px]">💰</span>
                   </div>
-                  <h4 className="text-[20px] font-bold mb-8" style={{color: '#294954'}}>Economía</h4>
-                  <p className="text-[14px] leading-relaxed flex-1" style={{color: '#6B7280'}}>
-                    Estudio del comportamiento de los mercados, oferta, demanda y políticas económicas.
-                  </p>
+                  <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                    <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Economía</h4>
+                    <p className="text-[14px]" style={{color: '#6B7280'}}>650 profesores</p>
+                  </div>
                 </div>
-                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[280px] flex-shrink-0 flex flex-col text-center cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
-                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mx-auto mb-8" style={{backgroundColor: '#294954'}}>
+                <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                  {'>'}
+                </div>
+              </div>
+              <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                <div className="flex items-center">
+                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#294954'}}>
                     <span className="text-[24px] text-white">⚖️</span>
                   </div>
-                  <h4 className="text-[20px] font-bold mb-8" style={{color: '#294954'}}>Derecho</h4>
-                  <p className="text-[14px] leading-relaxed flex-1" style={{color: '#6B7280'}}>
-                    Conocer las bases legales que rigen la sociedad y su aplicación en distintos contextos.
-                  </p>
+                  <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                    <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Derecho</h4>
+                    <p className="text-[14px]" style={{color: '#6B7280'}}>780 profesores</p>
+                  </div>
                 </div>
-                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[280px] flex-shrink-0 flex flex-col text-center cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
-                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mx-auto mb-8" style={{backgroundColor: '#68B2C9'}}>
+                <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                  {'>'}
+                </div>
+              </div>
+              <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                <div className="flex items-center">
+                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#68B2C9'}}>
                     <span className="text-[24px]">💻</span>
                   </div>
-                  <h4 className="text-[20px] font-bold mb-8" style={{color: '#294954'}}>Ingeniería de Software</h4>
-                  <p className="text-[14px] leading-relaxed flex-1" style={{color: '#6B7280'}}>
-                    Introducción al diseño, desarrollo y mantenimiento de sistemas y aplicaciones tecnológicas.
-                  </p>
+                  <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                    <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Ingeniería de Software</h4>
+                    <p className="text-[14px]" style={{color: '#6B7280'}}>1150 profesores</p>
+                  </div>
                 </div>
-                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[280px] flex-shrink-0 flex flex-col text-center cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
-                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mx-auto mb-8" style={{backgroundColor: '#FF9978'}}>
+                <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                  {'>'}
+                </div>
+              </div>
+              <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                <div className="flex items-center">
+                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#FF9978'}}>
                     <span className="text-[24px]">🧠</span>
                   </div>
-                  <h4 className="text-[20px] font-bold mb-8" style={{color: '#294954'}}>Psicología General</h4>
-                  <p className="text-[14px] leading-relaxed flex-1" style={{color: '#6B7280'}}>
-                    Estudio de la mente y la conducta humana desde diferentes enfoques teóricos.
-                  </p>
+                  <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                    <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Psicología General</h4>
+                    <p className="text-[14px]" style={{color: '#6B7280'}}>620 profesores</p>
+                  </div>
                 </div>
-                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[280px] flex-shrink-0 flex flex-col text-center cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
-                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mx-auto mb-8" style={{backgroundColor: '#8ED4BE'}}>
+                <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                  {'>'}
+                </div>
+              </div>
+              <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                <div className="flex items-center">
+                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#8ED4BE'}}>
                     <span className="text-[24px]">📢</span>
                   </div>
-                  <h4 className="text-[20px] font-bold mb-8" style={{color: '#294954'}}>Comunicación</h4>
-                  <p className="text-[14px] leading-relaxed flex-1" style={{color: '#6B7280'}}>
-                    Fortalecer las habilidades orales y escritas para la interacción profesional y académica.
-                  </p>
+                  <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                    <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Comunicación</h4>
+                    <p className="text-[14px]" style={{color: '#6B7280'}}>480 profesores</p>
+                  </div>
                 </div>
+                <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                  {'>'}
                 </div>
               </div>
-              {/* Arrow Navigation */}
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex gap-4 items-center">
-                <img 
-                  onClick={() => {
-                    const container = document.querySelector('.universidad-scroll') as HTMLElement;
-                    if (container) {
-                      container.classList.add('scrolling');
-                      container.style.transform = `translateX(0px)`;
-                      setTimeout(() => container.classList.remove('scrolling'), 800);
-                    }
-                  }}
-                  src="/flecha_iz.png" 
-                  alt="Página 1" 
-                  className="cursor-pointer hover:scale-125 transition-transform duration-300" 
-                  style={{width: '20px', height: '20px'}} />
-                <img 
-                  onClick={() => {
-                    const container = document.querySelector('.universidad-scroll') as HTMLElement;
-                    if (container) {
-                      container.classList.add('scrolling');
-                      container.style.transform = `translateX(-330px)`;
-                      setTimeout(() => container.classList.remove('scrolling'), 800);
-                    }
-                  }}
-                  src="/flecha_cntro.png" 
-                  alt="Página 2" 
-                  className="cursor-pointer hover:scale-125 transition-transform duration-300" 
-                  style={{width: '20px', height: '20px'}} />
-                <img 
-                  onClick={() => {
-                    const container = document.querySelector('.universidad-scroll') as HTMLElement;
-                    if (container) {
-                      container.classList.add('scrolling');
-                      container.style.transform = `translateX(-660px)`;
-                      setTimeout(() => container.classList.remove('scrolling'), 800);
-                    }
-                  }}
-                  src="/fcha a la drechas.png" 
-                  alt="Página 3" 
-                  className="cursor-pointer hover:scale-125 transition-transform duration-300" 
-                  style={{width: '20px', height: '20px'}} />
+            </div>
+            
+            {/* Materias adicionales de Universidad */}
+            {showMoreUniversidad && (
+              <div className="grid grid-cols-4 gap-[30px] justify-items-center mb-6" style={{padding: '20px 0'}}>
+                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                  <div className="flex items-center">
+                    <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#FFB6C1'}}>
+                      <span className="text-[24px]">🎭</span>
+                    </div>
+                    <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                      <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Arte y Diseño</h4>
+                      <p className="text-[14px]" style={{color: '#6B7280'}}>340 profesores</p>
+                    </div>
+                  </div>
+                  <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                    {'>'}
+                  </div>
+                </div>
+                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                  <div className="flex items-center">
+                    <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#DDA0DD'}}>
+                      <span className="text-[24px]">🏥</span>
+                    </div>
+                    <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                      <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Medicina</h4>
+                      <p className="text-[14px]" style={{color: '#6B7280'}}>920 profesores</p>
+                    </div>
+                  </div>
+                  <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                    {'>'}
+                  </div>
+                </div>
+                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                  <div className="flex items-center">
+                    <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#98FB98'}}>
+                      <span className="text-[24px]">🔬</span>
+                    </div>
+                    <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                      <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Ciencias Biológicas</h4>
+                      <p className="text-[14px]" style={{color: '#6B7280'}}>680 profesores</p>
+                    </div>
+                  </div>
+                  <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                    {'>'}
+                  </div>
+                </div>
+                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                  <div className="flex items-center">
+                    <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#F0E68C'}}>
+                      <span className="text-[24px]">🏗️</span>
+                    </div>
+                    <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                      <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Arquitectura</h4>
+                      <p className="text-[14px]" style={{color: '#6B7280'}}>450 profesores</p>
+                    </div>
+                  </div>
+                  <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                    {'>'}
+                  </div>
+                </div>
               </div>
+            )}
+            
+            {/* Botón Ver más/menos para Universidad */}
+            <div className="text-center">
+              <button 
+                onClick={() => setShowMoreUniversidad(!showMoreUniversidad)}
+                className="text-[18px] font-semibold tracking-[0.5px] transition-colors"
+                style={{
+                  backgroundColor: '#294954',
+                  color: '#FAF9F5',
+                  padding: '10px',
+                  borderRadius: '20px',
+                  border: '2px solid #294954'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1e3a42'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#294954'}
+              >
+                {showMoreUniversidad ? 'Ver menos' : 'Ver más materias'}
+              </button>
             </div>
           </div>
 
@@ -691,155 +786,186 @@ const Home: React.FC = () => {
             <h3 className="text-[32px] font-bold mb-8 text-center text-white drop-shadow-lg">
               Posgrado
             </h3>
-            <div className="relative group">
-              {/* Flecha Izquierda */}
-              <button 
-                onClick={() => {
-                  const container = document.querySelector('.posgrado-scroll') as HTMLElement;
-                  if (container) {
-                    container.classList.add('scrolling');
-                    const currentTransform = container.style.transform || 'translateX(0px)';
-                    const currentX = parseInt(currentTransform.match(/-?\d+/)?.[0] || '0') || 0;
-                    const newX = Math.min(currentX + 330, 0);
-                    container.style.transform = `translateX(${newX}px)`;
-                    setTimeout(() => container.classList.remove('scrolling'), 800);
-                  }
-                }}
-                className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-16 h-16 rounded-full bg-white shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300 flex items-center justify-center border-2 border-sky-blue/20 hover:border-sky-blue/40">
-                <svg className="w-8 h-8" style={{color: '#68B2C9'}} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              
-              {/* Flecha Derecha */}
-              <button 
-                onClick={() => {
-                  const container = document.querySelector('.posgrado-scroll') as HTMLElement;
-                  if (container) {
-                    container.classList.add('scrolling');
-                    const currentTransform = container.style.transform || 'translateX(0px)';
-                    const currentX = parseInt(currentTransform.match(/-?\d+/)?.[0] || '0') || 0;
-                    const newX = Math.max(currentX - 330, -990);
-                    container.style.transform = `translateX(${newX}px)`;
-                    setTimeout(() => container.classList.remove('scrolling'), 800);
-                  }
-                }}
-                className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-16 h-16 rounded-full bg-white shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300 flex items-center justify-center border-2 border-sky-blue/20 hover:border-sky-blue/40">
-                <svg className="w-8 h-8" style={{color: '#68B2C9'}} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-              
-              <div className="overflow-hidden transition-all duration-300" style={{padding: '20px 0'}}>
-                <div className="posgrado-scroll scroll-container flex gap-[30px] py-8 px-16 transition-transform duration-500 ease-in-out" style={{minHeight: '320px'}}>
-                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[280px] flex-shrink-0 flex flex-col text-center cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
-                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mx-auto mb-8" style={{backgroundColor: '#A8E6CF'}}>
+            <div className="grid grid-cols-4 gap-[30px] justify-items-center" style={{padding: '20px 0'}}>
+              <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                <div className="flex items-center">
+                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#A8E6CF'}}>
                     <span className="text-[24px]">🔍</span>
                   </div>
-                  <h4 className="text-[20px] font-bold mb-8" style={{color: '#294954'}}>Metodología de la Investigación</h4>
-                  <p className="text-[14px] leading-relaxed flex-1" style={{color: '#6B7280'}}>
-                    Desarrollo de proyectos académicos y científicos con rigor metodológico.
-                  </p>
+                  <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                    <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Metodología de la Investigación</h4>
+                    <p className="text-[14px]" style={{color: '#6B7280'}}>320 profesores</p>
+                  </div>
                 </div>
-                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[280px] flex-shrink-0 flex flex-col text-center cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
-                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mx-auto mb-8" style={{backgroundColor: '#2ECC71'}}>
+                <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                  {'>'}
+                </div>
+              </div>
+              <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                <div className="flex items-center">
+                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#2ECC71'}}>
                     <span className="text-[24px]">🏥</span>
                   </div>
-                  <h4 className="text-[20px] font-bold mb-8" style={{color: '#294954'}}>Medicina Especializada</h4>
-                  <p className="text-[14px] leading-relaxed flex-1" style={{color: '#6B7280'}}>
-                    Especialización médica en diversas áreas clínicas y de investigación biomédica.
-                  </p>
+                  <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                    <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Medicina Especializada</h4>
+                    <p className="text-[14px]" style={{color: '#6B7280'}}>450 profesores</p>
+                  </div>
                 </div>
-                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[280px] flex-shrink-0 flex flex-col text-center cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
-                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mx-auto mb-8" style={{backgroundColor: '#FF6B6B'}}>
+                <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                  {'>'}
+                </div>
+              </div>
+              <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                <div className="flex items-center">
+                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#FF6B6B'}}>
                     <span className="text-[24px]">🔬</span>
                   </div>
-                  <h4 className="text-[20px] font-bold mb-8" style={{color: '#294954'}}>Investigación Avanzada</h4>
-                  <p className="text-[14px] leading-relaxed flex-1" style={{color: '#6B7280'}}>
-                    Metodologías de investigación científica y desarrollo de proyectos de alto impacto.
-                  </p>
+                  <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                    <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Investigación Avanzada</h4>
+                    <p className="text-[14px]" style={{color: '#6B7280'}}>280 profesores</p>
+                  </div>
                 </div>
-                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[280px] flex-shrink-0 flex flex-col text-center cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
-                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mx-auto mb-8" style={{backgroundColor: '#68B2C9'}}>
+                <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                  {'>'}
+                </div>
+              </div>
+              <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                <div className="flex items-center">
+                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#68B2C9'}}>
                     <span className="text-[24px]">📊</span>
                   </div>
-                  <h4 className="text-[20px] font-bold mb-8" style={{color: '#294954'}}>Análisis de Datos Avanzado</h4>
-                  <p className="text-[14px] leading-relaxed flex-1" style={{color: '#6B7280'}}>
-                    Uso de estadística, programación y modelos predictivos para la innovación e investigación.
-                  </p>
+                  <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                    <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Análisis de Datos Avanzado</h4>
+                    <p className="text-[14px]" style={{color: '#6B7280'}}>380 profesores</p>
+                  </div>
                 </div>
-                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[280px] flex-shrink-0 flex flex-col text-center cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
-                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mx-auto mb-8" style={{backgroundColor: '#FF9978'}}>
+                <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                  {'>'}
+                </div>
+              </div>
+              <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                <div className="flex items-center">
+                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#FF9978'}}>
                     <span className="text-[24px]">🏦</span>
                   </div>
-                  <h4 className="text-[20px] font-bold mb-8" style={{color: '#294954'}}>Políticas Públicas</h4>
-                  <p className="text-[14px] leading-relaxed flex-1" style={{color: '#6B7280'}}>
-                    Estudio y diseño de estrategias para la toma de decisiones a nivel social y gubernamental.
-                  </p>
-                </div>
-                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[280px] flex-shrink-0 flex flex-col text-center cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
-                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mx-auto mb-8" style={{backgroundColor: '#294954'}}>
-                    <span className="text-[24px] text-white">💹</span>
+                  <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                    <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Políticas Públicas</h4>
+                    <p className="text-[14px]" style={{color: '#6B7280'}}>220 profesores</p>
                   </div>
-                  <h4 className="text-[20px] font-bold mb-8" style={{color: '#294954'}}>Finanzas Corporativas</h4>
-                  <p className="text-[14px] leading-relaxed flex-1" style={{color: '#6B7280'}}>
-                    Enfoque en la gestión estratégica de recursos financieros en organizaciones y empresas.
-                  </p>
                 </div>
-                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[280px] flex-shrink-0 flex flex-col text-center cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
-                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mx-auto mb-8" style={{backgroundColor: '#9B59B6'}}>
+                <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                  {'>'}
+                </div>
+              </div>
+              <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                <div className="flex items-center">
+                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#294954'}}>
+                    <span className="text-[24px] text-white">📈</span>
+                  </div>
+                  <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                    <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Finanzas Corporativas</h4>
+                    <p className="text-[14px]" style={{color: '#6B7280'}}>340 profesores</p>
+                  </div>
+                </div>
+                <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                  {'>'}
+                </div>
+              </div>
+              <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                <div className="flex items-center">
+                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#9B59B6'}}>
                     <span className="text-[24px] text-white">📚</span>
                   </div>
-                  <h4 className="text-[20px] font-bold mb-8" style={{color: '#294954'}}>Doctorado en Educación</h4>
-                  <p className="text-[14px] leading-relaxed flex-1" style={{color: '#6B7280'}}>
-                    Formación especializada en pedagogía avanzada y liderazgo educativo.
-                  </p>
+                  <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                    <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Doctorado en Educación</h4>
+                    <p className="text-[14px]" style={{color: '#6B7280'}}>180 profesores</p>
+                  </div>
                 </div>
+                <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                  {'>'}
                 </div>
               </div>
-              
-              {/* Arrow Navigation */}
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex gap-4 items-center">
-                <img 
-                  onClick={() => {
-                    const container = document.querySelector('.posgrado-scroll') as HTMLElement;
-                    if (container) {
-                      container.classList.add('scrolling');
-                      container.style.transform = `translateX(0px)`;
-                      setTimeout(() => container.classList.remove('scrolling'), 800);
-                    }
-                  }}
-                  src="/flecha_iz.png" 
-                  alt="Página 1" 
-                  className="cursor-pointer hover:scale-125 transition-transform duration-300" 
-                  style={{width: '20px', height: '20px'}} />
-                <img 
-                  onClick={() => {
-                    const container = document.querySelector('.posgrado-scroll') as HTMLElement;
-                    if (container) {
-                      container.classList.add('scrolling');
-                      container.style.transform = `translateX(-330px)`;
-                      setTimeout(() => container.classList.remove('scrolling'), 800);
-                    }
-                  }}
-                  src="/flecha_cntro.png" 
-                  alt="Página 2" 
-                  className="cursor-pointer hover:scale-125 transition-transform duration-300" 
-                  style={{width: '20px', height: '20px'}} />
-                <img 
-                  onClick={() => {
-                    const container = document.querySelector('.posgrado-scroll') as HTMLElement;
-                    if (container) {
-                      container.classList.add('scrolling');
-                      container.style.transform = `translateX(-660px)`;
-                      setTimeout(() => container.classList.remove('scrolling'), 800);
-                    }
-                  }}
-                  src="/fcha a la drechas.png" 
-                  alt="Página 3" 
-                  className="cursor-pointer hover:scale-125 transition-transform duration-300" 
-                  style={{width: '20px', height: '20px'}} />
+            </div>
+            
+            {/* Materias adicionales de Posgrado */}
+            {showMorePosgrado && (
+              <div className="grid grid-cols-4 gap-[30px] justify-items-center mb-6" style={{padding: '20px 0'}}>
+                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                  <div className="flex items-center">
+                    <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#FFB6C1'}}>
+                      <span className="text-[24px]">🎓</span>
+                    </div>
+                    <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                      <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Doctorado en Filosofía</h4>
+                      <p className="text-[14px]" style={{color: '#6B7280'}}>120 profesores</p>
+                    </div>
+                  </div>
+                  <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                    {'>'}
+                  </div>
+                </div>
+                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                  <div className="flex items-center">
+                    <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#DDA0DD'}}>
+                      <span className="text-[24px]">🧪</span>
+                    </div>
+                    <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                      <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Biotecnología Avanzada</h4>
+                      <p className="text-[14px]" style={{color: '#6B7280'}}>95 profesores</p>
+                    </div>
+                  </div>
+                  <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                    {'>'}
+                  </div>
+                </div>
+                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                  <div className="flex items-center">
+                    <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#98FB98'}}>
+                      <span className="text-[24px]">🌐</span>
+                    </div>
+                    <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                      <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Relaciones Internacionales</h4>
+                      <p className="text-[14px]" style={{color: '#6B7280'}}>160 profesores</p>
+                    </div>
+                  </div>
+                  <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                    {'>'}
+                  </div>
+                </div>
+                <div className="rounded-[20px] p-[30px] shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-[280px] h-[100px] flex items-center justify-between cursor-pointer border-2 border-pastel-yellow" style={{backgroundColor: '#FAF9F5'}}>
+                  <div className="flex items-center">
+                    <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#F0E68C'}}>
+                      <span className="text-[24px]">🤖</span>
+                    </div>
+                    <div className="flex flex-col" style={{padding: '0 0 0 20px'}}>
+                      <h4 className="text-[20px] font-bold mb-1" style={{color: '#294954'}}>Inteligencia Artificial</h4>
+                      <p className="text-[14px]" style={{color: '#6B7280'}}>240 profesores</p>
+                    </div>
+                  </div>
+                  <div className="text-[32px] font-bold" style={{color: '#294954'}}>
+                    {'>'}
+                  </div>
+                </div>
               </div>
+            )}
+            
+            {/* Botón Ver más/menos para Posgrado */}
+            <div className="text-center">
+              <button 
+                onClick={() => setShowMorePosgrado(!showMorePosgrado)}
+                className="text-[18px] font-semibold tracking-[0.5px] transition-colors"
+                style={{
+                  backgroundColor: '#294954',
+                  color: '#FAF9F5',
+                  padding: '10px',
+                  borderRadius: '20px',
+                  border: '2px solid #294954'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1e3a42'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#294954'}
+              >
+                {showMorePosgrado ? 'Ver menos' : 'Ver más materias'}
+              </button>
             </div>
           </div>
         </div>
@@ -848,9 +974,9 @@ const Home: React.FC = () => {
  {/* Sección Quiero ser docente */}
  <section className="py-[30px] px-[50px] bg-soft-white">
         <div className="max-w-[1200px] mx-auto">
-          <div className="flex items-center gap-[20px]">
+          <div className="flex items-center gap-[10px]">
             {/* Imagen del zorro docente a la izquierda */}
-            <div className="flex-shrink-0 -ml-[100px] overflow-hidden rounded-[20px]">
+            <div className="flex-shrink-0 -ml-[50px] overflow-hidden rounded-[20px]">
               <img 
                 src="/zorro_docnte_.png" 
                 alt="Zorro docente" 
@@ -860,7 +986,7 @@ const Home: React.FC = () => {
             </div>
             
             {/* Contenido de texto a la derecha en card */}
-            <div className="flex-1">
+            <div className="flex-1 ">
               <div className="rounded-[20px] p-[40px] shadow-2xl hover:shadow-3xl transition-all duration-500 w-[500px] h-[600px]" style={{backgroundColor: '#8ED4BE', border: '2px solid #8ED4BE', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'}}>
                 <h2 className="text-[72px] font-bold" style={{color: '#294954', padding: '0 0 20px 0'}}>
                   Conviértete en profesor
@@ -907,6 +1033,69 @@ const Home: React.FC = () => {
         </div>
       </section>
 
+      {/* Sección Conviértete en estudiante */}
+      <section className="py-[80px] px-[50px] bg-soft-white">
+        <div className="max-w-[1200px] mx-auto">
+          <div className="flex items-center gap-[10px]">
+            {/* Contenido de texto a la izquierda en card */}
+            <div className="flex-1 " style={{padding: '0 0 0 120px'}}>
+              <div className="rounded-[20px] p-[40px] shadow-2xl hover:shadow-3xl transition-all duration-500 w-[500px] h-[600px]" style={{backgroundColor: '#FFD97D', border: '2px solid #FFD97D', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'}}>
+                <h2 className="text-[72px] font-bold" style={{color: '#294954', padding: '0 0 20px 0'}}>
+                  Conviértete en estudiante
+                </h2>
+                <p className="text-[18px] leading-relaxed" style={{color: '#294954', padding: '0 0 20px 0'}}>
+                  Aprende nuevas habilidades y mejora tus conocimientos con la ayuda de tutores en línea. 
+                  Regístrate y empieza a recibir clases personalizadas en Preply.
+                </p>
+                
+                {/* Lista de beneficios */}
+                <ul className="space-y-3" style={{padding: '0 0 40px 0'}}>
+                  <li className="text-[16px]" style={{color: '#294954'}}>
+                    <strong>Encuentra profesores expertos</strong>
+                  </li>
+                  <li className="text-[16px]" style={{color: '#294954'}}>
+                    <strong>Aprende a tu propio ritmo</strong>
+                  </li>
+                  <li className="text-[16px]" style={{color: '#294954'}}>
+                    <strong>Usa la herramienta de videoconferencia integrada</strong>
+                  </li>
+                  <li className="text-[16px]" style={{color: '#294954'}}>
+                    <strong>Paga de forma segura y sin riesgos</strong>
+                  </li>
+                </ul>
+
+                {/* Botón Ver más centrado */}
+                <div className="text-center">
+                  <button 
+                    onClick={() => window.location.href = '/estudiante'}
+                    className="text-[18px] font-semibold tracking-[0.5px] transition-colors" 
+                    style={{
+                      backgroundColor: '#294954', 
+                      color: '#FAF9F5', 
+                      padding: '12px 24px', 
+                      borderRadius: '20px', 
+                      border: '2px solid #294954'
+                    }} 
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1e3a42'} 
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#294954'}>
+                    Ver más
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            {/* Imagen del zorro estudiante a la derecha */}
+            <div className="flex-shrink-0 -mr-[50px] overflow-hidden rounded-[20px]">
+              <img 
+                src="/buscando_zorro.png" 
+                alt="Zorro estudiante" 
+                className="w-[600px] h-[600px] object-cover scale-150"
+                style={{objectPosition: 'center'}}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
 
       <Footer />
     </div>

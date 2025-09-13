@@ -112,8 +112,9 @@ const Header: React.FC = () => {
           {/* Navigation Menu */}
           <nav className="flex items-center space-x-12">
             <NavItem to="/" label="Inicio" />
-            <NavItem to="/ser-docente" label="¿Ser docente?" />
-            <NavItem to="/sobre-nosotros" label="Sobre nosotros" />
+            <NavItem to="/be-teacher" label="¿Ser docente?" />
+            <NavItem to="/teachers" label="Tutores" />
+            <NavItem to="/about-us" label="Sobre nosotros" />
           </nav>
 
           {/* Perfil Dropdown */}
@@ -143,26 +144,30 @@ const Header: React.FC = () => {
                 }}
               >
                 <div className="py-2">
-                  <button
-                    className="w-full text-left px-4 py-2 text-sm transition-colors duration-200 hover:bg-gray-50"
+                  <Link
+                    to="/login"
+                    className="w-full text-left px-4 py-2 text-sm transition-colors duration-200 hover:bg-gray-50 block"
                     style={{
                       color: '#294954',
-                      fontFamily: 'Roboto, sans-serif'
+                      fontFamily: 'Roboto, sans-serif',
+                      textDecoration: 'none'
                     }}
                     onClick={() => setIsProfileOpen(false)}
                   >
                     Iniciar sesión
-                  </button>
-                  <button
-                    className="w-full text-left px-4 py-2 text-sm transition-colors duration-200 hover:bg-gray-50"
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="w-full text-left px-4 py-2 text-sm transition-colors duration-200 hover:bg-gray-50 block"
                     style={{
                       color: '#294954',
-                      fontFamily: 'Roboto, sans-serif'
+                      fontFamily: 'Roboto, sans-serif',
+                      textDecoration: 'none'
                     }}
                     onClick={() => setIsProfileOpen(false)}
                   >
                     Registrarse
-                  </button>
+                  </Link>
                 </div>
               </div>
             )}
@@ -186,9 +191,9 @@ const Header: React.FC = () => {
           <div className="fixed top-24 left-4 right-4 bg-[#FAF9F5]/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-[#68B2C9]/20 p-8">
             <nav className="flex flex-col space-y-6 font-['Roboto']">
               <NavItem to="/" label="Inicio" onClick={() => setIsMenuOpen(false)} mobile />
-              <NavItem to="/ver-mas" label="Tutores" onClick={() => setIsMenuOpen(false)} mobile />
-              <NavItem to="/sobre-nosotros" label="Sobre nosotros" onClick={() => setIsMenuOpen(false)} mobile />
-              <NavItem to="/ser-docente" label="¿Ser docente?" onClick={() => setIsMenuOpen(false)} mobile />
+              <NavItem to="/teachers" label="Tutores" onClick={() => setIsMenuOpen(false)} mobile />
+              <NavItem to="/about-us" label="Sobre nosotros" onClick={() => setIsMenuOpen(false)} mobile />
+              <NavItem to="/be-teacher" label="¿Ser docente?" onClick={() => setIsMenuOpen(false)} mobile />
               
               <div className="pt-6 border-t border-[#68B2C9]/20">
                 <button className="w-full bg-[#68B2C9] text-[#FAF9F5] rounded-2xl px-6 py-4 text-base font-medium shadow-lg hover:bg-[#294954] hover:shadow-xl transition-all duration-300 font-['Roboto']">

@@ -114,6 +114,7 @@ const Header: React.FC = () => {
             <NavItem to="/" label="Inicio" />
             <NavItem to="/ser-docente" label="¿Ser docente?" />
             <NavItem to="/sobre-nosotros" label="Sobre nosotros" />
+            <NavItem to="/register" label="Registrate" />
           </nav>
 
           {/* Perfil Dropdown */}

@@ -113,7 +113,7 @@ const Header: React.FC = () => {
           <nav className="flex items-center space-x-12">
             <NavItem to="/" label="Inicio" />
             <NavItem to="/ser-docente" label="¿Ser docente?" />
-            <NavItem to="/sobre-nosotros" label="Sobre nosotros" />
+            <NavItem to="/about-us" label="Sobre nosotros" />
             <NavItem to="/register" label="Registrate" />
           </nav>
 

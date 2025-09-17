@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Home from '../pages/home/Home';
+import HomeRol from '../pages/HomeRol';
 import AllTeachers from '../pages/teachers/AllTeachers';
 import AboutUs from '../pages/about-us/AboutUs';
 import BeTeacher from '../pages/teachers/BeTeacher';
@@ -10,6 +11,10 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <Home />,
+  },
+  {
+    path: '/home-rol',
+    element: <HomeRol />,
   },
   {
     path: '/teachers',

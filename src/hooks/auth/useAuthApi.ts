@@ -6,8 +6,13 @@ import type {
   LoginResponse 
 } from '../../context/auth/types';
 
-// API configuration
-const API_BASE_URL = '/api';
+// API configuration from environment
+const envApiUrl = (import.meta as any).env?.VITE_API_URL as string | undefined;
+const API_BASE_URL = envApiUrl && envApiUrl.trim().length > 0 ? envApiUrl : '/api';
+if (!envApiUrl) {
+  // eslint-disable-next-line no-console
+  console.warn('[AuthAPI] VITE_API_URL no está definido. Usando fallback \'/api\'. Configura tu .env a partir de .envExample');
+}
 
 // Custom hook for authentication API calls
 export const useAuthApi = () => {

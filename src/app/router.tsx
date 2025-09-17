@@ -33,23 +33,6 @@ const router = createBrowserRouter([
     path: '/register',
     element: <Register />,
   },
-  {
-    path: '/register',
-    element: <Register />,
-  },
-  // Mantener rutas individuales para compatibilidad
-  {
-    path: '/register/student',
-    element: <RegisterStudent />,
-  },
-  {
-    path: '/register/teacher',
-    element: <RegisterTeacher />,
-  },
-  {
-    path: '/register',
-    element: <Register />,
-  },
   // Mantener rutas individuales para compatibilidad
   {
     path: '/register/student',

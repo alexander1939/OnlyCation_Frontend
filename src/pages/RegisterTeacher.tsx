@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import RegisterForm from '../components/RegisterForm';
-import { authService } from '../services/authService';
+import { useAuthContext } from '../context/auth';
 
 interface RegisterFormData {
   first_name: string;
@@ -18,12 +18,13 @@ interface RegisterFormData {
   curriculum?: File | null;
 }
 
-const RegisterTeacher: React.FC = () => {
+export default function RegisterTeacher() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [registeredUser, setRegisteredUser] = useState<any>(null);
   const navigate = useNavigate();
+  const { registerTeacher } = useAuthContext();
 
   const handleSubmit = async (formData: RegisterFormData) => {
     setIsLoading(true);
@@ -33,10 +34,10 @@ const RegisterTeacher: React.FC = () => {
       // Paso 1: Registrar usuario básico
       const { confirmPassword, rfc, expertise_area, certificate, curriculum, ...registerData } = formData;
       
-      const response = await authService.registerTeacher(registerData);
+      const response = await registerTeacher(registerData);
       
       if (response.success) {
-        setRegisteredUser(response.data);
+        setRegisteredUser({ email: registerData.email, first_name: registerData.first_name, last_name: registerData.last_name });
         
         // Paso 2: Si hay documentos, subirlos (esto requeriría login primero)
         // Por ahora, solo mostramos éxito con información sobre el proceso
@@ -358,5 +359,3 @@ const RegisterTeacher: React.FC = () => {
     </div>
   );
 };
-
-export default RegisterTeacher;

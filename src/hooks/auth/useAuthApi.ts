@@ -1,50 +1,17 @@
-// Servicio para manejar la autenticación con el backend OnlyCation APIs
-const API_BASE_URL = '/api'; // Usar proxy de Vite para evitar CORS
+import { useCallback } from 'react';
+import type { 
+  RegisterRequest, 
+  RegisterResponse, 
+  LoginRequest, 
+  LoginResponse 
+} from '../../context/auth/types';
 
-export interface RegisterRequest {
-  first_name: string;
-  last_name: string;
-  email: string;
-  password: string;
-  privacy_policy_accepted: boolean;
-}
+// API configuration
+const API_BASE_URL = '/api';
 
-export interface RegisterResponse {
-  success: boolean;
-  message: string;
-  data: {
-    first_name: string;
-    last_name: string;
-    email: string;
-  };
-}
-
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface LoginResponse {
-  success: boolean;
-  message: string;
-  data: {
-    access_token: string;
-    refresh_token: string;
-    token_type: string;
-    email: string;
-    first_name: string;
-    last_name: string;
-    role: string;
-  };
-}
-
-export interface ApiError {
-  detail: string;
-  status_code: number;
-}
-
-class AuthService {
-  private getHeaders(includeAuth: boolean = false): HeadersInit {
+// Custom hook for authentication API calls
+export const useAuthApi = () => {
+  const getHeaders = useCallback((includeAuth: boolean = false): HeadersInit => {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
@@ -57,9 +24,9 @@ class AuthService {
     }
 
     return headers;
-  }
+  }, []);
 
-  private async handleResponse<T>(response: Response): Promise<T> {
+  const handleResponse = useCallback(async <T>(response: Response): Promise<T> => {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ 
         detail: 'Error de conexión con el servidor',
@@ -69,42 +36,42 @@ class AuthService {
     }
 
     return response.json();
-  }
+  }, []);
 
-  // Registro de estudiante
-  async registerStudent(userData: RegisterRequest): Promise<RegisterResponse> {
+  // Register student API call
+  const registerStudent = useCallback(async (userData: RegisterRequest): Promise<RegisterResponse> => {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/register/student/`, {
         method: 'POST',
-        headers: this.getHeaders(),
+        headers: getHeaders(),
         body: JSON.stringify(userData),
       });
 
-      return this.handleResponse<RegisterResponse>(response);
+      return handleResponse<RegisterResponse>(response);
     } catch (error) {
       console.error('Error registering student:', error);
       throw error;
     }
-  }
+  }, [getHeaders, handleResponse]);
 
-  // Registro de docente
-  async registerTeacher(userData: RegisterRequest): Promise<RegisterResponse> {
+  // Register teacher API call
+  const registerTeacher = useCallback(async (userData: RegisterRequest): Promise<RegisterResponse> => {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/register/teacher/`, {
         method: 'POST',
-        headers: this.getHeaders(),
+        headers: getHeaders(),
         body: JSON.stringify(userData),
       });
 
-      return this.handleResponse<RegisterResponse>(response);
+      return handleResponse<RegisterResponse>(response);
     } catch (error) {
       console.error('Error registering teacher:', error);
       throw error;
     }
-  }
+  }, [getHeaders, handleResponse]);
 
-  // Subir documentos de docente (separado del registro inicial)
-  async uploadTeacherDocuments(formData: FormData): Promise<any> {
+  // Upload teacher documents API call
+  const uploadTeacherDocuments = useCallback(async (formData: FormData): Promise<any> => {
     try {
       const response = await fetch(`${API_BASE_URL}/teachers/documents/`, {
         method: 'POST',
@@ -115,23 +82,23 @@ class AuthService {
         body: formData,
       });
 
-      return this.handleResponse(response);
+      return handleResponse(response);
     } catch (error) {
       console.error('Error uploading teacher documents:', error);
       throw error;
     }
-  }
+  }, [handleResponse]);
 
-  // Login
-  async login(credentials: LoginRequest): Promise<LoginResponse> {
+  // Login API call
+  const login = useCallback(async (credentials: LoginRequest): Promise<LoginResponse> => {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/login/`, {
         method: 'POST',
-        headers: this.getHeaders(),
+        headers: getHeaders(),
         body: JSON.stringify(credentials),
       });
 
-      const result = await this.handleResponse<LoginResponse>(response);
+      const result = await handleResponse<LoginResponse>(response);
       
       // Guardar tokens en localStorage
       if (result.success && result.data) {
@@ -147,16 +114,16 @@ class AuthService {
       console.error('Error during login:', error);
       throw error;
     }
-  }
+  }, [getHeaders, handleResponse]);
 
-  // Logout
-  async logout(): Promise<void> {
+  // Logout API call
+  const logout = useCallback(async (): Promise<void> => {
     try {
       const email = localStorage.getItem('user_email');
       if (email) {
         await fetch(`${API_BASE_URL}/auth/logout/`, {
           method: 'POST',
-          headers: this.getHeaders(true),
+          headers: getHeaders(true),
           body: JSON.stringify({ email }),
         });
       }
@@ -170,23 +137,23 @@ class AuthService {
       localStorage.removeItem('user_role');
       localStorage.removeItem('user_name');
     }
-  }
+  }, [getHeaders]);
 
-  // Refresh token
-  async refreshToken(): Promise<string | null> {
+  // Refresh token API call
+  const refreshToken = useCallback(async (): Promise<string | null> => {
     try {
-      const refreshToken = localStorage.getItem('refresh_token');
-      if (!refreshToken) {
+      const refreshTokenValue = localStorage.getItem('refresh_token');
+      if (!refreshTokenValue) {
         throw new Error('No refresh token available');
       }
 
       const response = await fetch(`${API_BASE_URL}/auth/refresh-token/`, {
         method: 'POST',
-        headers: this.getHeaders(),
-        body: JSON.stringify({ token: refreshToken }),
+        headers: getHeaders(),
+        body: JSON.stringify({ token: refreshTokenValue }),
       });
 
-      const result = await this.handleResponse<{
+      const result = await handleResponse<{
         success: boolean;
         data: { access_token: string; token_type: string };
       }>(response);
@@ -200,55 +167,33 @@ class AuthService {
     } catch (error) {
       console.error('Error refreshing token:', error);
       // Si falla el refresh, limpiar tokens
-      this.logout();
+      await logout();
       return null;
     }
-  }
+  }, [getHeaders, handleResponse, logout]);
 
-  // Verificar si el usuario está autenticado
-  isAuthenticated(): boolean {
-    return !!localStorage.getItem('access_token');
-  }
-
-  // Obtener información del usuario actual
-  getCurrentUser(): {
-    email: string;
-    name: string;
-    role: string;
-  } | null {
-    const email = localStorage.getItem('user_email');
-    const name = localStorage.getItem('user_name');
-    const role = localStorage.getItem('user_role');
-
-    if (email && name && role) {
-      return { email, name, role };
-    }
-
-    return null;
-  }
-
-  // Solicitar reset de contraseña
-  async requestPasswordReset(email: string): Promise<any> {
+  // Request password reset API call
+  const requestPasswordReset = useCallback(async (email: string): Promise<any> => {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/password-reset/request`, {
         method: 'POST',
-        headers: this.getHeaders(),
+        headers: getHeaders(),
         body: JSON.stringify({ email }),
       });
 
-      return this.handleResponse(response);
+      return handleResponse(response);
     } catch (error) {
       console.error('Error requesting password reset:', error);
       throw error;
     }
-  }
+  }, [getHeaders, handleResponse]);
 
-  // Verificar código de reset de contraseña
-  async verifyPasswordReset(email: string, code: string, newPassword: string): Promise<any> {
+  // Verify password reset API call
+  const verifyPasswordReset = useCallback(async (email: string, code: string, newPassword: string): Promise<any> => {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/password-reset/verify`, {
         method: 'POST',
-        headers: this.getHeaders(),
+        headers: getHeaders(),
         body: JSON.stringify({
           email,
           code,
@@ -256,14 +201,21 @@ class AuthService {
         }),
       });
 
-      return this.handleResponse(response);
+      return handleResponse(response);
     } catch (error) {
       console.error('Error verifying password reset:', error);
       throw error;
     }
-  }
-}
+  }, [getHeaders, handleResponse]);
 
-// Exportar instancia singleton
-export const authService = new AuthService();
-export default authService;
+  return {
+    registerStudent,
+    registerTeacher,
+    uploadTeacherDocuments,
+    login,
+    logout,
+    refreshToken,
+    requestPasswordReset,
+    verifyPasswordReset,
+  };
+};

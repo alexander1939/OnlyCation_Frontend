@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import RegisterForm from '../components/RegisterForm';
-import { authService } from '../services/authService';
+import { useAuthContext } from '../context/auth';
 
 interface RegisterFormData {
   first_name: string;
@@ -14,11 +14,12 @@ interface RegisterFormData {
   privacy_policy_accepted: boolean;
 }
 
-const RegisterStudent: React.FC = () => {
+export default function RegisterStudent() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
+  const { registerStudent } = useAuthContext();
 
   const handleSubmit = async (formData: RegisterFormData) => {
     setIsLoading(true);
@@ -28,7 +29,7 @@ const RegisterStudent: React.FC = () => {
       // Preparar datos para el backend (sin confirmPassword)
       const { confirmPassword, ...registerData } = formData;
       
-      const response = await authService.registerStudent(registerData);
+      const response = await registerStudent(registerData);
       
       if (response.success) {
         setSuccess(true);
@@ -240,5 +241,3 @@ const RegisterStudent: React.FC = () => {
     </div>
   );
 };
-
-export default RegisterStudent;

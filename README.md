@@ -149,6 +149,42 @@ git commit -m "style: aplicar formato consistente en componentes"
 - Los componentes están diseñados para ser reutilizables y modulares
 - Se implementa **React Router** para navegación SPA (Single Page Application)
 
+## 🔧 Configuración de Variables de Entorno
+
+El proyecto utiliza variables de entorno para configurar la API. Crea un archivo `.env` en la raíz del proyecto:
+
+```bash
+VITE_API_URL=http://localhost:8000/api
+VITE_APP_NAME=OnlyCation
+VITE_APP_VERSION=1.0.0
+```
+
+### Uso de Variables de Entorno
+
+Para usar las variables de entorno en tu código React, utiliza `import.meta.env`:
+
+```typescript
+// Ejemplo: Hacer petición a la API
+const API_URL = import.meta.env.VITE_API_URL;
+
+const fetchData = async () => {
+  const response = await fetch(`${API_URL}/endpoint`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+  
+  return await response.json();
+};
+```
+
+**Importante:** 
+- Las variables deben tener el prefijo `VITE_` para ser accesibles en el frontend
+- `import.meta.env.VITE_API_URL` obtiene la URL de la API desde el archivo `.env`
+- Esto permite cambiar fácilmente entre diferentes entornos (desarrollo, producción, etc.)
+
 ## 🐛 Solución de problemas
 
 ### El servidor no inicia

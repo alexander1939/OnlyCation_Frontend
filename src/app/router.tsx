@@ -5,8 +5,6 @@ import AboutUs from '../pages/about-us/AboutUs';
 import BeTeacher from '../pages/teachers/BeTeacher';
 import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
-import RegisterStudent from '../pages/RegisterStudent';
-import RegisterTeacher from '../pages/RegisterTeacher';
 
 const router = createBrowserRouter([
   {
@@ -32,15 +30,6 @@ const router = createBrowserRouter([
   {
     path: '/register',
     element: <Register />,
-  },
-  // Mantener rutas individuales para compatibilidad
-  {
-    path: '/register/student',
-    element: <RegisterStudent />,
-  },
-  {
-    path: '/register/teacher',
-    element: <RegisterTeacher />,
   },
 ]);
 

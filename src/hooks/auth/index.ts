@@ -1,3 +1,3 @@
 // Export all auth hooks
-export { useAuthHook } from './useAuth';
-export { useAuthApi } from './useAuthApi';
+export { useAuthHook } from './useRegister';
+export { useAuthApi } from './useRegisterApi';

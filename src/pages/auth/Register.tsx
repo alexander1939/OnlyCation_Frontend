@@ -30,6 +30,7 @@ function Register() {
   const [showForm, setShowForm] = useState(false);
   const [isContracting, setIsContracting] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [pendingType, setPendingType] = useState<UserType>(null);
   const navigate = useNavigate();
   const { registerStudent, registerTeacher } = useAuthContext();
 
@@ -41,39 +42,27 @@ function Register() {
 
   const handleSidebarClick = (type: 'student' | 'teacher') => {
     if (userType && userType !== type && !isTransitioning) {
+      // Inicia transición: ocultar formulario actual y preparar overlay
       setIsTransitioning(true);
       setShowForm(false);
       setError(null);
-      
-      // Fase 1: Ocultar formulario actual (200ms)
-      setTimeout(() => {
-        setIsContracting(true);
-      }, 200);
-      
-      // Fase 2: Contraer elemento actual y expandir nuevo (400ms)
-      setTimeout(() => {
-        setUserType(type);
-        setIsContracting(false);
-      }, 600);
-      
-      // Fase 3: Mostrar nuevo formulario (200ms después)
-      setTimeout(() => {
-        setShowForm(true);
-        setIsTransitioning(false);
-      }, 800);
+      setPendingType(type);
+      setIsContracting(false);
+      // Cambiamos de lado inmediatamente para que el ancho del panel se anime debajo del overlay
+      setUserType(type);
     }
   };
 
   const handleBackToSelection = () => {
-    setIsContracting(true);
+    // Inicia transición inversa: ocultar formulario y usar overlay desde el lado activo
     setShowForm(false);
     setError(null);
-    
-    // Después de la animación, resetear el tipo de usuario
-    setTimeout(() => {
-      setUserType(null);
+    if (!isTransitioning) {
+      setIsTransitioning(true);
+      setPendingType(userType); // usa el color/dirección del panel activo
+      setUserType(null); // vuelve a 50/50 bajo el overlay
       setIsContracting(false);
-    }, 800);
+    }
   };
 
   const handleSubmit = async (formData: RegisterFormData) => {
@@ -259,9 +248,23 @@ function Register() {
             {/* Card dinámico con expansión */}
             <div
               className={
-                `dynamic-card ${!userType ? 'is-closed clickable' : userType === 'student' ? 'is-student' : 'is-teacher'}`
+                `dynamic-card ${!userType ? 'is-closed clickable' : userType === 'student' ? 'is-student' : 'is-teacher'}${isTransitioning ? ' is-transitioning' : ''}`
               }
             >
+              {/* Sweep overlay to simulate parchment roll covering opposite panel */}
+              {isTransitioning && pendingType && (
+                <div
+                  className={`sweep-overlay ${pendingType === 'student' ? 'sweep-student' : 'sweep-teacher'}`}
+                  onAnimationEnd={() => {
+                    // Solo mostrar el formulario si hay un userType activo
+                    if (userType) {
+                      setShowForm(true);
+                    }
+                    setIsTransitioning(false);
+                    setPendingType(null);
+                  }}
+                />
+              )}
               {/* Fondo expandido para estudiante */}
               {userType === 'student' && (
                 <div className="bg-highlight bg-highlight--student" />
@@ -281,14 +284,7 @@ function Register() {
                     handleSidebarClick('student');
                   }
                 }}
-                className={`panel panel-student ${
-                  !userType ? 'is-initial' : userType === 'student' ? 'is-expanded' : 'is-sidebar'
-                } ${
-                  userType === 'student' && !isContracting && !isTransitioning ? 'expanding-student' :
-                  isContracting && userType === 'student' ? 'contracting-student' :
-                  userType === 'teacher' && !isContracting && !isTransitioning ? 'sidebar-student' :
-                  isTransitioning ? 'transitioning' : ''
-                }`}
+                className={`panel panel-student ${!userType ? 'is-initial' : userType === 'student' ? 'is-expanded' : 'is-sidebar'}`}
               >
 {userType !== 'student' && (
                   <>
@@ -334,6 +330,15 @@ function Register() {
                 {/* Formulario aparece aquí para estudiante */}
                 {userType === 'student' && showForm && !isContracting && !isTransitioning && (
                   <div className="form-container form-wrap">
+                    <button
+                      type="button"
+                      aria-label="Cerrar formulario"
+                      className={`close-btn close-student ${isTransitioning ? 'is-disabled' : ''}`}
+                      onClick={handleBackToSelection}
+                      disabled={isTransitioning}
+                    >
+                      ×
+                    </button>
                     <RegisterForm 
                       userType={userType}
                       onSubmit={handleSubmit}
@@ -363,14 +368,7 @@ function Register() {
                     handleSidebarClick('teacher');
                   }
                 }}
-                className={`panel panel-teacher ${
-                  !userType ? 'is-initial' : userType === 'teacher' ? 'is-expanded' : 'is-sidebar'
-                } ${
-                  userType === 'teacher' && !isContracting && !isTransitioning ? 'expanding-teacher' : 
-                  isContracting && userType === 'teacher' ? 'contracting-teacher' :
-                  userType === 'student' && !isContracting && !isTransitioning ? 'sidebar-teacher' : 
-                  isTransitioning ? 'transitioning' : ''
-                }`}
+                className={`panel panel-teacher ${!userType ? 'is-initial' : userType === 'teacher' ? 'is-expanded' : 'is-sidebar'}`}
                 style={{
                   writingMode: userType === 'student' ? 'vertical-rl' : 'horizontal-tb',
                   textOrientation: userType === 'student' ? 'mixed' : 'unset',
@@ -426,6 +424,15 @@ function Register() {
                     padding: '0 30px 20px 30px',
                     margin: '0 auto'
                   }}>
+                    <button
+                      type="button"
+                      aria-label="Cerrar formulario"
+                      className={`close-btn close-teacher ${isTransitioning ? 'is-disabled' : ''}`}
+                      onClick={handleBackToSelection}
+                      disabled={isTransitioning}
+                    >
+                      ×
+                    </button>
                     <RegisterForm 
                       userType={userType}
                       onSubmit={handleSubmit}
@@ -487,36 +494,6 @@ function Register() {
                   </p>
                 </div>
               </div>
-            )}
-
-            {/* Botón para cambiar selección */}
-            {userType && (
-              <button
-                onClick={handleBackToSelection}
-                style={{
-                  marginTop: '40px',
-                  padding: '12px 24px',
-                  borderRadius: '12px',
-                  border: '2px solid #6B7280',
-                  backgroundColor: 'transparent',
-                  color: '#6B7280',
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  fontFamily: 'Inter, sans-serif',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#6B7280';
-                  e.currentTarget.style.color = '#FFFFFF';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = '#6B7280';
-                }}
-              >
-                ← Cambiar selección
-              </button>
             )}
 
             {!userType && (

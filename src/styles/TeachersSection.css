@@ -1,0 +1,287 @@
+/* Container para las cards con efecto de desplazamiento */
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 50px;
+  justify-content: center;
+}
+
+.cards-container:has(.teacher-card:nth-child(1):hover) .teacher-card:nth-child(2),
+.cards-container:has(.teacher-card:nth-child(1):hover) .teacher-card:nth-child(3) {
+  transform: translateX(80px);
+}
+
+.cards-container:has(.teacher-card:nth-child(2):hover) .teacher-card:nth-child(1) {
+  transform: translateX(-40px);
+}
+
+.cards-container:has(.teacher-card:nth-child(2):hover) .teacher-card:nth-child(3) {
+  transform: translateX(40px);
+}
+
+.cards-container:has(.teacher-card:nth-child(3):hover) .teacher-card:nth-child(1),
+.cards-container:has(.teacher-card:nth-child(3):hover) .teacher-card:nth-child(2) {
+  transform: translateX(-80px);
+}
+
+/* Estilos para las cards de docentes */
+.teacher-card {
+  width: 299px;
+  height: 318px;
+  background-color: #FFFFFF;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  cursor: pointer;
+  transition: width 0.7s ease, transform 0.7s ease;
+  position: relative;
+}
+
+.teacher-card:hover {
+  width: 600px;
+  border-color: rgba(104, 178, 201, 0.25);
+  z-index: 10;
+}
+
+.teacher-card-content {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+/* Video ocupa todo el card inicialmente */
+.video-section {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  transition: all 0.7s ease;
+}
+
+/* En hover, video ocupa solo la mitad izquierda */
+.teacher-card:hover .video-section {
+  width: 50%;
+  border-radius: 16px 0 0 16px;
+}
+
+/* Sección de información - oculta inicialmente */
+.info-section {
+  width: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.7s ease;
+  background-color: #FFFFFF;
+  padding: 0;
+}
+
+/* En hover, información ocupa la mitad derecha */
+.teacher-card:hover .info-section {
+  width: 50%;
+  opacity: 1;
+  padding: 20px;
+}
+
+/* Estilos del video */
+.video-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.video-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+  filter: brightness(0.8);
+}
+
+.teacher-card:hover .video-thumbnail {
+  transform: scale(1.1);
+}
+
+.video-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(41, 73, 84, 0.3) 0%, rgba(104, 178, 201, 0.2) 50%, rgba(142, 212, 190, 0.1) 100%);
+}
+
+.play-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.1);
+  border: 3px solid rgba(104, 178, 201, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.5s ease;
+}
+
+.teacher-card:hover .play-button {
+  transform: translate(-50%, -50%) scale(1.25);
+}
+
+.play-icon {
+  width: 0;
+  height: 0;
+  border-left: 14px solid #294954;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  margin-left: 2px;
+}
+
+.video-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  padding: 4px 8px;
+  border-radius: 20px;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.video-badge-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: #EF4444;
+  animation: pulse 2s infinite;
+}
+
+.video-badge-text {
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Estilos de la información */
+.teacher-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: #294954;
+  margin-bottom: 8px;
+  font-family: 'Inter', sans-serif;
+}
+
+.teacher-subject {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.subject-dot {
+  width: 8px;
+  height: 16px;
+  border-radius: 4px;
+  background-color: #68B2C9;
+}
+
+.subject-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #68B2C9;
+}
+
+.rating-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.stars {
+  display: flex;
+  gap: 2px;
+}
+
+.star {
+  font-size: 18px;
+  color: #E5E7EB;
+}
+
+.star.filled {
+  color: #FFDE97;
+  text-shadow: 0 2px 4px rgba(255, 222, 151, 0.3);
+}
+
+.rating-number {
+  font-size: 14px;
+  font-weight: bold;
+  color: #294954;
+}
+
+.rating-reviews {
+  font-size: 12px;
+  color: #6B7280;
+}
+
+.teacher-description {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #4B5563;
+  margin-bottom: 16px;
+  flex: 1;
+}
+
+.additional-info {
+  margin-bottom: 16px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.info-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #68B2C9;
+}
+
+.info-text {
+  font-size: 12px;
+  color: #6B7280;
+}
+
+.price-section {
+  text-align: center;
+}
+
+.price-badge {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background-color: rgba(104, 178, 201, 0.1);
+  border: 1px solid rgba(104, 178, 201, 0.2);
+}
+
+.price-text {
+  font-size: 18px;
+  font-weight: bold;
+  color: #294954;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

@@ -5,8 +5,6 @@ import AboutUs from '../pages/about-us/AboutUs';
 import BeTeacher from '../pages/teachers/BeTeacher';
 import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
-import ForgotPassword from "../pages/auth/ForgotPassword";
-import ResetPassword from "../pages/auth/ResetPassword";
 
 const router = createBrowserRouter([
   {
@@ -32,14 +30,6 @@ const router = createBrowserRouter([
   {
     path: '/register',
     element: <Register />,
-  },
-  {
-    path: '/forgot-password',
-    element: <ForgotPassword />,
-  },
-  {
-    path: '/reset-password',
-    element: <ResetPassword />,
   },
 ]);
 

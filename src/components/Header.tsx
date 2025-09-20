@@ -112,9 +112,9 @@ const Header: React.FC = () => {
           {/* Navigation Menu */}
           <nav className="flex items-center space-x-12">
             <NavItem to="/" label="Inicio" />
-            <NavItem to="/be-teacher" label="¿Ser docente?" />
-            <NavItem to="/teachers" label="Tutores" />
+            <NavItem to="/ser-docente" label="¿Ser docente?" />
             <NavItem to="/about-us" label="Sobre nosotros" />
+            <NavItem to="/register" label="Registrate" />
           </nav>
 
           {/* Perfil Dropdown */}

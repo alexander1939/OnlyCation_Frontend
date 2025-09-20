@@ -1,0 +1,117 @@
+@keyframes smoothExpand { 0% { width: 50%; height: 400px; } 50% { width: 70%; height: 600px; } 100% { width: 82%; height: auto; min-height: 1000px; } }
+@keyframes smoothContract { 0% { width: 50%; height: 400px; } 50% { width: 30%; height: 600px; } 100% { width: 18%; height: auto; min-height: 1000px; } }
+@keyframes smoothRevert { 0% { width: 82%; height: auto; min-height: 1000px; } 50% { width: 70%; height: 600px; } 100% { width: 50%; height: 400px; } }
+@keyframes smoothExpandFromSidebar { 0% { width: 18%; height: auto; min-height: 1000px; } 50% { width: 30%; height: 600px; } 100% { width: 50%; height: 400px; } }
+@keyframes smoothTransition { 0% { opacity: 1; transform: translateY(0) scale(1); } 50% { opacity: 0.7; transform: translateY(-10px) scale(0.98); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes fadeInForm { 0% { opacity: 0; transform: translateY(30px) scale(0.95); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes fadeOutForm { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-20px) scale(0.98); } }
+@keyframes slideTransition { 0% { opacity: 1; transform: translateX(0) scale(1); } 50% { opacity: 0.3; transform: translateX(-20px) scale(0.95); } 100% { opacity: 1; transform: translateX(0) scale(1); } }
+
+.expanding-student { animation: smoothExpand 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; will-change: transform; }
+.expanding-teacher { animation: smoothExpand 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; will-change: transform; }
+.contracting-student { animation: smoothRevert 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; will-change: transform; }
+.contracting-teacher { animation: smoothRevert 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; will-change: transform; }
+.sidebar-student { animation: smoothContract 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; will-change: transform; }
+.sidebar-teacher { animation: smoothContract 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; will-change: transform; }
+.expanding-from-sidebar-student { animation: smoothExpandFromSidebar 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; will-change: transform; }
+.expanding-from-sidebar-teacher { animation: smoothExpandFromSidebar 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; will-change: transform; }
+.smooth-transition { animation: smoothTransition 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; will-change: transform, opacity; }
+.form-container { animation: fadeInForm 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s both; }
+.form-container-exit { animation: fadeOutForm 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+.transitioning { animation: slideTransition 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+
+/* Layout helpers */
+.page-container { background-color: #FAF9F5; }
+.main-spacing { padding-top: 120px; padding-bottom: 64px; }
+.content-center { max-width: 600px; margin: 0 auto; padding: 60px 20px; text-align: center; }
+.content-center-lg { max-width: 700px; margin: 0 auto; padding: 60px 20px; text-align: center; }
+.content-center-xl { max-width: 800px; margin: 0 auto; padding: 60px 20px; text-align: center; }
+
+/* Success cards */
+.success-card { background-color: #FFFFFF; border-radius: 24px; padding: 48px 32px; box-shadow: 0 12px 40px rgba(41, 73, 84, 0.08); border: 2px solid transparent; }
+.success-card--student { border-color: #10B981; }
+.success-card--teacher { border-color: #F59E0B; }
+
+.success-icon { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 36px; }
+.success-icon--student { background-color: #10B981; color: #FFFFFF; }
+.success-icon--teacher { background-color: #8ED4BE; color: #FFFFFF; }
+
+.success-title { font-size: 32px; font-weight: bold; color: #294954; margin-bottom: 16px; font-family: Inter, sans-serif; }
+.success-desc { font-size: 18px; color: #6B7280; line-height: 1.6; margin-bottom: 24px; font-family: Inter, sans-serif; }
+.success-desc--lg { margin-bottom: 32px; }
+
+/* Notice / info boxes */
+.redirect-box { padding: 16px; border-radius: 12px; margin-bottom: 24px; }
+.redirect-box--student { background-color: #F0F9FF; }
+.redirect-text { font-size: 14px; color: #1E40AF; margin: 0; font-family: Inter, sans-serif; }
+
+.info-box { background-color: #F0F9FF; border-radius: 16px; padding: 24px; margin-bottom: 32px; text-align: left; }
+.info-title { font-size: 18px; font-weight: 600; color: #1E40AF; margin-bottom: 16px; font-family: Inter, sans-serif; display: flex; align-items: center; gap: 8px; }
+.info-steps { display: flex; flex-direction: column; gap: 12px; }
+.info-step { display: flex; align-items: center; gap: 12px; padding: 8px 0; }
+.info-badge { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #FFFFFF; font-weight: bold; }
+.info-badge--ok { background-color: #10B981; }
+.info-badge--pending { background-color: #F59E0B; }
+.info-text { font-size: 14px; font-family: Inter, sans-serif; }
+.info-text--ok { color: #059669; }
+.info-text--pending { color: #92400E; }
+
+.teacher-note { background-color: #EBF8FF; border-radius: 12px; padding: 20px; margin-bottom: 32px; }
+.teacher-note-title { font-size: 16px; font-weight: 600; color: #1E40AF; margin-bottom: 12px; font-family: Inter, sans-serif; display: flex; align-items: center; gap: 8px; }
+.info-list { font-size: 14px; color: #1E40AF; line-height: 1.6; text-align: left; margin: 0; padding-left: 20px; font-family: Inter, sans-serif; }
+
+/* Buttons */
+.btn { padding: 16px 32px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; font-family: Inter, sans-serif; transition: all 0.3s ease; }
+.btn-primary { border: none; background-color: #68B2C9; color: #FFFFFF; }
+.btn-outline { border: 2px solid #68B2C9; background-color: transparent; color: #68B2C9; }
+.btn-success { border: none; background-color: #8ED4BE; color: #FFFFFF; }
+/* Button hovers */
+.btn-primary:hover { background-color: #5A9FB8; }
+.btn-outline:hover { background-color: #68B2C9; color: #FFFFFF; }
+.btn-success:hover { background-color: #7BC7AD; }
+
+/* Titles and subtitles */
+.page-title { font-size: 48px; font-weight: bold; color: #294954; margin-bottom: 24px; font-family: Inter, sans-serif; }
+.page-subtitle { font-size: 20px; color: #6B7280; margin-bottom: 60px; font-family: Inter, sans-serif; }
+
+/* Rows */
+.btn-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+/* Dynamic selection card */
+.dynamic-card { position: relative; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 60px rgba(41, 73, 84, 0.15); transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+.dynamic-card.is-closed { height: 400px; }
+.dynamic-card.is-student { height: auto; min-height: 800px; }
+.dynamic-card.is-teacher { height: auto; min-height: 1000px; }
+.dynamic-card.clickable { cursor: pointer; }
+
+.bg-highlight { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: #FFFFFF; border-radius: 24px; }
+.bg-highlight--student { box-shadow: inset 0 0 0 3px #68B2C9; }
+.bg-highlight--teacher { box-shadow: inset 0 0 0 3px #8ED4BE; }
+
+.panel { position: absolute; top: 0; height: 100%; display: flex; flex-direction: column; align-items: center; transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); box-sizing: border-box; }
+.panel-student { left: 0; }
+.panel-teacher { right: 0; }
+
+/* Initial state (no userType selected) */
+.panel.is-initial { width: 50%; justify-content: center; border-radius: 24px; }
+.panel-student.is-initial { background: linear-gradient(135deg, #68B2C9 0%, #5A9FB8 100%); }
+.panel-teacher.is-initial { background: linear-gradient(135deg, #8ED4BE 0%, #7BC4A8 100%); }
+.panel-student.is-initial, .panel-student.is-sidebar { color: #FFFFFF; }
+.panel-teacher.is-initial, .panel-teacher.is-sidebar { color: #FFFFFF; }
+
+/* Sidebar state (the non-selected panel when other side expanded) */
+.panel.is-sidebar { width: 18%; justify-content: center; border-radius: 24px; z-index: 1; cursor: pointer; }
+.panel-student.is-sidebar { background: linear-gradient(135deg, #68B2C9 0%, #5A9FB8 100%); }
+.panel-teacher.is-sidebar { background: linear-gradient(135deg, #8ED4BE 0%, #7BC4A8 100%); }
+
+/* Expanded state (the selected panel) */
+.panel.is-expanded { width: 82%; background: #FFFFFF; justify-content: flex-start; padding: 20px; z-index: 2; cursor: default; }
+.panel-student.is-expanded { border-radius: 24px 0 0 24px; box-shadow: inset 0 0 0 2px #68B2C9; color: #294954; }
+.panel-teacher.is-expanded { border-radius: 0 24px 24px 0; box-shadow: inset 0 0 0 2px #8ED4BE; color: #294954; }
+
+/* Hover effects on compact states */
+.panel.is-sidebar:hover { transform: scale(1.05); }
+.panel.is-initial:hover { transform: scale(1.02); }
+
+/* Form wrapper inside expanded panels */
+.form-wrap { width: 100%; max-width: 580px; padding: 0 30px 20px 30px; margin: 0 auto; box-sizing: border-box; }

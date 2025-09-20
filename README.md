@@ -99,7 +99,7 @@ src/
 
 - `/` - Página principal (Home)
 - `/ver-mas` - Lista de tutores disponibles
-- `/sobre-nosotros` - Información sobre la plataforma
+- `/about-us` - Información sobre la plataforma
 - `/ser-docente` - Información para convertirse en tutor
 
 ## 🎨 Paleta de colores

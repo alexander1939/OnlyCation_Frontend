@@ -1,3 +1,3 @@
 // Export all custom hooks from this file
-export { default as useAuth } from './useAuth';
+export { useAuthHook, useAuthApi } from './auth';
 export { default as useLocalStorage } from './useLocalStorage';

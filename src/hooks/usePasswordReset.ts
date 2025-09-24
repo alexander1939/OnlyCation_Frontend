@@ -15,24 +15,21 @@ export const usePasswordReset = () => {
     }
   };
 
-  // Función para validar código (sin cambiar contraseña)
-  const validateCode = async (email: string, code: string) => {
+
+  // Función para validar código usando el endpoint dedicado (solo code)
+  const checkVerificationCode = async (code: string) => {
     try {
-      const response = await axios.post(`${API_URL}/auth/password-reset/verify`, {
-        email,
-        code,
-        // NO enviamos new_password para solo validar
-      });
-      return { 
-        success: true, 
-        message: response.data.message,
-        validated: response.data.validated 
+      const response = await axios.post(`${API_URL}/auth/password-reset/check-code`, { code });
+      return {
+        success: response.data?.success === true,
+        message: response.data?.message ?? "",
+        validated: response.data?.active === true,
       };
     } catch (error: any) {
       return {
         success: false,
-        message: error.response?.data?.detail || "Error al validar el código",
-        validated: false
+        message: error.response?.data?.detail || "Error al verificar el código",
+        validated: false,
       };
     }
   };
@@ -61,7 +58,7 @@ export const usePasswordReset = () => {
 
   return {
     requestPasswordReset,
-    validateCode,
+    checkVerificationCode,
     changePasswordWithCode,
   };
 };

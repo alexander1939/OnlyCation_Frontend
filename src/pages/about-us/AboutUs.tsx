@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
-import Ribbon from '../../components/Ribbon';
+import Header from '../../components/ui/Header';
+import Footer from '../../components/ui/Footer';
+import Ribbon from '../../components/ui/Ribbon';
 
 const SobreNosotros: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);

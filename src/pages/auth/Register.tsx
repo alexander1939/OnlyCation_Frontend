@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
-import RegisterForm from '../../components/RegisterForm';
+import Header from '../../components/ui/Header';
+import Footer from '../../components/ui/Footer';
+import RegisterForm from '../../components/registerComp/RegisterForm';
 import { useAuthContext } from '../../context/auth';
 import '../../styles/Register.css';
+import SuccessReg from '../../components/registerComp/SuccessReg';
 
 interface RegisterFormData {
   first_name: string;
@@ -33,6 +34,14 @@ function Register() {
   const [pendingType, setPendingType] = useState<UserType>(null);
   const navigate = useNavigate();
   const { registerStudent, registerTeacher } = useAuthContext();
+
+  // Visibilidad para animar el título y subtítulo al montar
+  const [isVisible, setIsVisible] = useState(false);
+  useEffect(() => {
+    // activar en el siguiente tick para permitir la transición
+    const t = setTimeout(() => setIsVisible(true), 0);
+    return () => clearTimeout(t);
+  }, []);
 
   const handleUserTypeSelect = (type: 'student' | 'teacher') => {
     setUserType(type);
@@ -84,18 +93,6 @@ function Register() {
       if (response.success) {
         setRegisteredUser({ email: registerData.email, first_name: registerData.first_name, last_name: registerData.last_name });
         setSuccess(true);
-        
-        if (userType === 'student') {
-          // Redirigir después de 3 segundos para estudiantes
-          setTimeout(() => {
-            navigate('/', { 
-              state: { 
-                message: 'Registro exitoso. Ya puedes iniciar sesión.',
-                email: formData.email 
-              }
-            });
-          }, 3000);
-        }
       }
     } catch (error: any) {
       setError(error.message || `Error al registrar ${userType === 'student' ? 'estudiante' : 'docente'}`);
@@ -107,123 +104,14 @@ function Register() {
   // Pantalla de éxito para estudiante
   if (success && userType === 'student') {
     return (
-      <div className="min-h-screen w-full page-container">
-        <Header />
-        <main className="main-spacing">
-          <div className="content-center">
-            <div className="success-card success-card--student">
-              <div className="success-icon success-icon--student">
-                ✅
-              </div>
-              
-              <h1 className="success-title">
-                ¡Registro Exitoso!
-              </h1>
-              
-              <p className="success-desc">
-                Tu cuenta de estudiante ha sido creada exitosamente. 
-                Ya puedes acceder a todos nuestros tutores especializados.
-              </p>
-              
-              <div className="redirect-box redirect-box--student">
-                <p className="redirect-text">
-                  Serás redirigido al inicio en unos segundos...
-                </p>
-              </div>
-              
-              <button
-                onClick={() => navigate('/login')}
-                className="btn btn-primary"
-              >
-                Ir a Iniciar Sesión
-              </button>
-            </div>
-          </div>
-        </main>
-        <Footer />
-      </div>
+      <SuccessReg type="student" autoRedirect redirectTo="/" redirectDelayMs={3000} />
     );
   }
 
   // Pantalla de éxito para docente
   if (success && userType === 'teacher') {
     return (
-      <div className="min-h-screen w-full page-container">
-        <Header />
-        <main className="main-spacing">
-          <div className="content-center-lg">
-            <div className="success-card success-card--teacher">
-              <div className="success-icon success-icon--teacher">
-                ✅
-              </div>
-              
-              <h1 className="success-title">
-                ¡Cuenta Creada!
-              </h1>
-              
-              <p className="success-desc success-desc--lg">
-                Hola <strong>{registeredUser?.first_name}</strong>, tu cuenta de docente ha sido 
-                creada exitosamente en estado <strong>pendiente</strong>.
-              </p>
-              
-              <div className="info-box">
-                <h3 className="info-title">
-                  👨‍🏫 Estado de tu Cuenta
-                </h3>
-                
-                <div className="info-steps">
-                  <div className="info-step">
-                    <div className="info-badge info-badge--ok">
-                      ✓
-                    </div>
-                    <span className="info-text info-text--ok">
-                      Cuenta creada exitosamente en estado pendiente
-                    </span>
-                  </div>
-                  
-                  <div className="info-step">
-                    <div className="info-badge info-badge--pending">
-                      ⏳
-                    </div>
-                    <span className="info-text info-text--pending">
-                      No se enviaron documentos (proceso opcional)
-                    </span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="teacher-note">
-                <h4 className="teacher-note-title">
-                  📋 Proceso de Verificación (Opcional)
-                </h4>
-                <ul className="info-list">
-                  <li>Puedes iniciar sesión inmediatamente con tu cuenta pendiente</li>
-                  <li>Para dar clases, deberás completar el proceso de verificación</li>
-                  <li>Consulta el apartado <strong>Documentación/Activación</strong> en tu perfil</li>
-                  <li>Sube tus documentos cuando decidas activar tu cuenta</li>
-                </ul>
-              </div>
-              
-              <div className="btn-row">
-                <button
-                  onClick={() => navigate('/')}
-                  className="btn btn-outline"
-                >
-                  Volver al Inicio
-                </button>
-                
-                <button
-                  onClick={() => navigate('/login')}
-                  className="btn btn-success"
-                >
-                  Iniciar Sesión
-                </button>
-              </div>
-            </div>
-          </div>
-        </main>
-        <Footer />
-      </div>
+      <SuccessReg type="teacher" registeredUser={registeredUser} />
     );
   }
 
@@ -237,11 +125,11 @@ function Register() {
           
           
           <div className="content-center-xl">
-            <h1 className="page-title">
+            <h1 className={`page-title transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
               Únete a OnlyCation
             </h1>
             
-            <p className="page-subtitle">
+            <p className={`page-subtitle transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
               Selecciona cómo quieres formar parte de nuestra comunidad
             </p>
 

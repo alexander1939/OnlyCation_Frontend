@@ -1,6 +1,6 @@
 // Export all components from this file
-export { default as Button } from './Button';
-export { default as Card } from './Card';
-export { default as Header } from './Header';
-export { default as Footer } from './Footer';
+export { default as Button } from './ui/Button';
+export { default as Card } from './ui/Card';
+export { default as Header } from './ui/Header';
+export { default as Footer } from './ui/Footer';
 export { default as DeveloperCard } from './DeveloperCard';

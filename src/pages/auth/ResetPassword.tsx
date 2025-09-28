@@ -79,9 +79,9 @@ export default function ResetPassword() {
     return (
       <div className="page">
         <main className="page__main--compact">
-          <div className="container">
+          <div className="container container--wide">
             <div className="card">
-              <img src="/Codigo.png" alt="Validar código" className="illustration" />
+              <img src="/Codigo.png" alt="Validar código" className="illustration illustration--xl" />
               <h1 className="brand">Only<span className="brand__accent">Cation</span></h1>
               <h2 className="title">Validar Código de Verificación</h2>
               <p className="subtitle">Revisa tu correo y escribe el código que te enviamos.</p>
@@ -101,9 +101,9 @@ export default function ResetPassword() {
   return (
     <div className="page">
       <main className="page__main--compact">
-        <div className="container">
+        <div className="container container--wide">
           <div className="card">
-            <img src="/Cambio_contraseña.png" alt="Cambiar contraseña" className="illustration" />
+            <img src="/Cambio_contraseña.png" alt="Cambiar contraseña" className="illustration illustration--xl" />
             <h2 className="title">Establecer Nueva Contraseña</h2>
             <p className="subtitle">Para: <strong>{email}</strong></p>
 

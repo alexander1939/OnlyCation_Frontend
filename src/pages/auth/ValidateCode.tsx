@@ -14,7 +14,6 @@ export default function ValidateCode({ onCodeValidated, initialEmail }: Validate
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
-  const [remember, setRemember] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,15 +55,6 @@ export default function ValidateCode({ onCodeValidated, initialEmail }: Validate
     }
   };
 
-  const maskEmail = (value: string) => {
-    if (!value) return "";
-    const [user, domain] = value.split("@");
-    if (!user || !domain) return value;
-    const maskedUser = user.length <= 2 ? user[0] + "*" : user.slice(0, 2) + "***";
-    const [name, tld] = domain.split(".");
-    const maskedDomain = (name ? name[0] + "***" : domain) + (tld ? "." + tld : "");
-    return `${maskedUser}@${maskedDomain}`;
-  };
 
   const handleOtpChange = (index: number, val: string) => {
     const newVal = val.replace(/\D/g, "").slice(0, 1);
@@ -95,9 +85,6 @@ export default function ValidateCode({ onCodeValidated, initialEmail }: Validate
 
   return (
     <div>
-      <h3 className="section-title">Validar Código de Verificación</h3>
-      <p className="subtitle" style={{ marginTop: -4 }}>Introduce el código de seguridad enviado a <strong>{maskEmail(email)}</strong>.</p>
-
       <form onSubmit={handleSubmit} className="form">
         <div className="otp">
           {otp.map((v, idx) => (
@@ -113,14 +100,6 @@ export default function ValidateCode({ onCodeValidated, initialEmail }: Validate
               onKeyDown={(e) => handleOtpKeyDown(idx, e)}
             />
           ))}
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: '#374151' }}>
-            <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
-            Recordar dispositivo
-          </label>
-          <button type="button" className="inline-link">Usar otro método</button>
         </div>
 
         <div className="actions">

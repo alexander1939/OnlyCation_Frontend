@@ -88,7 +88,7 @@ export default function ResetPassword() {
               <ValidateCode onCodeValidated={handleCodeValidated} initialEmail={email} />
               <div className="center" style={{ marginTop: 20 }}>
                 <button type="button" onClick={() => navigate("/")} className="link">
-                  ← Volver al inicio
+                  Volver al inicio
                 </button>
               </div>
             </div>
@@ -133,7 +133,13 @@ export default function ResetPassword() {
                 <button
                   type="button"
                   className="btn btn--secondary"
-                  onClick={() => navigate("/")}
+                  onClick={() => {
+                    try {
+                      sessionStorage.removeItem("pr_email");
+                      sessionStorage.removeItem("pr_code");
+                    } catch (_) {}
+                    navigate("/");
+                  }}
                 >
                   CANCELAR
                 </button>
@@ -158,7 +164,7 @@ export default function ResetPassword() {
                 }}
                 className="link"
               >
-                ← Ir al inicio
+                Ir al inicio
               </button>
             </div>
           </div>

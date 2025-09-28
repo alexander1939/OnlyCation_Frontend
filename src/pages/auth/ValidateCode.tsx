@@ -46,6 +46,10 @@ export default function ValidateCode({ onCodeValidated, initialEmail }: Validate
     setIsResending(true);
     setMessage("");
     try {
+      // Si existía un código previamente validado, limpiarlo para no saltar al paso de cambio de contraseña
+      try {
+        sessionStorage.removeItem("pr_code");
+      } catch (_) {}
       const res = await requestPasswordReset(email);
       setMessage(res.success ? `✅ ${res.message}` : `❌ ${res.message}`);
     } catch (error: any) {
@@ -83,6 +87,22 @@ export default function ValidateCode({ onCodeValidated, initialEmail }: Validate
     }
   };
 
+  // Permitir pegar el código completo (6 dígitos) en la primera celda o en cualquier celda
+  const handleOtpPaste = (index: number, e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "");
+    if (!pasted) return;
+    e.preventDefault();
+    const chars = pasted.slice(0, otp.length - index).split("");
+    const next = [...otp];
+    for (let i = 0; i < chars.length; i++) {
+      next[index + i] = chars[i];
+    }
+    setOtp(next);
+    const focusTo = Math.min(index + chars.length, otp.length - 1);
+    const target = document.getElementById(`otp-${focusTo}`) as HTMLInputElement | null;
+    target?.focus();
+  };
+
   return (
     <div>
       <form onSubmit={handleSubmit} className="form">
@@ -98,6 +118,7 @@ export default function ValidateCode({ onCodeValidated, initialEmail }: Validate
               value={v}
               onChange={(e) => handleOtpChange(idx, e.target.value)}
               onKeyDown={(e) => handleOtpKeyDown(idx, e)}
+              onPaste={(e) => handleOtpPaste(idx, e)}
             />
           ))}
         </div>
@@ -106,7 +127,20 @@ export default function ValidateCode({ onCodeValidated, initialEmail }: Validate
           <button type="submit" disabled={isLoading} className="btn btn--success">
             {isLoading ? "Validando..." : "CONTINUAR"}
           </button>
-          <button type="button" className="btn btn--secondary">CANCELAR</button>
+          <button
+            type="button"
+            className="btn btn--secondary"
+            onClick={() => {
+              try {
+                sessionStorage.removeItem("pr_email");
+                sessionStorage.removeItem("pr_code");
+              } catch (_) {}
+              // Volver a inicio
+              window.location.href = "/";
+            }}
+          >
+            CANCELAR
+          </button>
         </div>
 
         <button

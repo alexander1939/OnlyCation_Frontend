@@ -17,6 +17,11 @@ export default function ForgotPassword() {
     setMessage(res.message);
     if (res.success) {
       // Redirigir a la vista de validación/cambio de contraseña con el email
+      // Asegurar que no quede un código previo almacenado que salte la verificación
+      try {
+        sessionStorage.setItem("pr_email", email);
+        sessionStorage.removeItem("pr_code");
+      } catch (_) {}
       navigate("/reset-password", { state: { email } });
     }
     setIsLoading(false);
@@ -54,7 +59,7 @@ export default function ForgotPassword() {
 
             <div className="center" style={{ marginTop: 20 }}>
               <button type="button" onClick={() => navigate("/")} className="link">
-                ← Volver al inicio
+                Volver al inicio
               </button>
             </div>
           </div>

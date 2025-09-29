@@ -15,6 +15,7 @@ export default function ResetPassword() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [msgVariant, setMsgVariant] = useState<"success" | "error" | "info">("info");
   const [isLoading, setIsLoading] = useState(false);
 
   // Hidratar desde sessionStorage si existe (soporta refresh de página)
@@ -49,9 +50,11 @@ export default function ResetPassword() {
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setMsgVariant("info");
     
     if (newPassword !== confirmPassword) {
-      setMessage("❌ Las contraseñas no coinciden");
+      setMessage("Las contraseñas no coinciden");
+      setMsgVariant("error");
       setIsLoading(false);
       return;
     }
@@ -59,6 +62,7 @@ export default function ResetPassword() {
     try {
       const result = await changePasswordWithCode(email, code, newPassword);
       setMessage(result.message);
+      setMsgVariant(result.success && result.password_changed ? "success" : result.success ? "info" : "error");
       if (result.success && result.password_changed) {
         // Limpiar sessionStorage al completar
         try {
@@ -69,7 +73,8 @@ export default function ResetPassword() {
         setTimeout(() => navigate("/login"), 1200);
       }
     } catch (error: any) {
-      setMessage("❌ Error al cambiar la contraseña");
+      setMessage("Error al cambiar la contraseña");
+      setMsgVariant("error");
     } finally {
       setIsLoading(false);
     }
@@ -147,8 +152,8 @@ export default function ResetPassword() {
             </form>
 
             {message && (
-              <div className={`msg ${message.startsWith("✅") ? "msg--success" : message.startsWith("❌") ? "msg--error" : "msg--info"}`}>
-                {message}
+              <div className={`msg ${msgVariant === "success" ? "msg--success" : msgVariant === "error" ? "msg--error" : "msg--info"}`}>
+                {msgVariant === "success" ? `✅ ${message}` : msgVariant === "error" ? message : message}
               </div>
             )}
 

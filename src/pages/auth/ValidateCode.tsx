@@ -12,6 +12,7 @@ export default function ValidateCode({ onCodeValidated, initialEmail }: Validate
   const [email] = useState(initialEmail ?? "");
   const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
   const [message, setMessage] = useState("");
+  const [msgVariant, setMsgVariant] = useState<"success" | "error" | "info">("info");
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
 
@@ -19,6 +20,7 @@ export default function ValidateCode({ onCodeValidated, initialEmail }: Validate
     e.preventDefault();
     setIsLoading(true);
     setMessage("");
+    setMsgVariant("info");
     
     const code = otp.join("");
     try {
@@ -26,13 +28,16 @@ export default function ValidateCode({ onCodeValidated, initialEmail }: Validate
       const result = await checkVerificationCode(code);
       // Avanzar si el backend indica que el código está activo/validado
       if (result.validated) {
-        setMessage("✅ Código validado correctamente");
+        setMessage("Código validado correctamente");
+        setMsgVariant("success");
         onCodeValidated(email, code);
       } else {
-        setMessage(`❌ ${result.message}`);
+        setMessage(result.message);
+        setMsgVariant("error");
       }
     } catch (error: any) {
-      setMessage("❌ Error al validar el código");
+      setMessage("Error al validar el código");
+      setMsgVariant("error");
     } finally {
       setIsLoading(false);
     }
@@ -40,20 +45,24 @@ export default function ValidateCode({ onCodeValidated, initialEmail }: Validate
 
   const handleResendCode = async () => {
     if (!email) {
-      setMessage("❌ No hay correo asociado a la recuperación");
+      setMessage("No hay correo asociado a la recuperación");
+      setMsgVariant("error");
       return;
     }
     setIsResending(true);
     setMessage("");
+    setMsgVariant("info");
     try {
       // Si existía un código previamente validado, limpiarlo para no saltar al paso de cambio de contraseña
       try {
         sessionStorage.removeItem("pr_code");
       } catch (_) {}
       const res = await requestPasswordReset(email);
-      setMessage(res.success ? `✅ ${res.message}` : `❌ ${res.message}`);
+      setMessage(res.message);
+      setMsgVariant(res.success ? "success" : "error");
     } catch (error: any) {
-      setMessage("❌ Error al reenviar el código");
+      setMessage("Error al reenviar el código");
+      setMsgVariant("error");
     } finally {
       setIsResending(false);
     }
@@ -154,8 +163,8 @@ export default function ValidateCode({ onCodeValidated, initialEmail }: Validate
       </form>
 
       {message && (
-        <div className={`msg ${message.startsWith("✅") ? "msg--success" : message.startsWith("❌") ? "msg--error" : "msg--info"}`}>
-          {message}
+        <div className={`msg ${msgVariant === "success" ? "msg--success" : msgVariant === "error" ? "msg--error" : "msg--info"}`}>
+          {msgVariant === "success" ? `✅ ${message}` : message}
         </div>
       )}
     </div>

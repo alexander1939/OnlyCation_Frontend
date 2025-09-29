@@ -7,14 +7,17 @@ export default function ForgotPassword() {
   const { requestPasswordReset } = usePasswordReset();
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [msgVariant, setMsgVariant] = useState<"success" | "error" | "info">("info");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setMsgVariant("info");
     const res = await requestPasswordReset(email);
     setMessage(res.message);
+    setMsgVariant(res.success ? "success" : "error");
     if (res.success) {
       // Redirigir a la vista de validación/cambio de contraseña con el email
       // Asegurar que no quede un código previo almacenado que salte la verificación
@@ -52,7 +55,7 @@ export default function ForgotPassword() {
             </form>
 
             {message && (
-              <div className={`msg ${message.startsWith("✅") ? "msg--success" : message.startsWith("❌") ? "msg--error" : "msg--info"}`}>
+              <div className={`msg ${msgVariant === "success" ? "msg--success" : msgVariant === "error" ? "msg--error" : "msg--info"}`}>
                 {message}
               </div>
             )}

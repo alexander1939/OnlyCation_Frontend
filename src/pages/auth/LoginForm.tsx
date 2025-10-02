@@ -19,7 +19,7 @@ const LoginForm: React.FC<Props> = ({ onSubmit, isLoading = false }) => {
   return (
     <form className="animate-card" onSubmit={handleSubmit}>
       <div className="flex flex-col mb-4">
-        <label className="block text-sm font-medium text-petroleum-blue mb-1">
+        <label className="block text-[0.9rem] font-medium text-gray-900 mb-1">
           Email
         </label>
         <input
@@ -33,7 +33,7 @@ const LoginForm: React.FC<Props> = ({ onSubmit, isLoading = false }) => {
       </div>
 
       <div className="flex flex-col mb-6">
-        <label className="block text-sm font-medium text-petroleum-blue mb-1">
+        <label className="block text-[0.9rem] font-medium text-gray-900 mb-1">
           Contraseña
         </label>
         <input

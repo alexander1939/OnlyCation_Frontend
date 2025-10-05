@@ -5,6 +5,8 @@ import AboutUs from '../pages/about-us/AboutUs';
 import BeTeacher from '../pages/teachers/BeTeacher';
 import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
+import ForgotPassword from '../pages/auth/ForgotPassword';
+import ResetPassword from '../pages/auth/ResetPassword';
 import RegisterStudent from '../pages/RegisterStudent';
 import RegisterTeacher from '../pages/RegisterTeacher';
 import TeacherHome from '../pages/teachervista/home';
@@ -52,14 +54,13 @@ const router = createBrowserRouter([
     path: '/register',
     element: <Register />,
   },
-  // Mantener rutas individuales para compatibilidad
   {
-    path: '/register/student',
-    element: <RegisterStudent />,
+    path: '/forgot-password',
+    element: <ForgotPassword />,
   },
   {
-    path: '/register/teacher',
-    element: <RegisterTeacher />,
+    path: '/reset-password',
+    element: <ResetPassword />,
   },
 ]);
 

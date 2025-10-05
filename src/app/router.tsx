@@ -7,11 +7,32 @@ import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
 import ForgotPassword from '../pages/auth/ForgotPassword';
 import ResetPassword from '../pages/auth/ResetPassword';
+import RegisterStudent from '../pages/RegisterStudent';
+import RegisterTeacher from '../pages/RegisterTeacher';
+import TeacherHome from '../pages/teachervista/home';
+import StudentHome from '../pages/studentvista/home';
+import PrivateRoute from "../components/PrivateRoute";
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <Home />,
+  },
+  {
+    path: "/teacher-home",
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <TeacherHome />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/student-home",
+    element: (
+      <PrivateRoute roles={["student"]}>
+        <StudentHome />
+      </PrivateRoute>
+    ),
   },
   {
     path: '/teachers',

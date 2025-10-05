@@ -15,8 +15,8 @@ const Footer: React.FC = () => {
         <div 
           style={{
             display: 'grid',
-            gridTemplateColumns: '3fr 1fr 1fr 1fr',
-            gap: '80px',
+            gridTemplateColumns: '3fr 1fr 1fr 1fr 1fr',
+            gap: '60px',
             alignItems: 'start'
           }}
         >
@@ -146,6 +146,49 @@ const Footer: React.FC = () => {
                 'FAQ',
                 'Contacto',
                 'Reportar Problema'
+              ].map((link, index) => (
+                <li key={index}>
+                  <a 
+                    href="#"
+                    className="text-sm font-medium transition-all duration-200"
+                    style={{ 
+                      color: 'rgba(255, 255, 255, 0.7)',
+                      textDecoration: 'none',
+                      display: 'block',
+                      padding: '2px 0'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = '#68B2C9';
+                      e.currentTarget.style.paddingLeft = '8px';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)';
+                      e.currentTarget.style.paddingLeft = '0px';
+                    }}
+                  >
+                    {link}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Privacidad */}
+          <div>
+            <h3 
+              className="font-semibold text-lg mb-6"
+              style={{ 
+                color: '#68B2C9',
+                letterSpacing: '-0.3px',
+                padding: '40px 0px 0px 0px'
+              }}
+            >
+              Privacidad
+            </h3>
+            <ul className="space-y-4">
+              {[
+                'Aviso de Privacidad',
+                'Términos y Condiciones'
               ].map((link, index) => (
                 <li key={index}>
                   <a 

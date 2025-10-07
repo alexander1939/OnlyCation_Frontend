@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { usePasswordReset } from "../../hooks/usePasswordReset";
+import { usePasswordReset } from "../../hooks/auth/usePasswordReset";
 import "../../styles/Auth.css";
 
 interface ValidateCodeProps {

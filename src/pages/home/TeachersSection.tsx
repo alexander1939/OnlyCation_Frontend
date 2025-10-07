@@ -147,18 +147,22 @@ const TeachersSection: React.FC = () => {
         
         {/* Botón Ver más centrado */}
         <div className="text-center mt-[60px]">
-          <button className="text-[18px] font-semibold tracking-[0.5px] transition-colors" 
+          <a 
+            href="/teachers"
+            className="inline-block text-[18px] font-semibold tracking-[0.5px] transition-colors" 
             style={{
               backgroundColor: '#294954', 
               color: '#FAF9F5', 
               padding: '12px 24px', 
               borderRadius: '20px', 
-              border: '2px solid #294954'
+              border: '2px solid #294954',
+              textDecoration: 'none',
+              cursor: 'pointer'
             }} 
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1e3a42'} 
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#294954'}>
-            Ver más
-          </button>
+            Ver más docentes
+          </a>
         </div>
       </div>
     </section>

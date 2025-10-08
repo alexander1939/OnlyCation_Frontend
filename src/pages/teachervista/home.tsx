@@ -1,10 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthContext } from '../../context/auth/AuthContext';
+import { useLoginContext } from '../../context/auth/LoginContext';
 import Header from '../../components/Header'; // 👈 importar el Header
 
 const TeacherHome: React.FC = () => {
-  const { logout } = useAuthContext();
+  const { logout } = useLoginContext();
   const navigate = useNavigate();
 
   const handleLogout = async () => {

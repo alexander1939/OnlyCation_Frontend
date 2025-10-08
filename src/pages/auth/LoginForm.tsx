@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import ButtonLogin from "../../components/ButtonLogin";
 
-
 interface Props {
   onSubmit: (email: string, password: string) => void;
   isLoading?: boolean;
@@ -17,7 +16,7 @@ const LoginForm: React.FC<Props> = ({ onSubmit, isLoading = false }) => {
   };
 
   return (
-    <form className="animate-card" onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="animate-card">
       <div className="flex flex-col mb-4">
         <label className="block text-[0.9rem] font-medium text-gray-900 mb-1">
           Email

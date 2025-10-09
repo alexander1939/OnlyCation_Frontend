@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { usePasswordReset } from "../../hooks/usePasswordReset";
+import { usePasswordReset } from "../../hooks/auth/usePasswordReset";
 import ValidateCode from "./ValidateCode";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../../styles/Auth.css";

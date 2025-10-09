@@ -1,14 +1,16 @@
-import { AuthProvider, ThemeProvider } from './context';
+// App.tsx
+import { LoginProvider } from './context/auth/LoginContext';
+import { ThemeProvider } from './context/ThemeContext'; // <-- ruta correcta
 import AppRouter from './app/router';
 
 function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
+      <LoginProvider>
         <AppRouter />
-      </AuthProvider>
+      </LoginProvider>
     </ThemeProvider>
   );
 }
 
-export default App
+export default App;

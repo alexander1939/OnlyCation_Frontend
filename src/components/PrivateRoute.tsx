@@ -1,7 +1,7 @@
 // src/components/PrivateRoute.tsx
 import React from "react";
 import { Navigate } from "react-router-dom";
-import { useAuthContext } from "../context/auth/AuthContext";
+import { useLoginContext } from "../context/auth/LoginContext";
 
 interface PrivateRouteProps {
   children: React.ReactNode;
@@ -9,7 +9,7 @@ interface PrivateRouteProps {
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, roles }) => {
-  const { user } = useAuthContext();
+  const { user } = useLoginContext();
 
   // 🚨 Si no hay usuario -> redirigir al login
   if (!user) {

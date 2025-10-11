@@ -1,18 +1,10 @@
 import { useCallback, useMemo, useState } from 'react';
 import axios, { AxiosError } from 'axios';
-import { useAuth } from './useAuth';
-import type {
-  PreferenceCreateRequest,
-  PreferenceCreateResponse,
-} from '../context/preferences/types';
+import type { PreferenceCreateRequest, PreferenceCreateResponse } from '../../context/preferences/types';
+import { useAuthToken } from '../auth/useAuthToken';
 
-// API configuration from environment (same pattern used in auth API)
-const envApiUrl = (import.meta as any).env?.VITE_API_URL as string | undefined;
-const API_BASE_URL = envApiUrl && envApiUrl.trim().length > 0 ? envApiUrl : '/api';
-if (!envApiUrl) {
-  // eslint-disable-next-line no-console
-  console.warn('[PreferencesAPI] VITE_API_URL no está definido. Usando fallback \'/api\'. Configura tu .env a partir de .envExample');
-}
+const API_URL = import.meta.env.VITE_API_URL as string | undefined;
+const BASE_URL = API_URL && API_URL.trim().length > 0 ? API_URL : '/api';
 
 export interface UsePreferencesState {
   loading: boolean;
@@ -20,25 +12,23 @@ export interface UsePreferencesState {
   success: boolean;
 }
 
-export interface UsePreferencesReturn extends UsePreferencesState {
-  createPreferences: (preferenceData: PreferenceCreateRequest) => Promise<PreferenceCreateResponse | null>;
-}
-
-export const usePreferences = (): UsePreferencesReturn => {
-  const { getAccessToken } = useAuth();
+export const usePreferences = () => {
+  const { getAccessToken } = useAuthToken();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
   const client = useMemo(() => {
     return axios.create({
-      baseURL: API_BASE_URL,
+      baseURL: BASE_URL,
       headers: { 'Content-Type': 'application/json' },
     });
   }, []);
 
   const createPreferences = useCallback(
-    async (preferenceData: PreferenceCreateRequest): Promise<PreferenceCreateResponse | null> => {
+    async (
+      preferenceData: PreferenceCreateRequest
+    ): Promise<{ success: boolean; data?: PreferenceCreateResponse; message: string }> => {
       setLoading(true);
       setError(null);
       setSuccess(false);
@@ -57,12 +47,16 @@ export const usePreferences = (): UsePreferencesReturn => {
 
         const data = response.data;
         setSuccess(!!data?.success);
-        return data;
+        return {
+          success: true,
+          data,
+          message: data?.message ?? 'Preferencias creadas correctamente',
+        };
       } catch (err) {
         const axErr = err as AxiosError<{ detail?: string }>;
-        const message = axErr.response?.data?.detail || axErr.message || 'Error creando preferencias';
+        const message = axErr.response?.data?.detail || axErr.message || 'Error al crear las preferencias';
         setError(message);
-        return null;
+        return { success: false, message };
       } finally {
         setLoading(false);
       }

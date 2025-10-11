@@ -12,11 +12,20 @@ import RegisterTeacher from '../pages/RegisterTeacher';
 import TeacherHome from '../pages/teachervista/home';
 import StudentHome from '../pages/studentvista/home';
 import PrivateRoute from "../components/PrivateRoute";
+import Preferences from '../pages/profile/Preferences';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <Home />,
+  },
+  {
+    path: '/profile/preferences',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <Preferences />
+      </PrivateRoute>
+    ),
   },
   {
     path: "/teacher-home",

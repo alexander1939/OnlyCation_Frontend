@@ -9,7 +9,12 @@ interface PrivateRouteProps {
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, roles }) => {
-  const { user } = useAuthContext();
+  const { user, isLoading } = useAuthContext();
+
+  // ⏳ Mientras se inicializa la sesión, evita redirecciones prematuras
+  if (isLoading) {
+    return <div style={{ padding: 16 }}>Cargando...</div>;
+  }
 
   // 🚨 Si no hay usuario -> redirigir al login
   if (!user) {
@@ -20,7 +25,6 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, roles }) => {
   if (roles && !roles.includes((user.role || "").toLowerCase())) {
     return <Navigate to="/" replace />;
   }
-  
 
   // ✅ Si pasa las validaciones, renderizamos el contenido protegido
   return <>{children}</>;

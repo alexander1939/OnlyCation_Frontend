@@ -1,41 +1,41 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLoginContext } from "../../context/auth/LoginContext";
+import { useLoginApi } from "../../hooks/auth/useLoginApi"; // ✅ Importa el hook de la lógica
 import LoginForm from "./LoginForm";
 import LoginHeader from "./LoginHeader";
 import "../../styles/Login.css";
 
 const Login: React.FC = () => {
-  const { login, user, loadingUser, loginLoading } = useLoginContext();
-  const navigate = useNavigate();
+  // ✅ Separar variables del contexto y funciones del hook
+  const { user, loadingUser, loginLoading } = useLoginContext();
+  const { login } = useLoginApi();
 
+  const navigate = useNavigate();
   const [error, setError] = useState("");
 
   // 🔹 Manejo del login
   const handleLogin = async (email: string, password: string) => {
-  setError("");
-  try {
-    const response = await login({ email, password });
-    console.log("Respuesta login:", response);
+    setError("");
+    try {
+      const response = await login({ email, password });
+      console.log("Respuesta login:", response);
 
-    // Si no hay respuesta o login falló
-    if (!response || !response.success || !response.data) {
-      setError(response?.message || "Credenciales inválidas");
-      return;
+      if (!response || !response.success || !response.data) {
+        setError(response?.message || "Credenciales inválidas");
+        return;
+      }
+
+      // Redirección según rol
+      const role = response.data.role.toLowerCase();
+      if (role === "teacher") navigate("/teacher-home");
+      else if (role === "student") navigate("/student-home");
+      else navigate("/");
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "No se pudo iniciar sesión");
     }
-
-    // Redirección según rol (ahora seguro)
-    const role = response.data.role.toLowerCase();
-    if (role === "teacher") navigate("/teacher-home");
-    else if (role === "student") navigate("/student-home");
-    else navigate("/");
-  } catch (err: any) {
-    console.error(err);
-    setError(err.message || "No se pudo iniciar sesión");
-  }
-};
-
-
+  };
 
   // 🔹 Redirección automática según rol
   useEffect(() => {

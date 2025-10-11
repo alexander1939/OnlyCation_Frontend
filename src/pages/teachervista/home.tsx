@@ -1,12 +1,13 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useLoginContext } from "../../context/auth/LoginContext";
-import { useLoginApi } from "../../hooks/auth/useLoginApi"; // ✅ importar el hook con la lógica
+import { useLoginApi } from "../../hooks/auth/useLoginApi";
 import Header from "../../components/Header";
+import WelcomeAlert from "../../components/WelcomeAlert"; // 👋 Componente de bienvenida temporal
 
 const TeacherHome: React.FC = () => {
-  const { user } = useLoginContext(); // ✅ solo variables del contexto
-  const { logout } = useLoginApi();   // ✅ lógica del logout desde el hook
+  const { user } = useLoginContext();
+  const { logout } = useLoginApi();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -16,19 +17,19 @@ const TeacherHome: React.FC = () => {
 
   return (
     <>
-      {/* Header siempre arriba */}
+      {/* Header superior */}
       <Header />
 
-      {/* Contenido de la página */}
-      <div style={{ padding: "6rem 2rem 2rem", textAlign: "center" }}>
-        <h1>Bienvenido, {user?.first_name || "Teacher"} 👨‍🏫</h1>
-        <p>Has iniciado sesión como docente.</p>
+      {/* 👋 Alerta temporal de bienvenida */}
+      <WelcomeAlert name={user?.first_name || "Teacher"} />
 
+      {/* Contenido principal */}
+      <div style={{ padding: "6rem 2rem 2rem", textAlign: "center" }}>
         <button
           onClick={handleLogout}
           style={{
             marginTop: "2rem",
-            padding: "0.5rem 1rem",
+            padding: "0.7rem 1.5rem",
             fontSize: "1rem",
             backgroundColor: "#e74c3c",
             color: "white",
@@ -36,6 +37,7 @@ const TeacherHome: React.FC = () => {
             borderRadius: "0.5rem",
             cursor: "pointer",
             transition: "background 0.3s ease",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
           }}
           onMouseOver={(e) =>
             (e.currentTarget.style.backgroundColor = "#c0392b")

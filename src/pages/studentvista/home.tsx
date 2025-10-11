@@ -1,13 +1,13 @@
-// src/pages/studentvista/Home.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useLoginContext } from "../../context/auth/LoginContext";
-import { useLoginApi } from "../../hooks/auth/useLoginApi"; // ✅ Importa el hook con la lógica
+import { useLoginApi } from "../../hooks/auth/useLoginApi";
 import Header from "../../components/Header";
+import WelcomeAlert from "../../components/WelcomeAlert"; // 👈 Importamos la alerta
 
 const StudentHome: React.FC = () => {
-  const { user } = useLoginContext(); // ✅ Solo las variables del contexto
-  const { logout } = useLoginApi();   // ✅ La lógica de logout desde el hook
+  const { user } = useLoginContext();
+  const { logout } = useLoginApi();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -19,6 +19,9 @@ const StudentHome: React.FC = () => {
     <>
       {/* Header fijo */}
       <Header />
+
+      {/* 👋 Alerta de bienvenida */}
+      {user?.first_name && <WelcomeAlert name={user.first_name} />}
 
       {/* Sección principal */}
       <main
@@ -39,13 +42,6 @@ const StudentHome: React.FC = () => {
             width: "100%",
           }}
         >
-          <h1 style={{ marginBottom: "1rem" }}>
-            🎓 Bienvenido, {user?.first_name || "Student"}
-          </h1>
-          <p style={{ marginBottom: "2rem", color: "#555" }}>
-            Has iniciado sesión como estudiante.
-          </p>
-
           <button
             onClick={handleLogout}
             style={{

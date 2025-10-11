@@ -17,6 +17,7 @@ export const usePreferences = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  // const [preferences, setPreferences] = useState<PreferenceData | null>(null); // deshabilitado temporalmente
 
   const client = useMemo(() => {
     return axios.create({
@@ -40,7 +41,7 @@ export const usePreferences = () => {
         }
 
         const response = await client.post<PreferenceCreateResponse>(
-          '/preferences/create/',
+          '/profile/preferences/create/',
           preferenceData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -64,10 +65,15 @@ export const usePreferences = () => {
     [client, getAccessToken]
   );
 
+  // getMyPreferences y updateMyPreferences deshabilitados temporalmente
+
   return {
     loading,
     error,
     success,
     createPreferences,
+    // preferences,
+    // getMyPreferences,
+    // updateMyPreferences,
   };
 };

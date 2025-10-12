@@ -1,3 +1,4 @@
 import { useLoginContext } from "./LoginContext";
 
-export { useLoginContext };
+// Export useLoginContext as useAuthContext for backward compatibility
+export { useLoginContext as useAuthContext, useLoginContext };

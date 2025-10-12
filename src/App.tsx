@@ -1,8 +1,12 @@
-// App.tsx
+import { LoginProvider } from './context/auth/LoginContext';
 import AppRouter from './app/router';
 
 function App() {
-  return <AppRouter />;
+  return (
+    <LoginProvider>
+      <AppRouter />
+    </LoginProvider>
+  );
 }
 
 export default App;

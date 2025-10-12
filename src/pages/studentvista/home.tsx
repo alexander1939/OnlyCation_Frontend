@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthContext } from '../../context/auth/AuthContext';
+import { useLoginContext } from '../../context/auth/LoginContext';
 import Header from '../../components/Header';
 import PublishConsult from '../../components/PublishConsult';
 import PriceCard from '../../components/PriceCard';
@@ -9,7 +9,7 @@ import FeaturedAdvisors from '../../components/FeaturedAdvisors';
 import KnowledgeCenter from '../../components/KnowledgeCenter';
 
 const StudentHome: React.FC = () => {
-  const { logout } = useAuthContext();
+  const { logout } = useLoginContext();
   const navigate = useNavigate();
 
   const handleLogout = async () => {

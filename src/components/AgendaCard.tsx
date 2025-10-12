@@ -1,26 +1,32 @@
 import React from 'react';
-import { GraduationCap } from 'lucide-react'; // icono de gorro
 import { useNavigate } from 'react-router-dom';
 
-const PublishConsult: React.FC = () => {
-  const navigate = useNavigate();
 
+const AgendaCard: React.FC = () => {
+const navigate = useNavigate();
   return (
     <div
       style={{
-        backgroundColor: '#1F3C48', // azul oscuro
+        backgroundColor: '#97E0C1', // verde menta
         borderRadius: '1rem',
         padding: '2rem',
-        color: 'white',
         display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        justifyContent: 'space-between',
+        alignItems: 'center',
+        justifyContent: 'flex-start', // alinea a la izquierda
         height: '200px',
       }}
     >
-      <GraduationCap size={40} color="#FDDC91" />
-
+      <img
+        src="./agenda-zorro1.png"
+        alt="Calendario"
+        style={{
+          height: '200%',
+          width: 'auto',
+          objectFit: 'contain',
+          marginRight: '-1rem', // separa de cualquier otro contenido
+        }}
+      />
+      {/* Si luego quieres texto o iconos, los puedes poner aquí */}
       <button
         onClick={() => navigate('/publicar')}
         style={{
@@ -37,10 +43,10 @@ const PublishConsult: React.FC = () => {
           gap: '0.5rem',
         }}
       >
-        Publicar una consulta →
+        Agendar Citas →
       </button>
     </div>
   );
 };
 
-export default PublishConsult;
+export default AgendaCard;

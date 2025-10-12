@@ -3,7 +3,7 @@ import React from 'react';
 const KnowledgeCenter: React.FC = () => {
   return (
     <div style={{
-      backgroundColor: '#FFD6E0',
+      backgroundColor: '#FFDE97',
       borderRadius: '1rem',
       padding: '2rem',
       textAlign: 'center'

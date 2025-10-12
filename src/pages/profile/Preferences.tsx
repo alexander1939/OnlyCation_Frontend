@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { usePreferences } from '../../hooks/profile/usePreferences';
+import { usePreferencesContext } from '../../context/preferences';
 import type { PreferenceCreateRequest } from '../../context/preferences/types';
 import '../../styles/Preferences.css';
 
@@ -23,7 +23,7 @@ const initialForm: PreferenceCreateRequest = {
 };
 
 const PreferencesPage: React.FC = () => {
-  const { createPreferences, loading, error, success } = usePreferences();
+  const { createPreferences, creating: loading, error, success } = usePreferencesContext();
   const [form, setForm] = useState<PreferenceCreateRequest>(initialForm);
 
   const handleChange = (

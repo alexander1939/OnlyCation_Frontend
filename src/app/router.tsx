@@ -13,6 +13,7 @@ import TeacherHome from '../pages/teachervista/home';
 import StudentHome from '../pages/studentvista/home';
 import PrivateRoute from "../components/PrivateRoute";
 import Preferences from '../pages/profile/Preferences';
+import CreateDocument from '../pages/documents/CreateDocument';
 
 const router = createBrowserRouter([
   {
@@ -24,6 +25,14 @@ const router = createBrowserRouter([
     element: (
       <PrivateRoute roles={["teacher"]}>
         <Preferences />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/documents/create',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <CreateDocument />
       </PrivateRoute>
     ),
   },

@@ -58,3 +58,10 @@ export interface PreferenceUpdateResponse {
   message: string;
   data: PreferenceUpdateData;
 }
+
+// Estado común que utiliza el hook/context de preferencias
+export interface UsePreferencesState {
+  loading: boolean;
+  error: string | null;
+  success: boolean;
+}

@@ -1,10 +1,29 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuthContext } from '../context/auth';
+import { useLoginApi } from '../hooks/auth/useLoginApi';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const location = useLocation();
+  const { user, setUser } = useAuthContext();
+  const isTeacher = user?.role === 'teacher';
+  const isStudent = user?.role === 'student';
+  const { logout } = useLoginApi();
+  const handleLogout = async () => {
+    // Temporary global logout using API hook
+    try {
+      if (logout) {
+        await logout();
+      }
+    } catch (e) {
+      // ignore
+    } finally {
+      setUser(null);
+      setIsProfileOpen(false);
+    }
+  };
 
   // Componente NavItem con CSS puro - sin Tailwind
   const NavItem: React.FC<{ to: string; label: string; onClick?: () => void; mobile?: boolean }> = ({ to, label, onClick, mobile = false }) => {
@@ -48,7 +67,7 @@ const Header: React.FC = () => {
       borderRadius: '50%'
     };
 
-    return (
+  return (
       <Link
         to={to}
         onClick={onClick}
@@ -115,6 +134,21 @@ const Header: React.FC = () => {
             <NavItem to="/ser-docente" label="¿Ser docente?" />
             <NavItem to="/about-us" label="Sobre nosotros" />
             <NavItem to="/register" label="Registrate" />
+            {/* Temporary global logout control */}
+            <button
+              onClick={handleLogout}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#294954',
+                fontWeight: 600,
+                fontSize: '18px',
+                fontFamily: 'Inter, sans-serif',
+                cursor: 'pointer'
+              }}
+            >
+              Cerrar sesión (tmp)
+            </button>
           </nav>
 
           {/* Perfil Dropdown */}
@@ -136,7 +170,7 @@ const Header: React.FC = () => {
             {/* Dropdown Menu */}
             {isProfileOpen && (
               <div 
-                className="absolute right-0 mt-2 w-48 rounded-lg shadow-lg border"
+                className="absolute right-0 mt-2 w-56 rounded-lg shadow-lg border"
                 style={{
                   backgroundColor: '#FFFFFF',
                   borderColor: 'rgba(104, 178, 201, 0.2)',
@@ -144,30 +178,44 @@ const Header: React.FC = () => {
                 }}
               >
                 <div className="py-2">
-                  <Link
-                    to="/login"
-                    className="w-full text-left px-4 py-2 text-sm transition-colors duration-200 hover:bg-gray-50 block"
-                    style={{
-                      color: '#294954',
-                      fontFamily: 'Roboto, sans-serif',
-                      textDecoration: 'none'
-                    }}
-                    onClick={() => setIsProfileOpen(false)}
-                  >
-                    Iniciar sesión
-                  </Link>
-                  <Link
-                    to="/register"
-                    className="w-full text-left px-4 py-2 text-sm transition-colors duration-200 hover:bg-gray-50 block"
-                    style={{
-                      color: '#294954',
-                      fontFamily: 'Roboto, sans-serif',
-                      textDecoration: 'none'
-                    }}
-                    onClick={() => setIsProfileOpen(false)}
-                  >
-                    Registrarse
-                  </Link>
+                  {!user && (
+                    <>
+                      <Link
+                        to="/login"
+                        className="w-full text-left px-4 py-2 text-sm transition-colors duration-200 hover:bg-gray-50 block"
+                        style={{ color: '#294954', fontFamily: 'Roboto, sans-serif', textDecoration: 'none' }}
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        Iniciar sesión
+                      </Link>
+                      <Link
+                        to="/register"
+                        className="w-full text-left px-4 py-2 text-sm transition-colors duration-200 hover:bg-gray-50 block"
+                        style={{ color: '#294954', fontFamily: 'Roboto, sans-serif', textDecoration: 'none' }}
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        Registrarse
+                      </Link>
+                    </>
+                  )}
+
+                  {isStudent && (
+                    <>
+                      <Link to="/estudiante/general" className="block px-4 py-2 text-sm hover:bg-gray-50" style={{ color: '#294954', textDecoration: 'none' }} onClick={() => setIsProfileOpen(false)}>General</Link>
+                      <Link to="/estudiante/datos-personales" className="block px-4 py-2 text-sm hover:bg-gray-50" style={{ color: '#294954', textDecoration: 'none' }} onClick={() => setIsProfileOpen(false)}>Datos personales</Link>
+                      <button className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50" style={{ color: '#294954' }} onClick={handleLogout}>Cerrar sesión</button>
+                    </>
+                  )}
+
+                  {isTeacher && (
+                    <>
+                      <Link to="/docente/general" className="block px-4 py-2 text-sm hover:bg-gray-50" style={{ color: '#294954', textDecoration: 'none' }} onClick={() => setIsProfileOpen(false)}>General</Link>
+                      <Link to="/docente/datos-personales" className="block px-4 py-2 text-sm hover:bg-gray-50" style={{ color: '#294954', textDecoration: 'none' }} onClick={() => setIsProfileOpen(false)}>Datos personales</Link>
+                      <Link to="/docente/documentos" className="block px-4 py-2 text-sm hover:bg-gray-50" style={{ color: '#294954', textDecoration: 'none' }} onClick={() => setIsProfileOpen(false)}>Documentos</Link>
+                      <Link to="/docente/agenda" className="block px-4 py-2 text-sm hover:bg-gray-50" style={{ color: '#294954', textDecoration: 'none' }} onClick={() => setIsProfileOpen(false)}>Agenda</Link>
+                      <button className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50" style={{ color: '#294954' }} onClick={handleLogout}>Cerrar sesión</button>
+                    </>
+                  )}
                 </div>
               </div>
             )}

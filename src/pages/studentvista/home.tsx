@@ -1,11 +1,15 @@
-// src/pages/studentvista/Home.tsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useLoginContext } from '../../context/auth/LoginContext';
+import { useAuthContext } from '../../context/auth/AuthContext';
 import Header from '../../components/Header';
+import PublishConsult from '../../components/PublishConsult';
+import PriceCard from '../../components/PriceCard';
+import SubjectList from '../../components/SubjectList';
+import FeaturedAdvisors from '../../components/FeaturedAdvisors';
+import KnowledgeCenter from '../../components/KnowledgeCenter';
 
 const StudentHome: React.FC = () => {
-  const { logout } = useLoginContext();
+  const { logout } = useAuthContext();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -15,56 +19,43 @@ const StudentHome: React.FC = () => {
 
   return (
     <>
-      {/* Header fijo */}
       <Header />
 
-      {/* Sección principal */}
-      <main
+      {/* 🔹 Separación ligeramente mayor respecto al Header */}
+      <div
         style={{
-          padding: '7rem 2rem 2rem',
-          display: 'flex',
-          justifyContent: 'center',
+          padding: '7.5rem 2rem 2rem', // <-- antes era 6rem, ahora hay más separación
+          display: 'grid',
+          gridTemplateColumns: '2fr 1fr',
+          gap: '2rem',
         }}
       >
-        <section
+        <div>
+          <PublishConsult />
+          <PriceCard />
+          <SubjectList />
+          <KnowledgeCenter />
+        </div>
+
+        <FeaturedAdvisors />
+      </div>
+
+      <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+        <button
+          onClick={handleLogout}
           style={{
-            textAlign: 'center',
-            backgroundColor: '#f9fafb',
-            borderRadius: '1rem',
-            padding: '2.5rem',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-            maxWidth: '500px',
-            width: '100%',
+            padding: '0.5rem 1rem',
+            fontSize: '1rem',
+            backgroundColor: '#e74c3c',
+            color: 'white',
+            border: 'none',
+            borderRadius: '0.5rem',
+            cursor: 'pointer',
           }}
         >
-          <h1 style={{ marginBottom: '1rem' }}>🎓 Bienvenido, Student</h1>
-          <p style={{ marginBottom: '2rem', color: '#555' }}>
-            Has iniciado sesión como estudiante.
-          </p>
-
-          <button
-            onClick={handleLogout}
-            style={{
-              padding: '0.75rem 1.5rem',
-              fontSize: '1rem',
-              backgroundColor: '#e74c3c',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '0.5rem',
-              cursor: 'pointer',
-              transition: 'background 0.3s ease',
-            }}
-            onMouseOver={(e) =>
-              (e.currentTarget.style.backgroundColor = '#c0392b')
-            }
-            onMouseOut={(e) =>
-              (e.currentTarget.style.backgroundColor = '#e74c3c')
-            }
-          >
-            Cerrar sesión
-          </button>
-        </section>
-      </main>
+          Cerrar sesión
+        </button>
+      </div>
     </>
   );
 };

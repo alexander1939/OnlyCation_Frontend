@@ -134,21 +134,6 @@ const Header: React.FC = () => {
             <NavItem to="/ser-docente" label="¿Ser docente?" />
             <NavItem to="/about-us" label="Sobre nosotros" />
             <NavItem to="/register" label="Registrate" />
-            {/* Temporary global logout control */}
-            <button
-              onClick={handleLogout}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: '#294954',
-                fontWeight: 600,
-                fontSize: '18px',
-                fontFamily: 'Inter, sans-serif',
-                cursor: 'pointer'
-              }}
-            >
-              Cerrar sesión (tmp)
-            </button>
           </nav>
 
           {/* Perfil Dropdown */}

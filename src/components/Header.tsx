@@ -131,7 +131,7 @@ const Header: React.FC = () => {
           {/* Navigation Menu */}
           <nav className="flex items-center space-x-12">
             <NavItem to="/" label="Inicio" />
-            <NavItem to="/ser-docente" label="¿Ser docente?" />
+            <NavItem to="/be-teacher" label="¿Ser docente?" />
             <NavItem to="/about-us" label="Sobre nosotros" />
             <NavItem to="/register" label="Registrate" />
           </nav>
@@ -195,7 +195,7 @@ const Header: React.FC = () => {
                   {isTeacher && (
                     <>
                       <Link to="/docente/general" className="block px-4 py-2 text-sm hover:bg-gray-50" style={{ color: '#294954', textDecoration: 'none' }} onClick={() => setIsProfileOpen(false)}>General</Link>
-                      <Link to="/docente/datos-personales" className="block px-4 py-2 text-sm hover:bg-gray-50" style={{ color: '#294954', textDecoration: 'none' }} onClick={() => setIsProfileOpen(false)}>Datos personales</Link>
+                      <Link to="/docente/datos-personales" className="block px-4 py-2 text-sm hover:bg-gray-50" style={{ color: '#294954', textDecoration: 'none' }} onClick={() => setIsProfileOpen(false)}>Actualizar datos personales</Link>
                       <Link to="/docente/documentos" className="block px-4 py-2 text-sm hover:bg-gray-50" style={{ color: '#294954', textDecoration: 'none' }} onClick={() => setIsProfileOpen(false)}>Documentos</Link>
                       <Link to="/docente/agenda" className="block px-4 py-2 text-sm hover:bg-gray-50" style={{ color: '#294954', textDecoration: 'none' }} onClick={() => setIsProfileOpen(false)}>Agenda</Link>
                       <button className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50" style={{ color: '#294954' }} onClick={handleLogout}>Cerrar sesión</button>

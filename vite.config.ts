@@ -1,8 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
-import fs from 'fs'
-import path from 'path'
 
 export default defineConfig({
   plugins: [
@@ -77,12 +75,8 @@ export default defineConfig({
     })
   ],
   server: {
-    host: true,
+    host: 'localhost',
     port: 5173,
-    https: {
-      key: fs.readFileSync(path.resolve(__dirname, 'ssl/onlycation.local-key.pem')),
-      cert: fs.readFileSync(path.resolve(__dirname, 'ssl/onlycation.local.pem')),
-    },
-    allowedHosts: ["onlycation.local"],
+    // HTTPS disabled for local development as requested
   },
 })

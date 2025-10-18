@@ -11,6 +11,7 @@ import TeacherHome from '../pages/teachervista/home';
 import DocenteGeneral from '../pages/docente/General';
 import AgendaDocente from '../pages/docente/Agenda';
 import DocenteDatosPersonales from '../pages/docente/DatosPersonales';
+import DocenteDocumentos from '../pages/docente/Documentos';
 import StudentHome from '../pages/studentvista/home';
 import PrivateRoute from "../components/PrivateRoute";
 
@@ -56,6 +57,14 @@ const router = createBrowserRouter([
     element: (
       <PrivateRoute roles={["teacher"]}>
         <DocenteDatosPersonales />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/docente/documentos',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <DocenteDocumentos />
       </PrivateRoute>
     ),
   },

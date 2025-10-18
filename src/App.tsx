@@ -1,14 +1,12 @@
-import { RegisterAuthProvider, ThemeProvider } from './context';
+import { LoginProvider } from './context/auth/LoginContext';
 import AppRouter from './app/router';
 
 function App() {
   return (
-    <ThemeProvider>
-      <RegisterAuthProvider>
-        <AppRouter />
-      </RegisterAuthProvider>
-    </ThemeProvider>
+    <LoginProvider>
+      <AppRouter />
+    </LoginProvider>
   );
 }
 
-export default App
+export default App;

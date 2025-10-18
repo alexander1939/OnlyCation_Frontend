@@ -4,7 +4,7 @@ import type {
   User, 
   AuthState, 
   RegisterRequest 
-} from '../../context/registerAuth/types';
+} from '../../context/regAuth/types';
 
 export const useRegisterAuthHook = () => {
   const [authState, setAuthState] = useState<AuthState>({

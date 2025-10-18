@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import RegisterForm from '../components/RegisterForm';
-import { useAuthContext } from '../context/auth';
 
 interface RegisterFormData {
   first_name: string;
@@ -19,7 +18,12 @@ export default function RegisterStudent() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
-  const { registerStudent } = useAuthContext();
+  // Placeholder local function mientras no hay contexto de auth
+  const registerStudent = async (_data: Omit<RegisterFormData, 'confirmPassword'>) => {
+    // TODO: conectar a API real de registro de estudiante
+    await new Promise((r) => setTimeout(r, 400));
+    return { success: true } as const;
+  };
 
   const handleSubmit = async (formData: RegisterFormData) => {
     setIsLoading(true);

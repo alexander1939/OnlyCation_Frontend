@@ -7,7 +7,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg', 'offline.html'],
       manifest: {
         name: 'OnlyCation',
         short_name: 'OnlyCation',
@@ -64,13 +64,34 @@ export default defineConfig({
                 maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
               }
             }
-          }
+          },
+          {
+            // Caché de documentos/navegación para funcionar sin conexión (usa precache)
+            urlPattern: ({ request }) => request.mode === 'navigate',
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'html-cache',
+              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 14 },
+            },
+          },
+          {
+            // API con Background Sync cuando esté sin conexión
+            urlPattern: /\/api\//i,
+            handler: 'NetworkOnly',
+            method: 'POST',
+            options: {
+              backgroundSync: {
+                name: 'onlycation-api-queue',
+                options: { maxRetentionTime: 24 * 60 },
+              },
+            },
+          },
         ]
       },
       devOptions: {
         enabled: true,
         type: 'module',
-        navigateFallback: 'index.html',
+        navigateFallback: 'offline.html',
       },
     })
   ],

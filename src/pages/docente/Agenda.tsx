@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import '../../styles/docente-agenda.css';
@@ -28,6 +28,17 @@ export default function AgendaDocente() {
     sunday: [],
   });
 
+  // Estado para días habilitados/deshabilitados
+  const [enabledDays, setEnabledDays] = useState<Record<DayKey, boolean>>({
+    monday: true,
+    tuesday: true,
+    wednesday: true,
+    thursday: true,
+    friday: true,
+    saturday: false,
+    sunday: false,
+  });
+
   const weekKeys = useMemo<DayKey[]>(() => ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'], []);
 
   // Modal state for hour selection
@@ -36,6 +47,10 @@ export default function AgendaDocente() {
   const [selectedHours, setSelectedHours] = useState<Set<number>>(new Set());
 
   const openAddModal = (day: DayKey) => {
+    if (!enabledDays[day]) {
+      alert('Este día está deshabilitado. Habilítalo primero para agregar horarios.');
+      return;
+    }
     setModalDay(day);
     setSelectedHours(new Set());
     setIsModalOpen(true);
@@ -96,36 +111,72 @@ export default function AgendaDocente() {
     }));
   };
 
+  const toggleDayEnabled = (day: DayKey) => {
+    const currentlyEnabled = Object.values(enabledDays).filter(Boolean).length;
+    
+    // No permitir deshabilitar si es el último día activo
+    if (enabledDays[day] && currentlyEnabled === 1) {
+      alert('Debes tener al menos un día activo en tu agenda.');
+      return;
+    }
+
+    setEnabledDays((prev) => ({
+      ...prev,
+      [day]: !prev[day],
+    }));
+
+    // Si se deshabilita un día, limpiar sus slots
+    if (enabledDays[day]) {
+      setSlots((prev) => ({
+        ...prev,
+        [day]: [],
+      }));
+    }
+  };
+
   return (
-    <div className="min-h-screen w-full page-container">
+    <div className="min-h-screen flex flex-col page-container">
       <Header />
-      <main className="main-spacing">
-        <section className="max-w-6xl mx-auto px-6">
+      <main className="flex-1 main-spacing">
+        <section className="agenda-container">
           <h1 className="agenda-title">Horario semanal</h1>
           <p className="agenda-subtitle">Establece tu horario semanal. Los horarios se aplicarán a todas las semanas.</p>
 
           <div className="agenda-card">
             <div className="agenda-grid">
-              {weekKeys.map((key) => (
-                <div key={key} className="agenda-day">
-                  <div className="agenda-day-name">{dayLabels[key]}</div>
-
-                  <div className="agenda-slots">
-                    {slots[key].length === 0 && (key === 'saturday' || key === 'sunday') && (
-                      <div className="agenda-na">No disponible</div>
-                    )}
-
-                    {slots[key].map((slot) => (
-                      <div key={slot.id} className="agenda-chip">
-                        <span>{slot.from} - {slot.to}</span>
-                        <button aria-label="remove" className="chip-remove" onClick={() => handleRemove(key, slot.id)}>×</button>
-                      </div>
-                    ))}
+              {weekKeys.map((key) => {
+                const isEnabled = enabledDays[key];
+                return (
+                <div key={key} className={`agenda-day ${!isEnabled ? 'agenda-day-disabled' : ''}`}>
+                  <div className="agenda-day-header">
+                    <div className="agenda-day-name">{dayLabels[key]}</div>
+                    <button 
+                      className={`day-toggle ${isEnabled ? 'day-toggle-active' : ''}`}
+                      onClick={() => toggleDayEnabled(key)}
+                      title={isEnabled ? 'Deshabilitar día' : 'Habilitar día'}
+                    >
+                      {isEnabled ? '✓' : '○'}
+                    </button>
                   </div>
 
-                  <button className="agenda-add" onClick={() => openAddModal(key)}>+ Agregar horario</button>
+                  {!isEnabled ? (
+                    <div className="agenda-disabled-message">Día deshabilitado</div>
+                  ) : (
+                    <>
+                      <div className="agenda-slots">
+                        {slots[key].map((slot) => (
+                          <div key={slot.id} className="agenda-chip">
+                            <span>{slot.from} - {slot.to}</span>
+                            <button aria-label="remove" className="chip-remove" onClick={() => handleRemove(key, slot.id)}>×</button>
+                          </div>
+                        ))}
+                      </div>
+
+                      <button className="agenda-add" onClick={() => openAddModal(key)}>+ Agregar horario</button>
+                    </>
+                  )}
                 </div>
-              ))}
+              );})}
             </div>
           </div>
 

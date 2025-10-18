@@ -7,7 +7,6 @@ type Clase = {
   id: string;
   diaHora: string;
   titulo: string;
-  aula: string;
   inscritos: number;
 };
 
@@ -17,9 +16,9 @@ export default function DocenteGeneral() {
   const initials = user ? `${user.first_name?.[0] ?? ''}${user.last_name?.[0] ?? ''}`.toUpperCase() || '-' : '-';
 
   const clases: Clase[] = [
-    { id: '1', diaHora: 'Lunes, 10:00', titulo: 'Álgebra Lineal', aula: 'Aula 201', inscritos: 12 },
-    { id: '2', diaHora: 'Miércoles, 08:00', titulo: 'Cálculo Diferencial', aula: 'Aula 105', inscritos: 18 },
-    { id: '3', diaHora: 'Viernes, 14:00', titulo: 'Estadística Aplicada', aula: 'Laboratorio B', inscritos: 9 },
+    { id: '1', diaHora: 'Lunes, 10:00', titulo: 'Álgebra Lineal', inscritos: 12 },
+    { id: '2', diaHora: 'Miércoles, 08:00', titulo: 'Cálculo Diferencial', inscritos: 18 },
+    { id: '3', diaHora: 'Viernes, 14:00', titulo: 'Estadística Aplicada', inscritos: 9 },
   ];
 
   return (
@@ -50,7 +49,6 @@ export default function DocenteGeneral() {
                   <span className="clase-fecha">{c.diaHora}</span>
                 </div>
                 <h3 className="clase-titulo">{c.titulo}</h3>
-                <div className="clase-aula">{c.aula}</div>
                 <div className="clase-footer">
                   <div className="alumnos">
                     <div className="alumno"/>

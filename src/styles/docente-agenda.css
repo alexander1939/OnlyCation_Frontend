@@ -1,16 +1,39 @@
-.agenda-title{font-family:'Roboto',sans-serif;color:#294954;font-weight:800;font-size:28px;margin-bottom:6px}
-.agenda-subtitle{font-family:'Roboto',sans-serif;color:#294954;opacity:.8;margin-bottom:14px}
-.agenda-card{background:#fff;border:1px solid rgba(104,178,201,.22);border-radius:16px;box-shadow:0 8px 28px rgba(41,73,84,.08);padding:16px}
-.agenda-grid{display:grid;grid-template-columns:1fr;gap:16px}
-@media(min-width:900px){.agenda-grid{grid-template-columns:repeat(7,1fr)}}
-.agenda-day{display:flex;flex-direction:column;gap:10px}
-.agenda-day-name{font-family:'Roboto',sans-serif;font-weight:700;color:#294954}
+/* Container */
+.agenda-container{max-width:1200px;margin:0 auto;padding:40px 24px}
+
+.agenda-title{font-family:'Roboto',sans-serif;color:#294954;font-weight:800;font-size:32px;margin-bottom:8px}
+.agenda-subtitle{font-family:'Roboto',sans-serif;color:#294954;opacity:.8;margin-bottom:24px;font-size:15px}
+.agenda-card{background:#fff;border:1px solid rgba(104,178,201,.22);border-radius:20px;box-shadow:0 10px 32px rgba(41,73,84,.10);padding:24px}
+.agenda-grid{display:grid;grid-template-columns:1fr;gap:20px}
+@media(min-width:768px){.agenda-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1024px){.agenda-grid{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:1280px){.agenda-grid{grid-template-columns:repeat(7,1fr)}}
+.agenda-day{display:flex;flex-direction:column;gap:12px;min-width:0;transition:opacity 300ms ease}
+.agenda-day-disabled{opacity:0.5}
+
+/* Header del día con toggle */
+.agenda-day-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.agenda-day-name{font-family:'Roboto',sans-serif;font-weight:700;color:#294954;font-size:15px}
+
+/* Botón toggle para habilitar/deshabilitar día */
+.day-toggle{width:28px;height:28px;border-radius:50%;border:2px solid rgba(104,178,201,.4);background:transparent;color:#294954;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all 200ms ease;font-family:'Roboto',sans-serif;font-weight:700}
+.day-toggle:hover{border-color:#68B2C9;background:rgba(104,178,201,.1)}
+.day-toggle-active{background:#0f9d68;border-color:#0f9d68;color:#fff}
+.day-toggle-active:hover{background:#0c7d53;border-color:#0c7d53}
+
+/* Mensaje de día deshabilitado */
+.agenda-disabled-message{font-family:'Roboto',sans-serif;color:#294954;opacity:.6;font-size:13px;font-style:italic;padding:8px 0}
 .agenda-slots{display:flex;flex-direction:column;gap:10px}
-.agenda-chip{font-family:'Roboto',sans-serif;display:flex;align-items:center;justify-content:space-between;gap:8px;background:rgba(104,178,201,.15);border:1px solid rgba(104,178,201,.35);color:#294954;padding:8px 10px;border-radius:10px;font-weight:600}
+.agenda-chip{font-family:'Roboto',sans-serif;display:flex;align-items:center;justify-content:space-between;gap:8px;background:rgba(104,178,201,.15);border:1px solid rgba(104,178,201,.35);color:#294954;padding:10px 12px;border-radius:12px;font-weight:600;font-size:14px}
 .chip-remove{background:transparent;border:none;color:#294954;opacity:.8;cursor:pointer;font-size:18px}
 .chip-remove:hover{opacity:1}
-.agenda-add{font-family:'Roboto',sans-serif;background:transparent;border:none;color:#68B2C9;cursor:pointer;padding:0;text-align:left;font-weight:600}
+.agenda-add{font-family:'Roboto',sans-serif;background:transparent;border:none;color:#68B2C9;cursor:pointer;padding:8px 0;text-align:left;font-weight:600;font-size:14px;transition:color 200ms ease}
+.agenda-add:hover{color:#294954}
 .agenda-na{font-family:'Roboto',sans-serif;color:#294954;opacity:.65}
+
+/* Deshabilitar interacción en días deshabilitados */
+.agenda-day-disabled .agenda-add{pointer-events:none;opacity:0.4}
+.agenda-day-disabled .agenda-chip{opacity:0.6}
 
 /* Modal */
 .modal-backdrop{position:fixed;inset:0;background:rgba(41,73,84,.35);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:60}

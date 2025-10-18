@@ -1,19 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useAuthApi } from './useRegisterApi';
+import { useRegisterAuthApi } from './useRegisterApi';
 import type { 
   User, 
   AuthState, 
   RegisterRequest 
-} from '../../context/auth/types';
+} from '../../context/registerAuth/types';
 
-export const useAuthHook = () => {
+export const useRegisterAuthHook = () => {
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
     isAuthenticated: false,
     isLoading: true,
   });
 
-  const authApi = useAuthApi();
+  const authApi = useRegisterAuthApi();
 
   // Check if user is authenticated
   const isAuthenticated = useCallback((): boolean => {

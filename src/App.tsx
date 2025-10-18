@@ -1,12 +1,12 @@
-import { AuthProvider, ThemeProvider } from './context';
+import { RegisterAuthProvider, ThemeProvider } from './context';
 import AppRouter from './app/router';
 
 function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
+      <RegisterAuthProvider>
         <AppRouter />
-      </AuthProvider>
+      </RegisterAuthProvider>
     </ThemeProvider>
   );
 }

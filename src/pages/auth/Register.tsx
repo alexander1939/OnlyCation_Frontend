@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../../components/ui/Header';
 import Footer from '../../components/ui/Footer';
 import RegisterForm from '../../components/registerComp/RegisterForm';
-import { useAuthContext } from '../../context/auth';
+import { useRegisterAuthContext } from '../../context/registerAuth';
 import '../../styles/Register.css';
 import SuccessReg from '../../components/registerComp/SuccessReg';
 
@@ -33,7 +33,7 @@ function Register() {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [pendingType, setPendingType] = useState<UserType>(null);
   const navigate = useNavigate();
-  const { registerStudent, registerTeacher } = useAuthContext();
+  const { registerStudent, registerTeacher } = useRegisterAuthContext();
 
   // Visibilidad para animar el título y subtítulo al montar
   const [isVisible, setIsVisible] = useState(false);

@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import type { 
   RegisterRequest, 
   RegisterResponse, 
-} from '../../context/auth/types';
+} from '../../context/registerAuth/types';
 
 // API configuration from environment
 const envApiUrl = (import.meta as any).env?.VITE_API_URL as string | undefined;
@@ -13,7 +13,7 @@ if (!envApiUrl) {
 }
 
 // Custom hook for authentication API calls
-export const useAuthApi = () => {
+export const useRegisterAuthApi = () => {
   const getHeaders = useCallback((includeAuth: boolean = false): HeadersInit => {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',

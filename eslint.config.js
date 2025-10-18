@@ -6,7 +6,8 @@ import tseslint from 'typescript-eslint'
 import { globalIgnores } from 'eslint/config'
 
 export default tseslint.config([
-  globalIgnores(['dist']),
+  // Ignorar rutas externas al código fuente
+  globalIgnores(['dist', 'dev-dist', 'node_modules']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [

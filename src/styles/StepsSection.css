@@ -1,0 +1,315 @@
+/* Contenedor principal de la tablet para pasos */
+.steps-tablet-container {
+  position: relative;
+  margin: 40px auto;
+  max-width: 1600px;
+  perspective: 1000px;
+}
+
+/* Marco de la tablet */
+.tablet-frame {
+  background: linear-gradient(145deg, #2c2c2c 0%, #1a1a1a 100%);
+  border-radius: 30px;
+  padding: 25px;
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.1),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3);
+  position: relative;
+  transform: rotateX(5deg) rotateY(-2deg);
+  transition: transform 0.3s ease;
+}
+
+.tablet-frame:hover {
+  transform: rotateX(2deg) rotateY(-1deg);
+}
+
+/* Botón home de la tablet */
+.tablet-home-button {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 50px;
+  background: radial-gradient(circle, #333 0%, #111 100%);
+  border-radius: 50%;
+  border: 2px solid #444;
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.1),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.tablet-home-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid #666;
+  border-radius: 4px;
+}
+
+/* Pantalla de la tablet */
+.tablet-screen {
+  background: linear-gradient(135deg, #000 0%, #111 100%);
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  min-height: 800px;
+  width: 100%;
+  box-shadow: 
+    inset 0 0 20px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(0, 150, 255, 0.1);
+}
+
+/* Barra de estado de la tablet */
+.tablet-status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 20px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.status-left .status-time {
+  color: #fff;
+  font-family: 'SF Pro Display', -apple-system, sans-serif;
+}
+
+.status-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wifi-icon, .battery-icon {
+  font-size: 12px;
+}
+
+.battery-percentage {
+  font-size: 12px;
+  color: #4CAF50;
+}
+
+/* Contenido de la aplicación */
+.tablet-app-content {
+  padding: 30px 40px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  min-height: calc(100% - 40px);
+}
+
+/* Header de la app */
+.app-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.app-title {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 15px;
+}
+
+.digital-title {
+  font-size: 32px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-family: 'SF Pro Display', -apple-system, sans-serif;
+  margin: 0;
+}
+
+.title-indicator {
+  height: 4px;
+  width: 60px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 2px;
+  margin: 10px auto 0;
+}
+
+.app-subtitle {
+  font-size: 16px;
+  color: #6c757d;
+  font-weight: 400;
+  margin: 0;
+  font-family: 'SF Pro Display', -apple-system, sans-serif;
+}
+
+/* Contenido con scroll */
+.tablet-content-scroll {
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.tablet-content-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tablet-content-scroll::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+.tablet-content-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 3px;
+}
+
+/* Grid de pasos */
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 25px;
+  padding: 20px 0;
+}
+
+/* Card de cada paso */
+.step-card {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.step-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+/* Número del paso */
+.step-number {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border: 3px solid white;
+}
+
+/* Contenido del paso */
+.step-content {
+  padding-top: 15px;
+}
+
+.step-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #294954;
+  margin-bottom: 12px;
+  font-family: 'SF Pro Display', -apple-system, sans-serif;
+}
+
+.step-description {
+  font-size: 14px;
+  color: #6c757d;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  font-family: 'SF Pro Display', -apple-system, sans-serif;
+}
+
+/* Contenedor de imagen */
+.step-image-container {
+  border-radius: 15px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  opacity: 0.9;
+}
+
+.step-image {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
+}
+
+/* Elementos decorativos de tablet */
+.tablet-decorations {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  border-radius: 30px;
+  overflow: hidden;
+}
+
+.screen-glare {
+  position: absolute;
+  top: 25px;
+  left: 25px;
+  right: 25px;
+  height: 200px;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.1) 0%, 
+    rgba(255, 255, 255, 0.05) 50%, 
+    transparent 100%);
+  border-radius: 20px 20px 0 0;
+}
+
+.reflection-1 {
+  position: absolute;
+  top: 100px;
+  left: 50px;
+  width: 80px;
+  height: 150px;
+  background: linear-gradient(45deg, 
+    rgba(255, 255, 255, 0.03) 0%, 
+    transparent 100%);
+  border-radius: 10px;
+  transform: rotate(-15deg);
+}
+
+.reflection-2 {
+  position: absolute;
+  bottom: 150px;
+  right: 80px;
+  width: 60px;
+  height: 120px;
+  background: linear-gradient(-45deg, 
+    rgba(255, 255, 255, 0.02) 0%, 
+    transparent 100%);
+  border-radius: 8px;
+  transform: rotate(20deg);
+}
+
+/* Responsive para pantallas más pequeñas */
+@media (max-width: 1200px) {
+  .steps-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .digital-title {
+    font-size: 28px;
+  }
+  
+  .step-card {
+    padding: 20px;
+  }
+}

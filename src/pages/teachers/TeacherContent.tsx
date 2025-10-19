@@ -3,7 +3,7 @@ import Ribbon from '../../components/Ribbon';
 
 const TeacherContent: React.FC = () => {
   return (
-    <div className="bg-white rounded-3xl shadow-lg border-2 border-mint-green p-8 md:p-12 space-y-10">
+    <div className="bg-white rounded-3xl shadow-lg p-8 md:p-12 space-y-10">
       {/* Sección tipo “Misión” (alineada a AboutUs) */}
       <section style={{ padding: '80px 0', backgroundColor: '#FFFFFF' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -39,7 +39,7 @@ const TeacherContent: React.FC = () => {
               {/* Botón principal en esta sección */}
               <div style={{ marginTop: '22px' }}>
                 <a
-                  href="/register/teacher"
+                  href="/register"
                   className="inline-block"
                   style={{
                     backgroundColor: '#294954',
@@ -47,10 +47,17 @@ const TeacherContent: React.FC = () => {
                     padding: '12px 20px',
                     borderRadius: '14px',
                     fontWeight: 700,
-                    boxShadow: '0 8px 24px rgba(41,73,84,0.18)'
+                    boxShadow: '0 8px 24px rgba(41,73,84,0.18)',
+                    textDecoration: 'none'
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#1e3a42')}
-                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#294954')}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#1e3a42';
+                    e.currentTarget.style.textDecoration = 'none';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#294954';
+                    e.currentTarget.style.textDecoration = 'none';
+                  }}
                 >
                   Crear mi cuenta docente
                 </a>

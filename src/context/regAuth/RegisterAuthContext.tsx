@@ -1,6 +1,6 @@
 import React, { createContext, useContext, type ReactNode } from 'react';
-import { useRegisterAuthHook } from '../../hooks/registerAuth';
-import type { AuthContextType } from './types';
+import { useRegisterAuthHook } from '../../hooks/regAuth/index.ts';
+import type { AuthContextType } from './reg.types.ts';
 
 const RegisterAuthContext = createContext<AuthContextType | undefined>(undefined);
 

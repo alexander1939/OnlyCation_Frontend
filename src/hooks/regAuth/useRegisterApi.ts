@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import type { 
   RegisterRequest, 
   RegisterResponse, 
-} from '../../context/regAuth/types';
+} from '../../context/regAuth/reg.types.ts';
 
 // API configuration from environment
 const envApiUrl = (import.meta as any).env?.VITE_API_URL as string | undefined;

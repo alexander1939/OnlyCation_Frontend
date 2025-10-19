@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../../components/ui/Header';
 import Footer from '../../components/ui/Footer';
 import RegisterForm from '../../components/registerComp/RegisterForm';
-import { useRegisterAuthContext } from '../../context/registerAuth';
+import { useRegisterAuthContext } from '../../context/regAuth';
 import '../../styles/Register.css';
 import SuccessReg from '../../components/registerComp/SuccessReg';
 

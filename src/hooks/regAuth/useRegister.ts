@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useRegisterAuthApi } from './useRegisterApi';
+import { useRegisterAuthApi } from './useRegisterApi.ts';
 import type { 
   User, 
   AuthState, 
   RegisterRequest 
-} from '../../context/regAuth/types';
+} from '../../context/regAuth/reg.types.ts';
 
 export const useRegisterAuthHook = () => {
   const [authState, setAuthState] = useState<AuthState>({

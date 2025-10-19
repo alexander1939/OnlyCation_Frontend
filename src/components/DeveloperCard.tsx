@@ -15,7 +15,7 @@ const DeveloperCard: React.FC<DeveloperCardProps> = ({
   role,
   email,
   image,
-  description,
+  // description is not used in the component
   skills,
   index
 }) => {

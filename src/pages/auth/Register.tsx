@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import RegisterForm from '../../components/RegisterForm';
-import { useAuthContext } from '../../context/auth';
 import '../../styles/Register.css';
 
 interface RegisterFormData {
@@ -31,7 +30,15 @@ function Register() {
   const [isContracting, setIsContracting] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const navigate = useNavigate();
-  const { registerStudent, registerTeacher } = useAuthContext();
+  // Placeholders locales mientras no existe el contexto de auth
+  const registerStudent = async (_data: Omit<RegisterFormData, 'confirmPassword' | 'rfc' | 'expertise_area' | 'certificate' | 'curriculum'>) => {
+    await new Promise((r) => setTimeout(r, 300));
+    return { success: true } as const;
+  };
+  const registerTeacher = async (_data: Omit<RegisterFormData, 'confirmPassword' | 'rfc' | 'expertise_area' | 'certificate' | 'curriculum'>) => {
+    await new Promise((r) => setTimeout(r, 300));
+    return { success: true } as const;
+  };
 
   const handleUserTypeSelect = (type: 'student' | 'teacher') => {
     setUserType(type);

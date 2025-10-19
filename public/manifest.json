@@ -1,0 +1,173 @@
+{
+  "name": "OnlyCation",
+  "short_name": "OnlyCation",
+  "description": "Plataforma educativa para conectar estudiantes con los mejores profesores",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAF9F5",
+  "theme_color": "#8ED4BE",
+  "orientation": "portrait",
+  
+  "icons": [
+    {
+      "src": "logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "zorro_Turoria.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "zorro_docnte_.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "zorro_confiormando.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "Penzando_zorro.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "Zorro_con100.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "buscando_zorro.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "mascota_sentado.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "library_1245359.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "email_icon.png",
+      "sizes": "64x64",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "youtube_icon.png",
+      "sizes": "64x64",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "usuario.png",
+      "sizes": "64x64",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "fcha a la drechas.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "flecha_cntro.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "flecha_iz.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "chus.jpeg",
+      "sizes": "256x256",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "rober.jpeg",
+      "sizes": "256x256",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "tavazo.jpeg",
+      "sizes": "256x256",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "yo.jpg",
+      "sizes": "256x256",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ],
+  
+  "screenshots": [
+    {
+      "src": "zorro_Turoria.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "zorro_docnte_.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  
+  "shortcuts": [
+    {
+      "name": "Inicio",
+      "short_name": "Inicio",
+      "description": "Página principal de OnlyCation",
+      "url": "/"
+    },
+    {
+      "name": "Profesores",
+      "short_name": "Profesores",
+      "description": "Explora nuestros profesores",
+      "url": "/teachers"
+    },
+    {
+      "name": "Iniciar Sesión",
+      "short_name": "Login",
+      "description": "Accede a tu cuenta",
+      "url": "/login"
+    }
+  ],
+  
+  "categories": ["education", "social", "productivity"],
+  "prefer_related_applications": false,
+  "related_applications": []
+}

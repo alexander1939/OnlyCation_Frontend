@@ -1,12 +1,19 @@
+// src/pages/student/StudentHome.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useLoginContext } from "../../context/auth/LoginContext";
 import { useLoginApi } from "../../hooks/auth/useLoginApi";
 import Header from "../../components/Header";
-import WelcomeAlert from "../../components/WelcomeAlert"; // 👈 Importamos la alerta
+import PublishConsult from "./HistoryCard";
+import AgendaCard from "./AgendaCard";
+import PriceCard from "./PriceCard";
+import SubjectList from "./SubjectList";
+import FeaturedAdvisors from "./FeaturedAdvisors";
+import KnowledgeCenter from "./KnowledgeCenter";
+import WelcomeAlert from "../../components/WelcomeAlert";
+import { Footer } from "../../components";
 
 const StudentHome: React.FC = () => {
-  const { user } = useLoginContext();
+  const { user } = useLoginApi();
   const { logout } = useLoginApi();
   const navigate = useNavigate();
 
@@ -16,56 +23,84 @@ const StudentHome: React.FC = () => {
   };
 
   return (
-    <>
-      {/* Header fijo */}
+    <div
+      style={{
+        backgroundColor: "#FAF9F5", // 👈 Fondo principal soft-white
+        minHeight: "100vh", // Asegura que cubra toda la altura visible
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <Header />
+      <WelcomeAlert name={user?.first_name || "Student"} />
 
-      {/* 👋 Alerta de bienvenida */}
-      {user?.first_name && <WelcomeAlert name={user.first_name} />}
-
-      {/* Sección principal */}
-      <main
+      {/* Contenido principal */}
+      <div
         style={{
-          padding: "7rem 2rem 2rem",
-          display: "flex",
-          justifyContent: "center",
+          flex: 1, // hace que el contenido principal se expanda
+          padding: "7.5rem 2rem 2rem",
+          display: "grid",
+          gridTemplateColumns: "2fr 1fr",
+          gap: "2rem",
         }}
       >
-        <section
+        <div>
+          {/* 🔹 KnowledgeCenter */}
+          <div style={{ marginBottom: "1.5rem" }}>
+            <KnowledgeCenter />
+          </div>
+
+          {/* 🔹 Publicar consulta + Agenda */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "1rem",
+              marginBottom: "1.5rem",
+            }}
+          >
+            <PublishConsult />
+            <AgendaCard />
+          </div>
+
+          {/* 🔹 PriceCard y SubjectList */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "1rem",
+              marginBottom: "1.5rem",
+            }}
+          >
+            <PriceCard />
+            <SubjectList />
+          </div>
+        </div>
+
+        {/* 🔹 Panel lateral */}
+        <FeaturedAdvisors />
+      </div>
+
+      {/* Botón de cierre de sesión */}
+      <div style={{ textAlign: "center", marginTop: "2rem" }}>
+        <button
+          onClick={handleLogout}
           style={{
-            textAlign: "center",
-            backgroundColor: "#f9fafb",
-            borderRadius: "1rem",
-            padding: "2.5rem",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-            maxWidth: "500px",
-            width: "100%",
+            padding: "0.5rem 1rem",
+            fontSize: "1rem",
+            backgroundColor: "#e74c3c",
+            color: "white",
+            border: "none",
+            borderRadius: "0.5rem",
+            cursor: "pointer",
           }}
         >
-          <button
-            onClick={handleLogout}
-            style={{
-              padding: "0.75rem 1.5rem",
-              fontSize: "1rem",
-              backgroundColor: "#e74c3c",
-              color: "#fff",
-              border: "none",
-              borderRadius: "0.5rem",
-              cursor: "pointer",
-              transition: "background 0.3s ease",
-            }}
-            onMouseOver={(e) =>
-              (e.currentTarget.style.backgroundColor = "#c0392b")
-            }
-            onMouseOut={(e) =>
-              (e.currentTarget.style.backgroundColor = "#e74c3c")
-            }
-          >
-            Cerrar sesión
-          </button>
-        </section>
-      </main>
-    </>
+          Cerrar sesión
+        </button>
+      </div>
+
+      <Footer />
+    </div>
   );
 };
 

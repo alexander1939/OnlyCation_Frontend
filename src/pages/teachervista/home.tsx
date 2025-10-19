@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useLoginContext } from "../../context/auth/LoginContext";
 import { useLoginApi } from "../../hooks/auth/useLoginApi";
 import Header from "../../components/Header";
-import WelcomeAlert from "../../components/WelcomeAlert"; // 👋 Componente de bienvenida temporal
+import WelcomeAlert from "../../components/WelcomeAlert"; 
 
 const TeacherHome: React.FC = () => {
   const { user } = useLoginContext();

@@ -10,11 +10,48 @@ import ResetPassword from '../pages/auth/ResetPassword';
 import TeacherHome from '../pages/teachervista/home';
 import StudentHome from '../pages/studentvista/home';
 import PrivateRoute from "../components/PrivateRoute";
+import Preferences from '../pages/profile/Preferences';
+import CreateDocument from '../pages/documents/CreateDocument';
+import CreatePrice from '../pages/prices/CreatePrice';
+import { DocumentsProvider } from '../context/documents';
+import { PreferencesProvider } from '../context/preferences';
+import { CatalogsProvider } from '../context/catalogs/CatalogsContext';
+import Video from '../pages/profile/Video';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <Home />,
+  },
+  {
+    path: '/profile/preferences',
+    element: (
+      <CatalogsProvider>
+        <PreferencesProvider>
+          <Preferences />
+        </PreferencesProvider>
+      </CatalogsProvider>
+    ),
+  },
+  {
+    path: '/documents/create',
+    element: (
+      <DocumentsProvider>
+        <CreateDocument />
+      </DocumentsProvider>
+    ),
+  },
+  {
+    path: '/prices/create',
+    element: (
+    <PrivateRoute roles={["teacher"]}>
+    <CreatePrice />
+    </PrivateRoute>
+    ),
+  },
+  {
+    path: '/profile/video',
+    element: <Video />,
   },
   {
     path: "/teacher-home",

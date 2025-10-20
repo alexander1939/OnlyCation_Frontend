@@ -1,6 +1,6 @@
 import React from 'react';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
+import Header from '../../components/ui/Header';
+import Footer from '../../components/ui/Footer';
 import TeacherHero from './TeacherHero';
 import TeacherContent from './TeacherContent';
 

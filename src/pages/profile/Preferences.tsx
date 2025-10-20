@@ -2,18 +2,9 @@ import React, { useState } from 'react';
 import { usePreferencesContext } from '../../context/preferences';
 import type { PreferenceCreateRequest } from '../../context/preferences/types';
 import '../../styles/Preferences.css';
+import { useCatalogsContext } from '../../context/catalogs/CatalogsContext';
 
-// Opciones de ejemplo para selects
-const educationLevels = [
-  { id: 1, name: 'Preparatoria' },
-  { id: 2, name: 'Universidad' },
-  { id: 3, name: 'Posgrado' },
-];
-
-const modalities = [
-  { id: 1, name: 'Presencial' },
-  { id: 2, name: 'En línea' },
-];
+// Las opciones ahora provienen del CatalogsContext
 
 const initialForm: PreferenceCreateRequest = {
   educational_level_id: 1,
@@ -24,6 +15,7 @@ const initialForm: PreferenceCreateRequest = {
 
 const PreferencesPage: React.FC = () => {
   const { createPreferences, creating: loading, error, success } = usePreferencesContext();
+  const { educationalLevels, modalities, loading: loadingCatalogs, error: catalogsError } = useCatalogsContext();
   const [form, setForm] = useState<PreferenceCreateRequest>(initialForm);
 
   const handleChange = (
@@ -77,10 +69,12 @@ const PreferencesPage: React.FC = () => {
                     onChange={handleChange}
                     className="pref-select with-icon pr-8"
                   >
-                    <option value="" disabled>
-                      Selecciona un nivel
-                    </option>
-                    {educationLevels.map((level) => (
+                    {loadingCatalogs && <option>Cargando...</option>}
+                    {catalogsError && <option disabled>Error al cargar niveles</option>}
+                    {!loadingCatalogs && educationalLevels.length === 0 && (
+                      <option disabled>No hay niveles disponibles</option>
+                    )}
+                    {educationalLevels.map((level) => (
                       <option key={level.id} value={level.id}>
                         {level.name}
                       </option>
@@ -107,9 +101,11 @@ const PreferencesPage: React.FC = () => {
                     onChange={handleChange}
                     className="pref-select with-icon pr-8"
                   >
-                    <option value="" disabled>
-                      Selecciona una modalidad
-                    </option>
+                    {loadingCatalogs && <option>Cargando...</option>}
+                    {catalogsError && <option disabled>Error al cargar modalidades</option>}
+                    {!loadingCatalogs && modalities.length === 0 && (
+                      <option disabled>No hay modalidades disponibles</option>
+                    )}
                     {modalities.map((m) => (
                       <option key={m.id} value={m.id}>
                         {m.name}

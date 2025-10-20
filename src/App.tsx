@@ -1,18 +1,12 @@
-import { AuthProvider, ThemeProvider, DocumentsProvider, PreferencesProvider } from './context';
+import { LoginProvider } from './context/auth/LoginContext';
 import AppRouter from './app/router';
 
 function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <PreferencesProvider>
-          <DocumentsProvider>
-            <AppRouter />
-          </DocumentsProvider>
-        </PreferencesProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <LoginProvider>
+      <AppRouter />
+    </LoginProvider>
   );
 }
 
-export default App
+export default App;

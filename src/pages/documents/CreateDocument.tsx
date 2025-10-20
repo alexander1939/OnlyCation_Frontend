@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDocumentsContext } from '../../context';
-import '../../styles/Documents.css';
+import '../../styles/documents.css';
 
 const CreateDocument: React.FC = () => {
   const navigate = useNavigate();

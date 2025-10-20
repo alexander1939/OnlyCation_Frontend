@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import ButtonLogin from "../../components/ButtonLogin";
-
+import PasswordInput from "../../components/PasswordInput";
 
 interface Props {
   onSubmit: (email: string, password: string) => void;
@@ -17,7 +17,7 @@ const LoginForm: React.FC<Props> = ({ onSubmit, isLoading = false }) => {
   };
 
   return (
-    <form className="animate-card" onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="animate-card">
       <div className="flex flex-col mb-4">
         <label className="block text-[0.9rem] font-medium text-gray-900 mb-1">
           Email
@@ -36,11 +36,9 @@ const LoginForm: React.FC<Props> = ({ onSubmit, isLoading = false }) => {
         <label className="block text-[0.9rem] font-medium text-gray-900 mb-1">
           Contraseña
         </label>
-        <input
-          type="password"
-          className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-blue transition"
+        <PasswordInput
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={setPassword}
           placeholder="••••••••"
           required
         />

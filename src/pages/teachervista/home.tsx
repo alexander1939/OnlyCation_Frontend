@@ -1,39 +1,50 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuthContext } from '../../context/auth/AuthContext';
-import Header from '../../components/Header'; // 👈 importar el Header
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { useLoginContext } from "../../context/auth/LoginContext";
+import { useLoginApi } from "../../hooks/auth/useLoginApi";
+import Header from "../../components/Header";
+import WelcomeAlert from "../../components/WelcomeAlert"; // 👋 Componente de bienvenida temporal
 
 const TeacherHome: React.FC = () => {
-  const { logout } = useAuthContext();
+  const { user } = useLoginContext();
+  const { logout } = useLoginApi();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     await logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
     <>
-      {/* Header siempre arriba */}
+      {/* Header superior */}
       <Header />
 
-      {/* Contenido de la página */}
-      <div style={{ padding: '6rem 2rem 2rem', textAlign: 'center' }}>
-        <h1>Bienvenido Teacher 👨‍🏫</h1>
-        <p>Has iniciado sesión como docente.</p>
+      {/* 👋 Alerta temporal de bienvenida */}
+      <WelcomeAlert name={user?.first_name || "Teacher"} />
 
+      {/* Contenido principal */}
+      <div style={{ padding: "6rem 2rem 2rem", textAlign: "center" }}>
         <button
           onClick={handleLogout}
           style={{
-            marginTop: '2rem',
-            padding: '0.5rem 1rem',
-            fontSize: '1rem',
-            backgroundColor: '#e74c3c',
-            color: 'white',
-            border: 'none',
-            borderRadius: '0.5rem',
-            cursor: 'pointer'
+            marginTop: "2rem",
+            padding: "0.7rem 1.5rem",
+            fontSize: "1rem",
+            backgroundColor: "#e74c3c",
+            color: "white",
+            border: "none",
+            borderRadius: "0.5rem",
+            cursor: "pointer",
+            transition: "background 0.3s ease",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
           }}
+          onMouseOver={(e) =>
+            (e.currentTarget.style.backgroundColor = "#c0392b")
+          }
+          onMouseOut={(e) =>
+            (e.currentTarget.style.backgroundColor = "#e74c3c")
+          }
         >
           Cerrar sesión
         </button>

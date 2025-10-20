@@ -1,10 +1,10 @@
-import { useAuthContext } from '../../context/auth/AuthContext';
+import { useAuthContext } from '../../context/auth';
 
 // Hook pequeño ubicado en la carpeta auth para exponer el token
 // y utilidades para obtener el rol desde el navegador (localStorage/JWT)
 export const useAuthToken = () => {
   // Mantiene acceso al contexto por si se requiere información adicional
-  useAuthContext();
+  const { user } = useAuthContext();
 
   const getAccessToken = (): string | null => localStorage.getItem('access_token');
 
@@ -26,8 +26,9 @@ export const useAuthToken = () => {
     }
   };
 
-  // Intenta obtener el rol desde el JWT; si no, usa localStorage 'user_role'
+  // Obtiene el rol: primero desde LoginContext, luego desde el JWT; si no, usa localStorage 'user_role'
   const getRoleFromToken = (): string | null => {
+    if (user?.role) return user.role.toLowerCase();
     const token = getAccessToken();
     if (token) {
       const payload = parseJwt<Record<string, any>>(token);

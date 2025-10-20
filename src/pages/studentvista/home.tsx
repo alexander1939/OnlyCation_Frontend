@@ -1,43 +1,70 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuthContext } from '../../context/auth/AuthContext';
-import Header from '../../components/Header'; // importa tu Header
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { useLoginContext } from "../../context/auth/LoginContext";
+import { useLoginApi } from "../../hooks/auth/useLoginApi";
+import Header from "../../components/Header";
+import WelcomeAlert from "../../components/WelcomeAlert"; // 👈 Importamos la alerta
 
 const StudentHome: React.FC = () => {
-  const { logout } = useAuthContext();
+  const { user } = useLoginContext();
+  const { logout } = useLoginApi();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     await logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
     <>
-      {/* Header siempre arriba */}
+      {/* Header fijo */}
       <Header />
 
-      {/* Contenido de la página */}
-      <div style={{ padding: '6rem 2rem 2rem', textAlign: 'center' }}>
-        <h1>Bienvenido Student 🎓</h1>
-        <p>Has iniciado sesión como estudiante.</p>
+      {/* 👋 Alerta de bienvenida */}
+      {user?.first_name && <WelcomeAlert name={user.first_name} />}
 
-        <button
-          onClick={handleLogout}
+      {/* Sección principal */}
+      <main
+        style={{
+          padding: "7rem 2rem 2rem",
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        <section
           style={{
-            marginTop: '2rem',
-            padding: '0.5rem 1rem',
-            fontSize: '1rem',
-            backgroundColor: '#e74c3c',
-            color: 'white',
-            border: 'none',
-            borderRadius: '0.5rem',
-            cursor: 'pointer'
+            textAlign: "center",
+            backgroundColor: "#f9fafb",
+            borderRadius: "1rem",
+            padding: "2.5rem",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+            maxWidth: "500px",
+            width: "100%",
           }}
         >
-          Cerrar sesión
-        </button>
-      </div>
+          <button
+            onClick={handleLogout}
+            style={{
+              padding: "0.75rem 1.5rem",
+              fontSize: "1rem",
+              backgroundColor: "#e74c3c",
+              color: "#fff",
+              border: "none",
+              borderRadius: "0.5rem",
+              cursor: "pointer",
+              transition: "background 0.3s ease",
+            }}
+            onMouseOver={(e) =>
+              (e.currentTarget.style.backgroundColor = "#c0392b")
+            }
+            onMouseOut={(e) =>
+              (e.currentTarget.style.backgroundColor = "#e74c3c")
+            }
+          >
+            Cerrar sesión
+          </button>
+        </section>
+      </main>
     </>
   );
 };

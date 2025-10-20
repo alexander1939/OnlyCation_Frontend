@@ -33,7 +33,7 @@
 @media (min-width: 640px) { .pref-col-2 { grid-column: span 2 / span 2; } }
 
 /* Page */
-.pref-page { background: var(--pref-surface); }
+.pref-page { background: var(--pref-surface); font-family: 'Roboto', system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif; }
 
 /* Limitar contenido para que no ocupe toda la página */
 .pref-wrap {

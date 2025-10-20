@@ -19,7 +19,7 @@
 }
 
 /* Page layout */
-.doc-page { background: var(--doc-surface); }
+.doc-page { background: var(--doc-surface); font-family: 'Roboto', system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif; }
 .doc-wrap { max-width: 960px; margin: 0 auto; }
 .doc-container { min-height: 100vh; padding: 2.5rem 1rem; }
 @media (min-width: 640px) { .doc-container { padding-left: 1.5rem; padding-right: 1.5rem; } }

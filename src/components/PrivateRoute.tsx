@@ -1,7 +1,7 @@
 // src/components/PrivateRoute.tsx
 import React from "react";
 import { Navigate } from "react-router-dom";
-import { useAuthContext } from "../context/auth/AuthContext";
+import { useAuthContext } from "../context/auth";
 
 interface PrivateRouteProps {
   children: React.ReactNode;
@@ -9,12 +9,7 @@ interface PrivateRouteProps {
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, roles }) => {
-  const { user, isLoading } = useAuthContext();
-
-  // ⏳ Mientras se inicializa la sesión, evita redirecciones prematuras
-  if (isLoading) {
-    return <div style={{ padding: 16 }}>Cargando...</div>;
-  }
+  const { user } = useAuthContext();
 
   // 🚨 Si no hay usuario -> redirigir al login
   if (!user) {

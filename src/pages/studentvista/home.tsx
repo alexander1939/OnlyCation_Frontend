@@ -1,8 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useLoginContext } from "../../context/auth/LoginContext";
+import { useLoginContext } from "../../context/auth";
 import { useLoginApi } from "../../hooks/auth/useLoginApi";
-import Header from "../../components/Header";
+import Header from "../../components/ui/Header";
 import WelcomeAlert from "../../components/WelcomeAlert"; // 👈 Importamos la alerta
 
 const StudentHome: React.FC = () => {

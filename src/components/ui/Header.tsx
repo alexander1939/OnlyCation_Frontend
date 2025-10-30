@@ -1,10 +1,35 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuthContext } from '../../context/auth';
+import { useLoginApi } from '../../hooks/auth/useLoginApi';
+import ProfileDropdown from '../ProfileDropdown';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const location = useLocation();
+  const { user, setUser } = useAuthContext();
+  const isTeacher = user?.role === 'teacher';
+  const isStudent = user?.role === 'student';
+  const { logout } = useLoginApi();
+  
+  // Calcular iniciales del usuario
+  const userInitials = user 
+    ? `${user.first_name?.[0] ?? ''}${user.last_name?.[0] ?? ''}`.toUpperCase() || 'U'
+    : '';
+  const handleLogout = async () => {
+    // Temporary global logout using API hook
+    try {
+      if (logout) {
+        await logout();
+      }
+    } catch (e) {
+      // ignore
+    } finally {
+      setUser(null);
+      setIsProfileOpen(false);
+    }
+  };
 
   // Componente NavItem con CSS puro - sin Tailwind
   const NavItem: React.FC<{ to: string; label: string; onClick?: () => void; mobile?: boolean }> = ({ to, label, onClick, mobile = false }) => {
@@ -48,7 +73,7 @@ const Header: React.FC = () => {
       borderRadius: '50%'
     };
 
-    return (
+  return (
       <Link
         to={to}
         onClick={onClick}
@@ -120,56 +145,43 @@ const Header: React.FC = () => {
           {/* Perfil Dropdown */}
           <div className="relative ml-8">
             <button 
-              className="w-[30px] h-[30px] rounded-full flex items-center justify-center transition-all duration-300 hover:bg-gray-100 overflow-hidden"
+              className="rounded-full flex items-center justify-center transition-all duration-300 overflow-hidden"
               onClick={() => setIsProfileOpen(!isProfileOpen)}
-            >
-              <img 
-                src="/usuario.png" 
-                alt="Usuario" 
-               className="w-[30px] h-[30px]"
-               style={{
-                objectFit: 'contain',
+              style={{
+                width: user ? '44px' : '30px',
+                height: user ? '44px' : '30px',
+                backgroundColor: user ? '#0f9d68' : 'transparent',
+                color: '#fff',
+                fontFamily: 'Roboto, sans-serif',
+                fontWeight: 700,
+                fontSize: '16px',
+                border: 'none',
+                cursor: 'pointer'
               }}
-              />
+            >
+              {user ? (
+                userInitials
+              ) : (
+                <img 
+                  src="/usuario.png" 
+                  alt="Usuario" 
+                  className="w-[30px] h-[30px]"
+                  style={{
+                    objectFit: 'contain',
+                  }}
+                />
+              )}
             </button>
 
             {/* Dropdown Menu */}
             {isProfileOpen && (
-              <div 
-                className="absolute right-0 mt-2 w-48 rounded-lg shadow-lg border"
-                style={{
-                  backgroundColor: '#FFFFFF',
-                  borderColor: 'rgba(104, 178, 201, 0.2)',
-                  zIndex: 1000
-                }}
-              >
-                <div className="py-2">
-                  <Link
-                    to="/login"
-                    className="w-full text-left px-4 py-2 text-sm transition-colors duration-200 hover:bg-gray-50 block"
-                    style={{
-                      color: '#294954',
-                      fontFamily: 'Roboto, sans-serif',
-                      textDecoration: 'none'
-                    }}
-                    onClick={() => setIsProfileOpen(false)}
-                  >
-                    Iniciar sesión
-                  </Link>
-                  <Link
-                    to="/register"
-                    className="w-full text-left px-4 py-2 text-sm transition-colors duration-200 hover:bg-gray-50 block"
-                    style={{
-                      color: '#294954',
-                      fontFamily: 'Roboto, sans-serif',
-                      textDecoration: 'none'
-                    }}
-                    onClick={() => setIsProfileOpen(false)}
-                  >
-                    Registrarse
-                  </Link>
-                </div>
-              </div>
+              <ProfileDropdown
+                user={user}
+                isTeacher={isTeacher}
+                isStudent={isStudent}
+                onClose={() => setIsProfileOpen(false)}
+                onLogout={handleLogout}
+              />
             )}
           </div>
           </div>

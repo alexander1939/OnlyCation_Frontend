@@ -1,16 +1,16 @@
 // src/pages/student/StudentHome.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useLoginApi } from "../../hooks/auth/useLoginApi";
-import Header from "../../components/Header";
+import Header from "../../components/ui/Header";
 import PublishConsult from "./HistoryCard";
 import AgendaCard from "./AgendaCard";
 import PriceCard from "./PriceCard";
 import SubjectList from "./SubjectList";
 import FeaturedAdvisors from "./FeaturedAdvisors";
 import KnowledgeCenter from "./KnowledgeCenter";
-import WelcomeAlert from "../../components/WelcomeAlert";
 import { Footer } from "../../components";
+import { useLoginApi } from "../../hooks/auth/useLoginApi";
+import WelcomeAlert from "../../components/WelcomeAlert"; // 👈 Importamos la alerta
 
 const StudentHome: React.FC = () => {
   const { user } = useLoginApi();

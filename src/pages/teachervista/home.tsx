@@ -1,9 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useLoginContext } from "../../context/auth/LoginContext";
+import { useLoginContext } from "../../context/auth";
 import { useLoginApi } from "../../hooks/auth/useLoginApi";
-import Header from "../../components/Header";
 import WelcomeAlert from "../../components/WelcomeAlert"; 
+import Header from "../../components/ui/Header";
+
 
 const TeacherHome: React.FC = () => {
   const { user } = useLoginContext();

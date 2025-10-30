@@ -1,5 +1,5 @@
 import React from "react";
-import Ribbon from "../../components/Ribbon"; // Ajusta la ruta según tu estructura
+import Ribbon from "../../components/ui/Ribbon"; // Ajusta la ruta según tu estructura
 
 const LoginHeader: React.FC = () => {
   return (

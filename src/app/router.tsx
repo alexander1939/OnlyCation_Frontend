@@ -7,9 +7,11 @@ import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
 import ForgotPassword from '../pages/auth/ForgotPassword';
 import ResetPassword from '../pages/auth/ResetPassword';
-import RegisterStudent from '../pages/RegisterStudent';
-import RegisterTeacher from '../pages/RegisterTeacher';
 import TeacherHome from '../pages/teachervista/home';
+import DocenteGeneral from '../pages/docente/General';
+import AgendaDocente from '../pages/docente/Agenda';
+import DocenteDatosPersonales from '../pages/docente/DatosPersonales';
+import DocenteDocumentos from '../pages/docente/Documentos';
 import StudentHome from '../pages/studentvista/home';
 import PrivateRoute from "../components/PrivateRoute";
 
@@ -35,6 +37,38 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: '/docente/general',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <DocenteGeneral />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/docente/agenda',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <AgendaDocente />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/docente/datos-personales',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <DocenteDatosPersonales />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/docente/documentos',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <DocenteDocumentos />
+      </PrivateRoute>
+    ),
+  },
+  {
     path: '/teachers',
     element: <AllTeachers />,
   },
@@ -46,6 +80,7 @@ const router = createBrowserRouter([
     path: '/be-teacher',
     element: <BeTeacher />,
   },
+
   {
     path: '/login',
     element: <Login />,

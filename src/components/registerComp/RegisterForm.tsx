@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Ribbon from './Ribbon';
+import Ribbon from '../ui/Ribbon';
 
 interface RegisterFormData {
   first_name: string;

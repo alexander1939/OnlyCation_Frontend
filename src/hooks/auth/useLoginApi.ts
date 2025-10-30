@@ -1,9 +1,32 @@
 // src/hooks/auth/useLoginApi.ts
+import axios from "axios";
 import { useEffect } from "react";
-import { useLoginContext, type LoginCredentials, type LoginResponse } from "../../context/auth/LoginContext";
+import {
+  useLoginContext,
+  type LoginCredentials,
+  type LoginResponse,
+} from "../../context/auth/LoginContext";
 
-const API_BASE_URL =
-  (import.meta.env.VITE_API_URL as string)?.trim() || "http://localhost:8000/api";
+// 🧩 Configuración base de Axios
+const API_BASE_URL = import.meta.env.VITE_API_URL?.trim();
+
+if (!API_BASE_URL) {
+  throw new Error("❌ Faltó definir VITE_API_URL en tu archivo .env");
+}
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: { "Content-Type": "application/json" },
+});
+
+// 🔐 Interceptor: agrega automáticamente el token a cada request
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("access_token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 export const useLoginApi = () => {
   const {
@@ -15,31 +38,38 @@ export const useLoginApi = () => {
     setLoginLoading,
   } = useLoginContext();
 
-  // 🟢 Cargar usuario del localStorage
+  // 🟢 Cargar usuario guardado del localStorage al iniciar
   useEffect(() => {
     const storedUser = getStoredUser();
     if (storedUser) setUser(storedUser);
     setLoadingUser(false);
   }, []);
 
-  // 🟢 Login
-  const login = async (credentials: LoginCredentials): Promise<LoginResponse> => {
+  // 🟢 Login (petición a la API)
+  const login = async (
+    credentials: LoginCredentials
+  ): Promise<LoginResponse> => {
     setLoginLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(credentials),
-      });
-
-      const data: LoginResponse = await response.json();
+      const { data } = await api.post<LoginResponse>("/auth/login/", credentials);
       console.log("[LoginAPI] Response:", data);
 
       if (!data.success || !data.data) {
-        return { success: false, message: data.message || "Credenciales inválidas", data: null };
+        return {
+          success: false,
+          message: data.message || "Credenciales inválidas",
+          data: null,
+        };
       }
 
-      const { access_token, refresh_token, email, first_name, last_name, role } = data.data;
+      const {
+        access_token,
+        refresh_token,
+        email,
+        first_name,
+        last_name,
+        role,
+      } = data.data;
 
       // Guardar en localStorage
       localStorage.setItem("access_token", access_token);
@@ -54,11 +84,12 @@ export const useLoginApi = () => {
       return data;
     } catch (error: any) {
       console.error("[LoginAPI] Error:", error);
-      return {
-        success: false,
-        message: error.message || "Error durante el inicio de sesión",
-        data: null,
-      };
+
+      const message =
+        error.response?.data?.message ||
+        "Error durante el inicio de sesión. Intenta nuevamente.";
+
+      return { success: false, message, data: null };
     } finally {
       setLoginLoading(false);
     }
@@ -74,7 +105,7 @@ export const useLoginApi = () => {
     setUser(null);
   };
 
-  // 🟢 Helper: obtener usuario guardado
+  // 🟢 Helper: obtener usuario guardado del localStorage
   const getStoredUser = () => {
     const email = localStorage.getItem("user_email");
     const name = localStorage.getItem("user_name");

@@ -1,6 +1,6 @@
-export { default as Button } from '../components/Button';
-export { default as Card } from '../components/Card';
-export { default as Header } from '../components/Header';
+export { default as Button } from '../components/ui/Button';
+export { default as Card } from '../components/ui/Card';
+export { default as Header } from '../components/ui/Header';
 
 export { default as Home } from './Home';
 export { default as Login } from './Login';

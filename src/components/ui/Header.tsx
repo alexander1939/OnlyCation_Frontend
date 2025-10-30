@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useAuthContext } from '../context/auth';
-import { useLoginApi } from '../hooks/auth/useLoginApi';
-import ProfileDropdown from './ProfileDropdown';
+import { useAuthContext } from '../../context/auth';
+import { useLoginApi } from '../../hooks/auth/useLoginApi';
+import ProfileDropdown from '../ProfileDropdown';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

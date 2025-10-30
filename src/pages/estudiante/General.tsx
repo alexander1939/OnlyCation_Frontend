@@ -1,7 +1,7 @@
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
+import Header from '../../components/ui/Header';
+import Footer from '../../components/ui/Footer';
 import { Link } from 'react-router-dom';
-import Button from '../../components/Button';
+import Button from '../../components/ui/Button';
 import { useAuthContext } from '../../context/auth';
 import '../../styles/estudiante-general.css';
 

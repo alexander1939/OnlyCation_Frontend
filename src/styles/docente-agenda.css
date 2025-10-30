@@ -24,7 +24,9 @@
 /* Mensaje de día deshabilitado */
 .agenda-disabled-message{font-family:'Roboto',sans-serif;color:#294954;opacity:.6;font-size:13px;font-style:italic;padding:8px 0}
 .agenda-slots{display:flex;flex-direction:column;gap:10px}
-.agenda-chip{font-family:'Roboto',sans-serif;display:flex;align-items:center;justify-content:space-between;gap:8px;background:rgba(104,178,201,.15);border:1px solid rgba(104,178,201,.35);color:#294954;padding:10px 12px;border-radius:12px;font-weight:600;font-size:14px}
+.agenda-chip{font-family:'Roboto',sans-serif;display:flex;align-items:center;justify-content:space-between;gap:8px;background:rgba(104,178,201,.15);border:1px solid rgba(104,178,201,.35);color:#294954;padding:10px 12px;border-radius:12px;font-weight:600;font-size:14px;transition:all 200ms ease}
+.agenda-chip.has-booking{background:rgba(255,153,120,.12);border-color:rgba(255,153,120,.5);color:#294954}
+.agenda-chip.has-booking .chip-remove{opacity:0.5;cursor:not-allowed}
 .chip-remove{background:transparent;border:none;color:#294954;opacity:.8;cursor:pointer;font-size:18px}
 .chip-remove:hover{opacity:1}
 .agenda-add{font-family:'Roboto',sans-serif;background:transparent;border:none;color:#68B2C9;cursor:pointer;padding:8px 0;text-align:left;font-weight:600;font-size:14px;transition:color 200ms ease}
@@ -46,8 +48,10 @@
 /* 24h Grid */
 .hours-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 @media(min-width:768px){.hours-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-.hour-btn{font-family:'Roboto',sans-serif;padding:8px 10px;border-radius:10px;border:1px solid rgba(104,178,201,.35);background:rgba(104,178,201,.12);color:#294954;cursor:pointer;text-align:left;font-weight:600}
+.hour-btn{font-family:'Roboto',sans-serif;padding:8px 10px;border-radius:10px;border:1px solid rgba(104,178,201,.35);background:rgba(104,178,201,.12);color:#294954;cursor:pointer;text-align:center;font-weight:600;transition:all 200ms ease}
 .hour-btn.is-active{background:#68B2C9;color:#FAF9F5;border-color:#68B2C9}
+.hour-btn.is-disabled{background:#f8f9fa;color:#adb5bd;border-color:#dee2e6;cursor:not-allowed;opacity:0.6}
+.hour-btn:not(.is-disabled):hover{background:rgba(104,178,201,.25);border-color:#68B2C9}
 
 /* Modal actions */
 .btn-primary{font-family:'Roboto',sans-serif;background:#68B2C9;color:#FAF9F5;border:none;border-radius:10px;padding:8px 14px;cursor:pointer;font-weight:600}

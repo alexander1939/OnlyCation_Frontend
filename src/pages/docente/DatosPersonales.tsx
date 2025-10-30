@@ -1,5 +1,5 @@
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
+import Header from '../../components/ui/Header';
+import Footer from '../../components/ui/Footer';
 import { Link } from 'react-router-dom';
 import { useAuthContext } from '../../context/auth';
 import '../../styles/docente-datos.css';

@@ -1,6 +1,6 @@
 import { useAuthContext } from '../../context/auth';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
+import Header from '../../components/ui/Header';
+import Footer from '../../components/ui/Footer';
 import '../../styles/docente-general.css';
 
 type Clase = {

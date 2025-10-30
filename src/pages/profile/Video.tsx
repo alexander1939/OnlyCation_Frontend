@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { VideosProvider, useVideosContext } from '../../context/videos';
 import type { VideoSaveRequest, VideoData } from '../../context/videos/types';
 import '../../styles/Video.css';
+import OnboardingSteps from '../../components/OnboardingSteps';
 
 const initialForm: VideoSaveRequest = { url_or_id: '' };
 
@@ -9,17 +10,40 @@ const VideoInner: React.FC = () => {
   const { saveMyVideo, saving, error, success, resetStatus } = useVideosContext();
   const [form, setForm] = useState<VideoSaveRequest>(initialForm);
   const [saved, setSaved] = useState<VideoData | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>('');
+
+  // Extrae el ID de YouTube desde una URL completa o devuelve el valor si ya parece un ID
+  const extractYouTubeId = (value: string): string | null => {
+    const v = value.trim();
+    if (!v) return null;
+    // youtu.be/<id>
+    const short = v.match(/^https?:\/\/youtu\.be\/([A-Za-z0-9_-]{6,})/i);
+    if (short) return short[1];
+    // youtube.com/watch?v=<id>
+    const watch = v.match(/[?&]v=([A-Za-z0-9_-]{6,})/i);
+    if (watch) return watch[1];
+    // youtube.com/embed/<id>
+    const embed = v.match(/\/embed\/([A-Za-z0-9_-]{6,})/i);
+    if (embed) return embed[1];
+    // Si no es URL, asumir que podría ser ID
+    if (/^[A-Za-z0-9_-]{6,}$/.test(v)) return v;
+    return null;
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
     if (error || success) resetStatus();
+    // Actualiza vista previa
+    const id = extractYouTubeId(value);
+    setPreviewUrl(id ? `https://www.youtube.com/embed/${id}` : '');
   };
 
   const handleCancel = () => {
     setForm(initialForm);
     setSaved(null);
     resetStatus();
+    setPreviewUrl('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,6 +55,7 @@ const VideoInner: React.FC = () => {
   return (
     <div className="video-page video-container">
       <div className="video-wrap">
+        <OnboardingSteps />
         <div className="video-header">
           <h1 className="video-title video-title-lg">Video de Presentación</h1>
           <p className="video-subtitle video-text-sm" style={{ marginTop: '0.5rem' }}>
@@ -62,10 +87,10 @@ const VideoInner: React.FC = () => {
                 </div>
               </div>
 
-              {saved?.embed_url && (
+              {(previewUrl || saved?.embed_url) && (
                 <div className="video-col-2">
                   <div className="video-preview">
-                    <iframe src={saved.embed_url} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen title="Video de presentación" />
+                    <iframe src={previewUrl || (saved?.embed_url as string)} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen title="Video de presentación" />
                   </div>
                 </div>
               )}

@@ -164,3 +164,8 @@
 
 /* Small margin utilities used by header */
 .pref-mt-2 { margin-top: 0.5rem; }
+
+/* Ensure placeholders use Roboto (inherit from container) */
+.pref-page input::placeholder,
+.pref-page textarea::placeholder,
+.pref-page select::placeholder { font-family: inherit; }

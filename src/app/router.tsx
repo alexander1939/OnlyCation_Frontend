@@ -17,6 +17,10 @@ import { DocumentsProvider } from '../context/documents';
 import { PreferencesProvider } from '../context/preferences';
 import { CatalogsProvider } from '../context/catalogs/CatalogsContext';
 import Video from '../pages/profile/Video';
+import Cartera from '../pages/profile/Cartera';
+import { AgendaProvider } from '../context/cartera';
+import Agenda from '../pages/profile/Agenda';
+import { BookingProvider } from '../context/booking';
 
 const router = createBrowserRouter([
   {
@@ -34,6 +38,22 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: '/profile/cartera',
+    element: (
+      <AgendaProvider>
+        <Cartera />
+      </AgendaProvider>
+    ),
+  },
+  {
+    path: '/profile/agenda',
+    element: (
+      <BookingProvider>
+        <Agenda />
+      </BookingProvider>
+    ),
+  },
+  {
     path: '/documents/create',
     element: (
       <DocumentsProvider>
@@ -43,10 +63,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/prices/create',
-    element: (
-    <PrivateRoute roles={["teacher"]}>
-    <CreatePrice />
-    </PrivateRoute>
+    element: ( <CreatePrice />
     ),
   },
   {
@@ -102,3 +119,4 @@ const router = createBrowserRouter([
 export default function AppRouter() {
   return <RouterProvider router={router} />;
 }
+

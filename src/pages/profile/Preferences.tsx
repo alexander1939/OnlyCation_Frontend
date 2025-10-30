@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { usePreferencesContext } from '../../context/preferences';
 import type { PreferenceCreateRequest } from '../../context/preferences/types';
 import '../../styles/Preferences.css';
 import { useCatalogsContext } from '../../context/catalogs/CatalogsContext';
+import OnboardingSteps from '../../components/OnboardingSteps';
 
 // Las opciones ahora provienen del CatalogsContext
 
@@ -15,6 +17,7 @@ const initialForm: PreferenceCreateRequest = {
 
 const PreferencesPage: React.FC = () => {
   const { createPreferences, creating: loading, error, success } = usePreferencesContext();
+  const navigate = useNavigate();
   const { educationalLevels, modalities, loading: loadingCatalogs, error: catalogsError } = useCatalogsContext();
   const [form, setForm] = useState<PreferenceCreateRequest>(initialForm);
 
@@ -35,9 +38,16 @@ const PreferencesPage: React.FC = () => {
     await createPreferences(form);
   };
 
+  React.useEffect(() => {
+    if (success) {
+      navigate('/documents/create');
+    }
+  }, [success, navigate]);
+
   return (
     <div className="pref-page pref-container">
       <div className="pref-wrap">
+        <OnboardingSteps />
         {/* Header */}
         <div className="pref-header">
           <h1 className="pref-title pref-title-lg">Configura tus Preferencias Educativas</h1>

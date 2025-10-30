@@ -31,7 +31,7 @@
 /* Typography */
 .price-title { color: var(--price-text); letter-spacing: -0.01em; font-size: 1.875rem; line-height: 2.25rem; font-weight: 700; }
 .price-subtitle { color: var(--price-muted); font-size: 0.95rem; }
-.price-header { text-align: left; margin-bottom: 1.5rem; }
+.price-header { text-align: center; margin-bottom: 1.5rem; }
 
 /* Form paddings */
 .price-form { padding: 1.5rem; }
@@ -73,3 +73,8 @@
 .price-alert { margin-top: 0.75rem; font-size: 0.875rem; }
 .price-alert--error { color: #DC2626; }
 .price-alert--success { color: #059669; }
+
+/* Ensure placeholders use Roboto (inherit from container) */
+.price-page input::placeholder,
+.price-page textarea::placeholder,
+.price-page select::placeholder { font-family: inherit; }

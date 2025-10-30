@@ -2,33 +2,46 @@ import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PricesProvider, usePricesContext } from '../../context/prices';
 import '../../styles/prices.css';
+import OnboardingSteps from '../../components/OnboardingSteps';
+import { PriceAvailabilityProvider, usePriceAvailabilityContext } from '../../context/catalogs/PriceAvailabilityContext';
 
 const CreatePriceForm: React.FC = () => {
   const navigate = useNavigate();
   const { createPrice, creating, error, lastCreated, resetStatus } = usePricesContext();
+  const { data: availability, priceRanges, loading: loadingAvail, error: availError } = usePriceAvailabilityContext();
 
   const [preferenceId, setPreferenceId] = useState('');
   const [priceRangeId, setPriceRangeId] = useState('');
-  const [selectedPricesRaw, setSelectedPricesRaw] = useState('');
-  const [extraHourPrice, setExtraHourPrice] = useState('');
+  const [selectedPrice, setSelectedPrice] = useState<number>(0);
+  const [extraHourPrice, setExtraHourPrice] = useState<number>(0);
 
   const isValid = useMemo(() => {
     return (
       preferenceId.trim() !== '' &&
-      priceRangeId.trim() !== '' &&
-      selectedPricesRaw.trim() !== '' &&
-      extraHourPrice.trim() !== ''
+      priceRangeId.trim() !== ''
     );
-  }, [preferenceId, priceRangeId, selectedPricesRaw, extraHourPrice]);
+  }, [preferenceId, priceRangeId]);
 
-  const parseSelectedPrices = (): number[] => {
-    return selectedPricesRaw
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean)
-      .map((n) => Number(n))
-      .filter((n) => !Number.isNaN(n));
-  };
+  React.useEffect(() => {
+    if (availability?.preference_id) {
+      setPreferenceId(String(availability.preference_id));
+    } else {
+      const stored = localStorage.getItem('preference_id');
+      if (stored) setPreferenceId(stored);
+    }
+  }, [availability?.preference_id]);
+
+  // Selected price range and bounds
+  const selectedRange = useMemo(() => priceRanges.find(r => String(r.id) === String(priceRangeId)), [priceRanges, priceRangeId]);
+  const minPrice = selectedRange?.minimum_price ?? selectedRange?.min_price ?? 0;
+  const maxPrice = selectedRange?.maximum_price ?? selectedRange?.max_price ?? 0;
+
+  // When range changes, snap selectedPrice to minimum within bounds
+  React.useEffect(() => {
+    if (!selectedRange) return;
+    const next = Math.max(minPrice, Math.min(maxPrice || minPrice, selectedPrice || minPrice));
+    setSelectedPrice(next);
+  }, [selectedRange, minPrice, maxPrice]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +50,7 @@ const CreatePriceForm: React.FC = () => {
     await createPrice({
       preference_id: Number(preferenceId),
       price_range_id: Number(priceRangeId),
-      selected_prices: parseSelectedPrices(),
+      selected_prices: Number(selectedPrice),
       extra_hour_price: Number(extraHourPrice),
     });
   };
@@ -47,9 +60,16 @@ const CreatePriceForm: React.FC = () => {
     navigate(-1);
   };
 
+  React.useEffect(() => {
+    if (lastCreated) {
+      navigate('/profile/video');
+    }
+  }, [lastCreated, navigate]);
+
   return (
     <div className="price-page price-container">
       <div className="price-wrap">
+        <OnboardingSteps />
         <div className="price-header">
           <h1 className="price-title">Registrar Precio</h1>
           <p className="price-subtitle" style={{ marginTop: '0.5rem' }}>
@@ -60,55 +80,68 @@ const CreatePriceForm: React.FC = () => {
         <div className="price-card">
           <form onSubmit={onSubmit} className="price-form" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <div className="price-grid">
-              <div>
+              <div style={{ display: 'none' }}>
                 <label className="price-label">Preferencia</label>
                 <input
                   type="number"
                   className="price-input"
-                  placeholder="Ingresa tu preferencia"
+                  placeholder="Preferencia derivada del token"
                   value={preferenceId}
                   onChange={(e) => setPreferenceId(e.target.value)}
+                  readOnly
                 />
               </div>
               <div>
                 <label className="price-label">Rango de Precios</label>
-                <input
-                  type="number"
+                <select
                   className="price-input"
-                  placeholder="Selecciona el rango"
                   value={priceRangeId}
                   onChange={(e) => setPriceRangeId(e.target.value)}
-                />
+                  disabled={loadingAvail || !!availError}
+                >
+                  <option value="">{loadingAvail ? 'Cargando...' : 'Selecciona un rango'}</option>
+                  {priceRanges.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.label || r.name || `${r.minimum_price ?? r.min_price ?? ''} - ${r.maximum_price ?? r.max_price ?? ''}`}
+                    </option>
+                  ))}
+                </select>
+                {availError && <div className="price-alert price-alert--error" style={{ marginTop: '0.25rem' }}>{availError}</div>}
+              </div>
+            </div>
+
+            <div className="price-grid">
+              <div className="price-col-2">
+                <label className="price-label">Precio Seleccionado</label>
+                <div>
+                  <input
+                    type="range"
+                    min={minPrice}
+                    max={Math.max(minPrice, maxPrice)}
+                    step={10}
+                    value={selectedPrice}
+                    onChange={(e) => setSelectedPrice(Number(e.target.value))}
+                    className="price-range"
+                    disabled={!selectedRange}
+                  />
+                  <div className="price-subtitle" style={{ marginTop: '0.25rem' }}>
+                    Valor seleccionado: ${selectedPrice}
+                  </div>
+                </div>
               </div>
             </div>
 
             <div className="price-grid">
               <div>
-                <label className="price-label">Precio Seleccionado</label>
+                <label className="price-label">Precio por hora extra</label>
                 <input
-                  type="text"
+                  type="number"
+                  min={0}
                   className="price-input"
-                  placeholder="Ingresa los precios seleccionados"
-                  value={selectedPricesRaw}
-                  onChange={(e) => setSelectedPricesRaw(e.target.value)}
+                  placeholder="0"
+                  value={extraHourPrice}
+                  onChange={(e) => setExtraHourPrice(Number(e.target.value))}
                 />
-              </div>
-              <div>
-                <label className="price-label">Precio por Hora Extra</label>
-                <div>
-                  <input
-                    type="range"
-                    min={0}
-                    max={1000}
-                    step={10}
-                    value={extraHourPrice || '0'}
-                    onChange={(e) => setExtraHourPrice(e.target.value)}
-                    className="price-range"
-                  />
-                  <div className="price-subtitle" style={{ marginTop: '0.25rem' }}>
-                    Valor seleccionado: ${extraHourPrice || '0'}
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -130,7 +163,9 @@ const CreatePriceForm: React.FC = () => {
 
 const CreatePrice: React.FC = () => (
   <PricesProvider>
-    <CreatePriceForm />
+    <PriceAvailabilityProvider>
+      <CreatePriceForm />
+    </PriceAvailabilityProvider>
   </PricesProvider>
 );
 

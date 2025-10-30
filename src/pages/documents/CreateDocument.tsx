@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDocumentsContext } from '../../context';
 import '../../styles/documents.css';
+import OnboardingSteps from '../../components/OnboardingSteps';
 
 const CreateDocument: React.FC = () => {
   const navigate = useNavigate();
@@ -34,9 +35,16 @@ const CreateDocument: React.FC = () => {
     navigate(-1);
   };
 
+  React.useEffect(() => {
+    if (lastCreated) {
+      navigate('/prices/create');
+    }
+  }, [lastCreated, navigate]);
+
   return (
     <div className="doc-page doc-container">
       <div className="doc-wrap">
+        <OnboardingSteps />
         <div className="doc-header">
           <h1 className="doc-title">Cargar Documentos</h1>
           <p className="doc-subtitle" style={{ marginTop: '0.5rem' }}>Por favor, complete el formulario para cargar sus documentos de forma segura.</p>
@@ -110,7 +118,6 @@ const CreateDocument: React.FC = () => {
 
             {/* Footer */}
             <div className="doc-actions">
-              <button type="button" className="doc-link" onClick={() => alert(rfc || 'Sin RFC')}>Previsualizar RFC</button>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
                 <button type="button" className="doc-btn--secondary" onClick={onCancel}>Cancelar</button>
                 <button type="submit" className="doc-btn--primary" disabled={!isValid || creating}>{creating ? 'Guardando...' : 'Guardar'}</button>

@@ -31,7 +31,7 @@
 /* Typography */
 .doc-title { color: var(--doc-text); letter-spacing: -0.01em; font-size: 1.875rem; line-height: 2.25rem; font-weight: 700; }
 .doc-subtitle { color: var(--doc-muted); font-size: 0.95rem; }
-.doc-header { text-align: left; margin-bottom: 1.5rem; }
+.doc-header { text-align: center; margin-bottom: 1.5rem; }
 
 /* Form paddings */
 .doc-form { padding: 1.5rem; }
@@ -65,7 +65,7 @@
 .doc-trailing { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #9CA3AF; }
 
 /* Footer actions */
-.doc-actions { display: flex; align-items: center; justify-content: space-between; padding-top: 1rem; border-top: 1px solid #F3F4F6; }
+.doc-actions { display: flex; align-items: center; justify-content: flex-end; padding-top: 1rem; border-top: 1px solid #F3F4F6; }
 .doc-link { color: #0EA5E9; font-weight: 500; text-decoration: none; }
 .doc-link:hover { color: #0284C7; }
 
@@ -82,3 +82,8 @@
 .doc-alert--success { color: #059669; }
 
 .doc-trailing { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #9CA3AF; display: inline-flex; align-items: center; }
+
+/* Ensure placeholders use Roboto (inherit from container) */
+.doc-page input::placeholder,
+.doc-page textarea::placeholder,
+.doc-page select::placeholder { font-family: inherit; }

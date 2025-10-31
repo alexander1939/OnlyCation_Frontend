@@ -5,6 +5,7 @@ import type { PreferenceCreateRequest } from '../../context/preferences/types';
 import '../../styles/Preferences.css';
 import { useCatalogsContext } from '../../context/catalogs/CatalogsContext';
 import OnboardingSteps from '../../components/OnboardingSteps';
+import { useActivation } from '../../context/activation/ActivationContext';
 
 // Las opciones ahora provienen del CatalogsContext
 
@@ -19,6 +20,7 @@ const PreferencesPage: React.FC = () => {
   const { createPreferences, creating: loading, error, success } = usePreferencesContext();
   const navigate = useNavigate();
   const { educationalLevels, modalities, loading: loadingCatalogs, error: catalogsError } = useCatalogsContext();
+  const { check, getNextRoute } = useActivation();
   const [form, setForm] = useState<PreferenceCreateRequest>(initialForm);
 
   const handleChange = (
@@ -40,9 +42,20 @@ const PreferencesPage: React.FC = () => {
 
   React.useEffect(() => {
     if (success) {
-      navigate('/documents/create');
+      navigate('/profile/documentos');
     }
   }, [success, navigate]);
+
+  // Guard: si el backend dice que ya completó este paso, redirigir al siguiente
+  React.useEffect(() => {
+    (async () => {
+      try {
+        await check();
+        const next = getNextRoute();
+        if (next !== '/profile/preferences') navigate(next, { replace: true });
+      } catch {}
+    })();
+  }, [check, getNextRoute, navigate]);
 
   return (
     <div className="pref-page pref-container">

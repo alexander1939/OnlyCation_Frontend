@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { VideosProvider, useVideosContext } from '../../context/videos';
 import type { VideoSaveRequest, VideoData } from '../../context/videos/types';
 import '../../styles/Video.css';
@@ -11,6 +12,7 @@ const VideoInner: React.FC = () => {
   const [form, setForm] = useState<VideoSaveRequest>(initialForm);
   const [saved, setSaved] = useState<VideoData | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
+  const navigate = useNavigate();
 
   // Extrae el ID de YouTube desde una URL completa o devuelve el valor si ya parece un ID
   const extractYouTubeId = (value: string): string | null => {
@@ -51,6 +53,12 @@ const VideoInner: React.FC = () => {
     const res = await saveMyVideo(form);
     if (res.success && res.data?.data) setSaved(res.data.data);
   };
+
+  React.useEffect(() => {
+    if (success) {
+      navigate('/profile/agenda');
+    }
+  }, [success, navigate]);
 
   return (
     <div className="video-page video-container">

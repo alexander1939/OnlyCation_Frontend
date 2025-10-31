@@ -1,118 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useBookingContext } from '../../context/booking';
 import '../../styles/Booking.css';
 import OnboardingSteps from '../../components/OnboardingSteps';
-import { useAuthToken } from '../../hooks/auth/useAuthToken';
+import AvailabilityConfig from '../../components/AvailabilityConfig';
+import { ScheduleProvider } from '../../context/availability/ScheduleContext';
+import { useSchedule } from '../../context/availability/ScheduleContext';
+import { useAgendaApi } from '../../hooks/profile/useAgendaApi';
 
 const BookingPage: React.FC = () => {
-  const { createAvailability, creating, error, success, lastResponse, resetStatus } = useBookingContext();
-  const { getAccessToken, parseJwt } = useAuthToken();
-  const navigate = useNavigate();
-  const [preferenceId, setPreferenceId] = useState<string>('');
-  const days = [
-    { key: 'monday', label: 'Lunes' },
-    { key: 'tuesday', label: 'Martes' },
-    { key: 'wednesday', label: 'Miércoles' },
-    { key: 'thursday', label: 'Jueves' },
-    { key: 'friday', label: 'Viernes' },
-    { key: 'saturday', label: 'Sábado' },
-    { key: 'sunday', label: 'Domingo' },
-  ] as const;
-
-  type DayKey = typeof days[number]['key'];
-  const [form, setForm] = useState<Record<DayKey, { enabled: boolean; start: string; end: string }>>({
-    monday: { enabled: false, start: '09:00', end: '12:00' },
-    tuesday: { enabled: false, start: '09:00', end: '12:00' },
-    wednesday: { enabled: false, start: '09:00', end: '12:00' },
-    thursday: { enabled: false, start: '09:00', end: '12:00' },
-    friday: { enabled: false, start: '09:00', end: '12:00' },
-    saturday: { enabled: false, start: '09:00', end: '12:00' },
-    sunday: { enabled: false, start: '09:00', end: '12:00' },
-  });
-  const [formError, setFormError] = useState<string | null>(null);
-
-  React.useEffect(() => {
-    const token = getAccessToken();
-    if (token) {
-      const payload = parseJwt<Record<string, any>>(token);
-      const pid = payload?.preference_id || payload?.pref_id || payload?.preferenceId;
-      if (pid) {
-        setPreferenceId(String(pid));
-        return;
-      }
-    }
-    const stored = localStorage.getItem('preference_id');
-    if (stored) setPreferenceId(stored);
-  }, [getAccessToken, parseJwt]);
-
-  const handleToggle = (k: DayKey) => {
-    setForm(prev => ({ ...prev, [k]: { ...prev[k], enabled: !prev[k].enabled } }));
-    if (error || success || formError) resetStatus();
-  };
-
-  // Go to next step when success
-  React.useEffect(() => {
-    if (success) {
-      navigate('/profile/cartera');
-    }
-  }, [success, navigate]);
-
-  const handleTime = (k: DayKey, field: 'start' | 'end', value: string) => {
-    setForm(prev => ({ ...prev, [k]: { ...prev[k], [field]: value } }));
-  };
-
-  const handleCreate = async () => {
-    setFormError(null);
-    const dayNumber: Record<DayKey, number> = {
-      monday: 1,
-      tuesday: 2,
-      wednesday: 3,
-      thursday: 4,
-      friday: 5,
-      saturday: 6,
-      sunday: 7,
-    };
-    const selected = days.filter(d => form[d.key].enabled);
-    if (selected.length === 0) {
-      setFormError('Selecciona al menos un día.');
-      return;
-    }
-    if (!preferenceId) {
-      setFormError('No se detectó preference_id. Vuelve a iniciar sesión o configura tus preferencias.');
-      return;
-    }
-    // Validación de horas y construcción de payloads con fecha completa
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    const datePrefix = `${yyyy}-${mm}-${dd}`;
-
-    const payloads = selected.map(d => {
-      const start = form[d.key].start; // HH:mm
-      const end = form[d.key].end;     // HH:mm
-      if (!start || !end || start >= end) {
-        throw new Error('Verifica que las horas sean válidas (inicio < fin).');
-      }
-      return {
-        preference_id: Number(preferenceId),
-        day_of_week: dayNumber[d.key],
-        start_time: `${datePrefix} ${start}:00`,
-        end_time: `${datePrefix} ${end}:00`,
-      };
-    });
-
-    try {
-      // Ejecutar en secuencia para respetar el estado del contexto
-      for (const p of payloads) {
-        // eslint-disable-next-line no-await-in-loop
-        await createAvailability(p);
-      }
-    } catch (e: any) {
-      setFormError(e?.message || 'Error al crear la disponibilidad');
-    }
-  };
 
   return (
     <div className="booking-page booking-container">
@@ -125,58 +20,10 @@ const BookingPage: React.FC = () => {
 
         <div className="booking-card">
           <div className="booking-body">
-            <div className="booking-field">
-              <label className="booking-label">Selecciona días y horarios</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.75rem' }}>
-                {days.map(d => (
-                  <div key={d.key} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 120 }}>
-                      <input type="checkbox" checked={form[d.key].enabled} onChange={() => handleToggle(d.key)} />
-                      <span>{d.label}</span>
-                    </label>
-                    <input
-                      type="time"
-                      className="booking-textarea"
-                      style={{ maxWidth: 160 }}
-                      value={form[d.key].start}
-                      onChange={(e) => handleTime(d.key, 'start', e.target.value)}
-                      disabled={!form[d.key].enabled}
-                    />
-                    <span>—</span>
-                    <input
-                      type="time"
-                      className="booking-textarea"
-                      style={{ maxWidth: 160 }}
-                      value={form[d.key].end}
-                      onChange={(e) => handleTime(d.key, 'end', e.target.value)}
-                      disabled={!form[d.key].enabled}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="booking-actions">
-              <button
-                type="button"
-                onClick={handleCreate}
-                disabled={creating}
-                className={`booking-btn--primary ${creating ? 'cursor-not-allowed' : ''}`}
-              >
-                {creating ? 'Creando...' : 'Crear disponibilidad'}
-              </button>
-              <button type="button" onClick={resetStatus} className="booking-btn--secondary">
-                Limpiar estado
-              </button>
-            </div>
-
-            {formError && <p className="booking-alert booking-alert--error">{formError}</p>}
-            {error && <p className="booking-alert booking-alert--error">{error}</p>}
-            {success && lastResponse && (
-              <div className="booking-result">
-                <p className="booking-alert booking-alert--success">{lastResponse.message || 'Disponibilidad creada exitosamente.'}</p>
-              </div>
-            )}
+            <ScheduleProvider>
+              <AvailabilityConfig />
+              <SaveAvailabilityBar />
+            </ScheduleProvider>
           </div>
         </div>
       </div>
@@ -185,3 +32,84 @@ const BookingPage: React.FC = () => {
 };
 
 export default BookingPage;
+
+const SaveAvailabilityBar: React.FC = () => {
+  const { enabledDays, slots } = useSchedule();
+  const { createAvailability } = useAgendaApi();
+  const [creating, setCreating] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+  const [success, setSuccess] = React.useState<string | null>(null);
+  const navigate = useNavigate();
+
+  const dayNumber: Record<string, number> = {
+    monday: 1,
+    tuesday: 2,
+    wednesday: 3,
+    thursday: 4,
+    friday: 5,
+    saturday: 6,
+    sunday: 7,
+  };
+
+  const onSave = async () => {
+    setCreating(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      const pref = localStorage.getItem('preference_id');
+      if (!pref) throw new Error('No se detectó preference_id. Inicia sesión nuevamente.');
+      const preference_id = Number(pref);
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      const datePrefix = `${yyyy}-${mm}-${dd}`;
+
+      // Build requests per selected hour
+      const requests: Array<Promise<any>> = [];
+      (Object.keys(enabledDays) as Array<keyof typeof enabledDays>).forEach((dayKey) => {
+        if (!enabledDays[dayKey]) return;
+        const daySlots = slots[dayKey] || [];
+        daySlots.forEach((s) => {
+          const start_time = `${datePrefix} ${s.hour}:00`;
+          const [hStr] = s.hour.split(':');
+          const endHour = String(Number(hStr) + 1).padStart(2, '0');
+          const end_time = `${datePrefix} ${endHour}:00`;
+          const payload = {
+            preference_id,
+            day_of_week: dayNumber[String(dayKey)],
+            start_time,
+            end_time,
+          };
+          requests.push(createAvailability(payload));
+        });
+      });
+
+      if (requests.length === 0) {
+        throw new Error('No hay horarios seleccionados para guardar.');
+      }
+
+      for (const req of requests) {
+        // eslint-disable-next-line no-await-in-loop
+        const res = await req;
+        if (!res?.success) throw new Error(res?.message || 'Error al crear disponibilidad');
+      }
+      setSuccess('Disponibilidad guardada correctamente.');
+      navigate('/profile/cartera');
+    } catch (e: any) {
+      setError(e?.message || 'Error al guardar');
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  return (
+    <div className="booking-actions" style={{ marginTop: '1rem' }}>
+      <button type="button" className="booking-btn--primary" onClick={onSave} disabled={creating}>
+        {creating ? 'Guardando...' : 'Guardar disponibilidad'}
+      </button>
+      {error && <p className="booking-alert booking-alert--error" style={{ marginTop: 8 }}>{error}</p>}
+      {success && <p className="booking-alert booking-alert--success" style={{ marginTop: 8 }}>{success}</p>}
+    </div>
+  );
+};

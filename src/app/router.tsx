@@ -20,11 +20,13 @@ import CreatePrice from '../pages/prices/CreatePrice';
 import { DocumentsProvider } from '../context/documents';
 import { PreferencesProvider } from '../context/preferences';
 import { CatalogsProvider } from '../context/catalogs/CatalogsContext';
+import { ActivationProvider } from '../context/activation/ActivationContext';
 import Video from '../pages/profile/Video';
 import Cartera from '../pages/profile/Cartera';
 import { AgendaProvider } from '../context/cartera';
 import Agenda from '../pages/profile/Agenda';
 import { BookingProvider } from '../context/booking';
+import ContinueOnboarding from '../pages/profile/ContinueOnboarding';
 
 const router = createBrowserRouter([
   {
@@ -34,11 +36,13 @@ const router = createBrowserRouter([
   {
     path: '/profile/preferences',
     element: (
-      <CatalogsProvider>
-        <PreferencesProvider>
-          <Preferences />
-        </PreferencesProvider>
-      </CatalogsProvider>
+        <ActivationProvider>
+          <CatalogsProvider>
+            <PreferencesProvider>
+              <Preferences />
+            </PreferencesProvider>
+          </CatalogsProvider>
+        </ActivationProvider>
     ),
   },
   {
@@ -52,27 +56,46 @@ const router = createBrowserRouter([
   {
     path: '/profile/agenda',
     element: (
-      <BookingProvider>
-        <Agenda />
-      </BookingProvider>
+      <ActivationProvider>
+        <BookingProvider>
+          <Agenda />
+        </BookingProvider>
+      </ActivationProvider>
     ),
   },
   {
-    path: '/documents/create',
+    path: '/profile/documentos',
     element: (
-      <DocumentsProvider>
-        <CreateDocument />
-      </DocumentsProvider>
+      <ActivationProvider>
+        <DocumentsProvider>
+          <CreateDocument />
+        </DocumentsProvider>
+      </ActivationProvider>
     ),
   },
   {
-    path: '/prices/create',
-    element: ( <CreatePrice />
+    path: '/profile/price',
+    element: (
+      <ActivationProvider>
+        <CreatePrice />
+      </ActivationProvider>
     ),
   },
   {
     path: '/profile/video',
-    element: <Video />,
+    element: (
+      <ActivationProvider>
+        <Video />
+      </ActivationProvider>
+    ),
+  },
+  {
+    path: '/profile/continue',
+    element: (
+      <ActivationProvider>
+        <ContinueOnboarding />
+      </ActivationProvider>
+    ),
   },
   {
     path: "/teacher-home",

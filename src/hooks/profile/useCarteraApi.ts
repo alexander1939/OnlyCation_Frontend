@@ -23,7 +23,7 @@ export const useAgendaApi = () => {
       if (!token) throw new Error('No hay token de acceso. Inicia sesión nuevamente.');
 
       const response = await client.post<WalletCreateResponse>(
-        '/wallet/create',
+        '/wallet/create/',
         walletData,
         { headers: { Authorization: `Bearer ${token}` } }
       );

@@ -1,25 +1,24 @@
 // src/components/PrivateRoute.tsx
 import React from "react";
 import { Navigate } from "react-router-dom";
-import { useAuthContext } from "../context/auth";
+import { useLoginContext } from "../context/auth/LoginContext";
 
 interface PrivateRouteProps {
   children: React.ReactNode;
-  roles?: string[]; // 👈 opcional, para validar roles como "student" o "teacher"
+  roles?: string[]; 
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, roles }) => {
-  const { user } = useAuthContext();
+  const { user } = useLoginContext();
 
-  // 🚨 Si no hay usuario -> redirigir al login
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   }
 
-  // 🚨 Si hay roles definidos y el del usuario no coincide -> redirigir al home
   if (roles && !roles.includes((user.role || "").toLowerCase())) {
     return <Navigate to="/" replace />;
   }
+  
 
   // ✅ Si pasa las validaciones, renderizamos el contenido protegido
   return <>{children}</>;

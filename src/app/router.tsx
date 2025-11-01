@@ -114,7 +114,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/docente/general',
+    path: '/teacher/booking',
     element: (
       <PrivateRoute roles={["teacher"]}>
         <DocenteGeneral />
@@ -122,7 +122,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/docente/agenda',
+    path: '/teacher/availability',
     element: (
       <PrivateRoute roles={["teacher"]}>
         <AgendaDocente />
@@ -130,7 +130,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/docente/datos-personales',
+    path: '/teacher/personal-data',
     element: (
       <PrivateRoute roles={["teacher"]}>
         <DocenteDatosPersonales />
@@ -138,7 +138,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/docente/documentos',
+    path: '/teacher/documents',
     element: (
       <PrivateRoute roles={["teacher"]}>
         <DocenteDocumentos />

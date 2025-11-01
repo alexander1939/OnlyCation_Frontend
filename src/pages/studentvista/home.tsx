@@ -10,35 +10,30 @@ import FeaturedAdvisors from "./FeaturedAdvisors";
 import KnowledgeCenter from "./KnowledgeCenter";
 import { Footer } from "../../components";
 import { useLoginApi } from "../../hooks/auth/useLoginApi";
-import WelcomeAlert from "../../components/WelcomeAlert"; // 👈 Importamos la alerta
+import WelcomeAlert from "../../components/WelcomeAlert";
 
 const StudentHome: React.FC = () => {
   const { user } = useLoginApi();
-  const { logout } = useLoginApi();
   const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    await logout();
-    navigate("/login");
-  };
 
   return (
     <div
       style={{
-        backgroundColor: "#FAF9F5", // 👈 Fondo principal soft-white
-        minHeight: "100vh", // Asegura que cubra toda la altura visible
+        backgroundColor: "#FAF9F5",
+        minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
+        padding: "0", // sin padding extra en el contenedor principal
       }}
     >
       <Header />
       <WelcomeAlert name={user?.first_name || "Student"} />
 
-      {/* Contenido principal */}
+      {/* Contenido principal con padding simétrico */}
       <div
         style={{
-          flex: 1, // hace que el contenido principal se expanda
-          padding: "7.5rem 2rem 2rem",
+          flex: 1,
+          padding: "7.5rem 2rem 2rem 2rem", // 🔹 mismo espacio a izquierda y derecha
           display: "grid",
           gridTemplateColumns: "2fr 1fr",
           gap: "2rem",
@@ -79,24 +74,6 @@ const StudentHome: React.FC = () => {
 
         {/* 🔹 Panel lateral */}
         <FeaturedAdvisors />
-      </div>
-
-      {/* Botón de cierre de sesión */}
-      <div style={{ textAlign: "center", marginTop: "2rem" }}>
-        <button
-          onClick={handleLogout}
-          style={{
-            padding: "0.5rem 1rem",
-            fontSize: "1rem",
-            backgroundColor: "#e74c3c",
-            color: "white",
-            border: "none",
-            borderRadius: "0.5rem",
-            cursor: "pointer",
-          }}
-        >
-          Cerrar sesión
-        </button>
       </div>
 
       <Footer />

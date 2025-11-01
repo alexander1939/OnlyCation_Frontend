@@ -1,53 +1,92 @@
-import React from 'react';
+import React from "react";
 
 const advisors = [
-  {
-    name: 'Prof. Carlos Mendoza',
-    video: 'https://www.youtube.com/embed/3icoSeGqQtY',
-  },
-  {
-    name: 'Lic. María González',
-    video: 'https://www.youtube.com/embed/3icoSeGqQtY',
-  },
+  { name: "Prof. Carlos Mendoza", video: "https://www.youtube.com/embed/3icoSeGqQtY" },
+  { name: "Lic. María González", video: "https://www.youtube.com/embed/3icoSeGqQtY" },
+  { name: "Ing. David Torres", video: "https://www.youtube.com/embed/3icoSeGqQtY" },
 ];
+
+// 🔹 Iniciales sin títulos
+const getInitials = (fullName: string) => {
+  const excludeWords = ["Prof.", "Lic.", "Ing.", "Mtro.", "Dra.", "Dr."];
+  const filtered = fullName
+    .split(" ")
+    .filter((word) => !excludeWords.includes(word));
+  return filtered
+    .slice(0, 2)
+    .map((n) => n[0]?.toUpperCase() || "")
+    .join("");
+};
 
 const FeaturedAdvisors: React.FC = () => {
   return (
     <div
       style={{
-        display: 'grid',
-        gap: '1rem',
-        fontFamily: 'Roboto, sans-serif',
+        display: "grid",
+        gap: "0.7rem",
+        fontFamily: "Roboto, sans-serif",
+        maxHeight: "570px", // ⬆️ aumentado (antes 500px)
+        overflowY: "auto",
+        paddingRight: "0.4rem",
+        scrollbarWidth: "none",
+        msOverflowStyle: "none",
       }}
+      className="scroll-vertical"
     >
+      <style>
+        {`
+          .scroll-vertical::-webkit-scrollbar {
+            display: none;
+          }
+
+          @keyframes buttonGlow {
+            0%, 100% { box-shadow: 0 0 3px rgba(37,99,235,0.5); }
+            50% { box-shadow: 0 0 7px rgba(37,99,235,0.8); }
+          }
+
+          @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 rgba(37,99,235,0.4); }
+            50% { transform: scale(1.03); box-shadow: 0 0 4px rgba(37,99,235,0.6); }
+            100% { transform: scale(1); box-shadow: 0 0 0 rgba(37,99,235,0.4); }
+          }
+        `}
+      </style>
+
       {advisors.map((a) => (
         <div
           key={a.name}
           style={{
-            backgroundColor: '#fff',
-            borderRadius: '1rem',
-            padding: '0.8rem', // 🔹 menos espacio general
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.05)',
-            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-            cursor: 'pointer',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.3rem', // 🔹 espacio más compacto
+            background: "linear-gradient(180deg, #E0F2FE 0%, #F0F9FF 100%)",
+            borderRadius: "0.7rem",
+            padding: "0.55rem",
+            boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
+            transition: "transform 0.25s ease, box-shadow 0.25s ease",
+            cursor: "pointer",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
           }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.boxShadow = '0 6px 14px rgba(0,0,0,0.1)')
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.05)')
-          }
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "translateY(-2px)";
+            e.currentTarget.style.boxShadow =
+              "0 5px 10px rgba(37,99,235,0.15)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "translateY(0)";
+            e.currentTarget.style.boxShadow =
+              "0 2px 5px rgba(0,0,0,0.05)";
+          }}
         >
-          {/* Video del docente */}
+          {/* 🔹 Video ajustado */}
           <div
             style={{
-              width: '100%',
-              aspectRatio: '16/9', // mantiene proporción rectangular
-              borderRadius: '0.5rem',
-              overflow: 'hidden',
+              width: "84%",
+              aspectRatio: "16 / 8",
+              borderRadius: "0.45rem",
+              overflow: "hidden",
+              marginBottom: "0.45rem",
+              boxShadow: "0 2px 4px rgba(0,0,0,0.08)",
+              border: "1px solid #E5E7EB",
             }}
           >
             <iframe
@@ -58,49 +97,78 @@ const FeaturedAdvisors: React.FC = () => {
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               style={{
-                border: 'none',
+                border: "none",
               }}
             ></iframe>
           </div>
 
-          {/* Nombre y botón */}
+          {/* 🔹 Avatar + nombre */}
           <div
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginTop: '0.2rem',
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "0.45rem",
+              marginBottom: "0.4rem",
             }}
           >
+            <div
+              style={{
+                background: "linear-gradient(135deg, #2563EB 0%, #1E40AF 100%)",
+                color: "white",
+                width: "32px",
+                height: "32px",
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "0.8rem",
+                fontWeight: "bold",
+                boxShadow: "0 2px 5px rgba(37,99,235,0.3)",
+                animation: "pulse 3s infinite ease-in-out",
+              }}
+            >
+              {getInitials(a.name)}
+            </div>
+
             <h4
               style={{
                 margin: 0,
-                fontSize: '1rem',
-                fontWeight: 'bold',
-                color: '#1F2937',
-                lineHeight: '1.2', // 🔹 menos espacio debajo del texto
+                fontSize: "0.8rem",
+                fontWeight: 700,
+                color: "#1E3A8A",
+                textAlign: "left",
               }}
             >
               {a.name}
             </h4>
-
-            <button
-              style={{
-                backgroundColor: 'transparent',
-                color: '#2563EB',
-                border: 'none',
-                fontWeight: 600,
-                fontSize: '0.9rem',
-                cursor: 'pointer',
-                transition: 'color 0.2s ease',
-                padding: 0,
-              }}
-              onMouseOver={(e) => (e.currentTarget.style.color = '#1E40AF')}
-              onMouseOut={(e) => (e.currentTarget.style.color = '#2563EB')}
-            >
-              Ver más →
-            </button>
           </div>
+
+          {/* 🔹 Botón compacto */}
+          <button
+            style={{
+              backgroundColor: "#2563EB",
+              color: "#fff",
+              border: "none",
+              borderRadius: "0.35rem",
+              fontWeight: 600,
+              fontSize: "0.7rem",
+              cursor: "pointer",
+              transition: "all 0.25s ease",
+              padding: "0.3rem 0.8rem",
+              boxShadow: "0 0 3px rgba(37,99,235,0.4)",
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = "#1D4ED8";
+              e.currentTarget.style.animation = "buttonGlow 1s infinite";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = "#2563EB";
+              e.currentTarget.style.animation = "none";
+            }}
+          >
+            Ver perfil
+          </button>
         </div>
       ))}
     </div>

@@ -2,8 +2,9 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useLoginContext } from "../../context/auth";
 import { useLoginApi } from "../../hooks/auth/useLoginApi";
+import WelcomeAlert from "../../components/WelcomeAlert"; 
 import Header from "../../components/ui/Header";
-import WelcomeAlert from "../../components/WelcomeAlert"; // 👋 Componente de bienvenida temporal
+
 
 const TeacherHome: React.FC = () => {
   const { user } = useLoginContext();

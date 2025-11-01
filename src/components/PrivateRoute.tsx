@@ -1,6 +1,6 @@
 // src/components/PrivateRoute.tsx
 import React from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useLoginContext } from "../context/auth/LoginContext";
 
 interface PrivateRouteProps {
@@ -10,7 +10,6 @@ interface PrivateRouteProps {
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, roles }) => {
   const { user } = useLoginContext();
-  const location = useLocation();
 
   if (!user) {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
@@ -20,6 +19,8 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, roles }) => {
     return <Navigate to="/" replace />;
   }
   
+
+  // ✅ Si pasa las validaciones, renderizamos el contenido protegido
   return <>{children}</>;
 };
 

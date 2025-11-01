@@ -14,11 +14,88 @@ import DocenteDatosPersonales from '../pages/docente/DatosPersonales';
 import DocenteDocumentos from '../pages/docente/Documentos';
 import StudentHome from '../pages/studentvista/home';
 import PrivateRoute from "../components/PrivateRoute";
+import Preferences from '../pages/profile/Preferences';
+import CreateDocument from '../pages/documents/CreateDocument';
+import CreatePrice from '../pages/prices/CreatePrice';
+import { DocumentsProvider } from '../context/documents';
+import { PreferencesProvider } from '../context/preferences';
+import { CatalogsProvider } from '../context/catalogs/CatalogsContext';
+import { ActivationProvider } from '../context/activation/ActivationContext';
+import Video from '../pages/profile/Video';
+import Cartera from '../pages/profile/Cartera';
+import { AgendaProvider } from '../context/cartera';
+import Agenda from '../pages/profile/Agenda';
+import { BookingProvider } from '../context/booking';
+import ContinueOnboarding from '../pages/profile/ContinueOnboarding';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <Home />,
+  },
+  {
+    path: '/profile/preferences',
+    element: (
+        <ActivationProvider>
+          <CatalogsProvider>
+            <PreferencesProvider>
+              <Preferences />
+            </PreferencesProvider>
+          </CatalogsProvider>
+        </ActivationProvider>
+    ),
+  },
+  {
+    path: '/profile/cartera',
+    element: (
+      <AgendaProvider>
+        <Cartera />
+      </AgendaProvider>
+    ),
+  },
+  {
+    path: '/profile/agenda',
+    element: (
+      <ActivationProvider>
+        <BookingProvider>
+          <Agenda />
+        </BookingProvider>
+      </ActivationProvider>
+    ),
+  },
+  {
+    path: '/profile/documentos',
+    element: (
+      <ActivationProvider>
+        <DocumentsProvider>
+          <CreateDocument />
+        </DocumentsProvider>
+      </ActivationProvider>
+    ),
+  },
+  {
+    path: '/profile/price',
+    element: (
+      <ActivationProvider>
+        <CreatePrice />
+      </ActivationProvider>
+    ),
+  },
+  {
+    path: '/profile/video',
+    element: (
+      <ActivationProvider>
+        <Video />
+      </ActivationProvider>
+    ),
+  },
+  {
+    path: '/profile/continue',
+    element: (
+      <ActivationProvider>
+        <ContinueOnboarding />
+      </ActivationProvider>
+    ),
   },
   {
     path: "/teacher-home",
@@ -102,3 +179,4 @@ const router = createBrowserRouter([
 export default function AppRouter() {
   return <RouterProvider router={router} />;
 }
+

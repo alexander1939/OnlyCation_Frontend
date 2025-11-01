@@ -1,0 +1,24 @@
+:root{
+  --obs-text:#294954;
+  --obs-muted:#6B7280;
+  --obs-done:#8ED4BE;
+  --obs-active:#FFDE97;
+  --obs-sep:#E5E7EB;
+}
+
+.obs-steps{ margin-bottom: 1.25rem; }
+.obs-list{ display:flex; align-items:center; gap:.5rem; list-style:none; padding:0; margin:0; flex-wrap:wrap; }
+.obs-item{ display:flex; align-items:center; gap:.5rem; }
+
+.obs-link{ display:inline-flex; align-items:center; gap:.5rem; text-decoration:none; color:var(--obs-text); font-weight:600; }
+.obs-link:hover .obs-label{ text-decoration:underline; }
+
+.obs-circle{ display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:999px; border:2px solid var(--obs-text); font-weight:800; color:var(--obs-text); background:#fff; }
+.obs-link.is-done .obs-circle{ border-color: var(--obs-done); color:#0b2a33; background: color-mix(in oklab, var(--obs-done) 30%, white); }
+.obs-link.is-active .obs-circle{ border-color: var(--obs-active); background: color-mix(in oklab, var(--obs-active) 30%, white); }
+
+.obs-label{ font-size:.85rem; color:var(--obs-muted); }
+.obs-link.is-active .obs-label{ color:var(--obs-text); }
+
+.obs-sep{ display:inline-block; width:28px; height:2px; background:var(--obs-sep); border-radius:2px; opacity:.8; }
+.obs-sep.is-done{ background: var(--obs-done); opacity:1; }

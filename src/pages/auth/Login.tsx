@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useLoginContext } from "../../context/auth/LoginContext";
 import { useLoginApi } from "../../hooks/auth/useLoginApi"; // ✅ Importa el hook de la lógica
 import LoginForm from "./LoginForm";
@@ -7,14 +7,14 @@ import LoginHeader from "./LoginHeader";
 import "../../styles/Login.css";
 
 const Login: React.FC = () => {
-  // ✅ Separar variables del contexto y funciones del hook
   const { user, loadingUser, loginLoading } = useLoginContext();
   const { login } = useLoginApi();
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as { from?: string } | null)?.from;
   const [error, setError] = useState("");
 
-  // 🔹 Manejo del login
   const handleLogin = async (email: string, password: string) => {
     setError("");
     try {
@@ -26,8 +26,11 @@ const Login: React.FC = () => {
         return;
       }
 
-      // Redirección según rol
       const role = response.data.role.toLowerCase();
+      if (from) {
+        navigate(from, { replace: true });
+        return;
+      }
       if (role === "teacher") navigate("/teacher-home");
       else if (role === "student") navigate("/student-home");
       else navigate("/");
@@ -37,9 +40,13 @@ const Login: React.FC = () => {
     }
   };
 
-  // 🔹 Redirección automática según rol
   useEffect(() => {
     if (!user || loadingUser) return;
+
+    if (from) {
+      navigate(from, { replace: true });
+      return;
+    }
 
     switch (user.role.toLowerCase()) {
       case "teacher":
@@ -52,7 +59,7 @@ const Login: React.FC = () => {
         navigate("/");
         break;
     }
-  }, [user, loadingUser, navigate]);
+  }, [user, loadingUser, navigate, from]);
 
   return (
     <div className="login-page">
@@ -60,7 +67,6 @@ const Login: React.FC = () => {
         <div className="login-card animate-card">
           <div className="login-card-content">
 
-            {/* Lado izquierdo */}
             <div className="login-card-left">
               <div className="login-card-left-header">
                 <LoginHeader />
@@ -70,7 +76,6 @@ const Login: React.FC = () => {
               </div>
             </div>
 
-            {/* Lado derecho */}
             <div className="login-card-right">
               <div className="login-icon mb-6">
                 <img src="/usuario.png" alt="Icono Login" />

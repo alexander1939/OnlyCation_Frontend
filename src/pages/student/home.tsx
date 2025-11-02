@@ -2,12 +2,12 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/ui/Header";
-import PublishConsult from "./HistoryCard";
-import AgendaCard from "./AgendaCard";
-import PriceCard from "./PriceCard";
-import SubjectList from "./SubjectList";
-import FeaturedAdvisors from "./FeaturedAdvisors";
-import KnowledgeCenter from "./KnowledgeCenter";
+import PublishConsult from "../../components/comptHome/HistoryCard";
+import AgendaCard from "../../components/comptHome/AgendaCard";
+import PriceCard from "../../components/comptHome/PriceCard";
+import SubjectList from "../../components/comptHome/SubjectList";
+import FeaturedAdvisors from "../../components/comptHome/FeaturedAdvisors";
+import KnowledgeCenter from "../../components/comptHome/KnowledgeCenter";
 import { Footer } from "../../components";
 import { useLoginApi } from "../../hooks/auth/useLoginApi";
 import WelcomeAlert from "../../components/WelcomeAlert";

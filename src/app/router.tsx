@@ -26,6 +26,7 @@ import Cartera from '../pages/profile/Wallet';
 import { AgendaProvider } from '../context/wallet';
 import Agenda from '../pages/profile/Availability';
 import { BookingProvider } from '../context/availability';
+import { MyNextClassesProvider, BookingDetailProvider } from '../context/booking';
 import ContinueOnboarding from '../pages/profile/ContinueOnboarding';
 // NUEVOS: páginas básicas por carpeta
 import TeacherBooking from '../pages/booking/my_next_booking';
@@ -131,7 +132,11 @@ const router = createBrowserRouter([
     path: '/student/my_next_booking',
     element: (
       <PrivateRoute roles={["student"]}>
-        <MyNextBooking />
+        <MyNextClassesProvider>
+          <BookingDetailProvider>
+            <MyNextBooking />
+          </BookingDetailProvider>
+        </MyNextClassesProvider>
       </PrivateRoute>
     ),
   },
@@ -139,7 +144,11 @@ const router = createBrowserRouter([
     path: '/teacher/my_next_booking',
     element: (
       <PrivateRoute roles={["teacher"]}>
-        <MyNextBooking />
+        <MyNextClassesProvider>
+          <BookingDetailProvider>
+            <MyNextBooking />
+          </BookingDetailProvider>
+        </MyNextClassesProvider>
       </PrivateRoute>
     ),
   },

@@ -41,25 +41,22 @@ const Login: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!user || loadingUser) return;
+  if (!user || loadingUser) return;
 
-    if (from) {
-      navigate(from, { replace: true });
-      return;
-    }
+  // Siempre redirigir al home principal según el rol
+  switch (user.role.toLowerCase()) {
+    case "teacher":
+      navigate("/teacher-home");
+      break;
+    case "student":
+      navigate("/student-home");
+      break;
+    default:
+      navigate("/");
+      break;
+  }
+}, [user, loadingUser, navigate]);
 
-    switch (user.role.toLowerCase()) {
-      case "teacher":
-        navigate("/teacher-home");
-        break;
-      case "student":
-        navigate("/student-home");
-        break;
-      default:
-        navigate("/");
-        break;
-    }
-  }, [user, loadingUser, navigate, from]);
 
   return (
     <div className="login-page">

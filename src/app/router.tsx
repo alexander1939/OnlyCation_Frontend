@@ -15,17 +15,17 @@ import DocenteDocumentos from '../pages/docente/Documentos';
 import StudentHome from '../pages/studentvista/home';
 import PrivateRoute from "../components/PrivateRoute";
 import Preferences from '../pages/profile/Preferences';
-import CreateDocument from '../pages/documents/CreateDocument';
-import CreatePrice from '../pages/prices/CreatePrice';
+import CreateDocument from '../pages/profile/Document';
+import CreatePrice from '../pages/profile/Price';
 import { DocumentsProvider } from '../context/documents';
 import { PreferencesProvider } from '../context/preferences';
 import { CatalogsProvider } from '../context/catalogs/CatalogsContext';
 import { ActivationProvider } from '../context/activation/ActivationContext';
 import Video from '../pages/profile/Video';
-import Cartera from '../pages/profile/Cartera';
-import { AgendaProvider } from '../context/cartera';
-import Agenda from '../pages/profile/Agenda';
-import { BookingProvider } from '../context/booking';
+import Cartera from '../pages/profile/Wallet';
+import { AgendaProvider } from '../context/wallet';
+import Agenda from '../pages/profile/Availability';
+import { BookingProvider } from '../context/availability';
 import ContinueOnboarding from '../pages/profile/ContinueOnboarding';
 
 const router = createBrowserRouter([
@@ -46,7 +46,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/profile/cartera',
+    path: '/profile/wallet',
     element: (
       <AgendaProvider>
         <Cartera />
@@ -54,7 +54,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/profile/agenda',
+    path: '/profile/availability',
     element: (
       <ActivationProvider>
         <BookingProvider>
@@ -64,7 +64,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/profile/documentos',
+    path: '/profile/document',
     element: (
       <ActivationProvider>
         <DocumentsProvider>

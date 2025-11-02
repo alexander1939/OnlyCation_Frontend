@@ -5,7 +5,7 @@ import type { PreferenceCreateRequest } from '../../context/preferences/types';
 import '../../styles/Preferences.css';
 import { useCatalogsContext } from '../../context/catalogs/CatalogsContext';
 import OnboardingSteps from '../../components/OnboardingSteps';
-import { useActivation } from '../../context/activation/ActivationContext';
+import { useActivation } from '../../context/activation/useActivation';
 
 // Las opciones ahora provienen del CatalogsContext
 
@@ -42,7 +42,7 @@ const PreferencesPage: React.FC = () => {
 
   React.useEffect(() => {
     if (success) {
-      navigate('/profile/documentos');
+      navigate('/profile/document');
     }
   }, [success, navigate]);
 
@@ -212,6 +212,9 @@ const PreferencesPage: React.FC = () => {
             )}
           </form>
         </div>
+      </div>
+      <div style={{ position: 'fixed', left: '2rem', bottom: '1rem', pointerEvents: 'none' }}>
+        <img src="/Activar_cuenta.png" alt="activar cuenta" style={{ width: '330px', height: 'auto' }} />
       </div>
     </div>
   );

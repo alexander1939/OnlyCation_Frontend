@@ -1,3 +1,58 @@
+/* Decorative crescents (match Preferences/Prices) */
+.agenda-page::before {
+  content: "";
+  position: fixed;
+  left: -4rem;
+  top: -3rem;
+  width: clamp(180px, 20vw, 320px);
+  height: clamp(180px, 20vw, 320px);
+  border-radius: 9999px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
+  background:
+    radial-gradient(60% 60% at 55% 55%, rgba(142, 212, 190, 0.55) 0%, rgba(142, 212, 190, 0.22) 55%, transparent 72%),
+    radial-gradient(42% 42% at 70% 30%, rgba(104, 178, 201, 0.22) 0%, transparent 68%),
+    radial-gradient(40% 40% at 40% 40%, rgba(255, 222, 151, 0.30) 0%, transparent 70%);
+}
+
+.agenda-container::before {
+  content: "";
+  position: fixed;
+  right: 16rem;
+  top: 6rem;
+  width: clamp(140px, 16vw, 260px);
+  height: clamp(140px, 16vw, 260px);
+  border-radius: 9999px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.78;
+  background:
+    radial-gradient(60% 60% at 50% 50%, rgba(142, 212, 190, 0.6) 0%, rgba(142, 212, 190, 0.28) 55%, transparent 72%),
+    radial-gradient(38% 38% at 55% 40%, rgba(104, 178, 201, 0.18) 0%, transparent 70%),
+    radial-gradient(30% 30% at 45% 65%, rgba(255, 153, 120, 0.12) 0%, transparent 72%);
+}
+
+.agenda-page::after {
+  content: "";
+  position: fixed;
+  right: -6rem;
+  bottom: -6rem;
+  width: clamp(260px, 28vw, 420px);
+  height: clamp(260px, 28vw, 420px);
+  border-radius: 9999px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.9;
+  background:
+    radial-gradient(60% 60% at 40% 40%, rgba(142, 212, 190, 0.65) 0%, rgba(142, 212, 190, 0.28) 55%, transparent 72%),
+    radial-gradient(45% 45% at 75% 35%, rgba(104, 178, 201, 0.20) 0%, transparent 68%),
+    radial-gradient(36% 36% at 60% 70%, rgba(255, 153, 120, 0.20) 0%, transparent 72%),
+    radial-gradient(40% 40% at 65% 65%, rgba(255, 222, 151, 0.45) 0%, transparent 70%);
+}
+/* Force full-viewport background for Wallet/Agenda */
+html, body { background: var(--agenda-soft-white) !important; }
+
 /* Agenda (Cartera) page reusable styles */
 :root {
   --agenda-soft-white: #FAF9F5;
@@ -18,8 +73,8 @@
   --agenda-shadow: 0 8px 24px rgba(41, 73, 84, 0.10);
 }
 
-.agenda-page { background: var(--agenda-surface); font-family: 'Roboto', system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif; }
-.agenda-container { min-height: 100vh; padding: 2.5rem 1rem; }
+.agenda-page { background: var(--agenda-surface); font-family: 'Roboto', system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif; position: relative; }
+.agenda-container { min-height: 100vh; padding: 4rem 1rem 2.5rem; }
 @media (min-width: 640px) { .agenda-container { padding-left: 1.5rem; padding-right: 1.5rem; } }
 @media (min-width: 1024px) { .agenda-container { padding-left: 2rem; padding-right: 2rem; } }
 
@@ -29,7 +84,7 @@
 .agenda-body { padding: 1.5rem; }
 @media (min-width: 640px) { .agenda-body { padding: 2rem; } }
 
-.agenda-header { text-align: center; margin-bottom: 2rem; }
+.agenda-header { text-align: center; margin-top: 3rem; margin-bottom: 3rem; }
 .agenda-title { color: var(--agenda-text); letter-spacing: -0.01em; }
 .agenda-title-lg { font-size: 1.875rem; line-height: 2.25rem; font-weight: 700; }
 .agenda-subtitle { color: var(--agenda-muted); }

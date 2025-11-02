@@ -69,7 +69,10 @@ const VideoInner: React.FC = () => {
           <p className="video-subtitle video-text-sm" style={{ marginTop: '0.5rem' }}>
             Agrega tu video de YouTube para mostrarte en tu perfil.
           </p>
-        </div>
+          <div style={{ position: 'fixed', left: '2rem', bottom: '1rem', pointerEvents: 'none' }}>
+        <img src="/Activar_cuenta.png" alt="activar cuenta" style={{ width: '330px', height: 'auto' }} />
+      </div>
+    </div>
 
         <div className="video-card">
           <form onSubmit={handleSubmit} className="video-form">

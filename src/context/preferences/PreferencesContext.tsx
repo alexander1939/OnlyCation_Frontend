@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import type { PreferenceCreateRequest, PreferenceCreateResponse } from './types';
-import { usePreferencesApi } from '../../hooks/profile/usePreferencesApi';
+import { usePreferencesApi } from '../../hooks/preferences/usePreferencesApi';
 
 export interface PreferencesContextType {
   creating: boolean;

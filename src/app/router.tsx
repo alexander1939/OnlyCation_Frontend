@@ -1,16 +1,16 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Home from '../pages/home/Home';
-import AllTeachers from '../pages/teachers/AllTeachers';
+import AllTeachers from '../pages/home/AllTeachers';
 import AboutUs from '../pages/about-us/AboutUs';
-import BeTeacher from '../pages/teachers/BeTeacher';
+import BeTeacher from '../pages/home/BeTeacher';
 import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
 import ForgotPassword from '../pages/auth/ForgotPassword';
 import ResetPassword from '../pages/auth/ResetPassword';
 import TeacherHome from '../pages/teachervista/home';
-import DocenteGeneral from '../pages/docente/General';
+import DocenteGeneral from '../pages/booking/my_next_booking';
 import AgendaDocente from '../pages/docente/Agenda';
-import DocenteDatosPersonales from '../pages/docente/DatosPersonales';
+import DocenteDatosPersonales from '../pages/personal-data/DatosPersonales';
 import DocenteDocumentos from '../pages/docente/Documentos';
 import StudentHome from '../pages/studentvista/home';
 import PrivateRoute from "../components/PrivateRoute";
@@ -27,6 +27,11 @@ import { AgendaProvider } from '../context/cartera';
 import Agenda from '../pages/profile/Agenda';
 import { BookingProvider } from '../context/booking';
 import ContinueOnboarding from '../pages/profile/ContinueOnboarding';
+// NUEVOS: páginas básicas por carpeta
+import TeacherBooking from '../pages/booking/my_next_booking';
+import TeacherSubscription from '../pages/subscription/TeacherSubscription';
+import TeacherConfirmation from '../pages/confirmation/TeacherConfirmation';
+import TeacherChat from '../pages/chat/TeacherChat';
 
 const router = createBrowserRouter([
   {
@@ -113,11 +118,12 @@ const router = createBrowserRouter([
       </PrivateRoute>
     ),
   },
+  // AJUSTES TEACHER
   {
     path: '/teacher/booking',
     element: (
       <PrivateRoute roles={["teacher"]}>
-        <DocenteGeneral />
+        <TeacherBooking />
       </PrivateRoute>
     ),
   },
@@ -126,6 +132,30 @@ const router = createBrowserRouter([
     element: (
       <PrivateRoute roles={["teacher"]}>
         <AgendaDocente />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/teacher/subscription',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <TeacherSubscription />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/teacher/confirmation',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <TeacherConfirmation />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/teacher/chat',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <TeacherChat />
       </PrivateRoute>
     ),
   },
@@ -145,6 +175,7 @@ const router = createBrowserRouter([
       </PrivateRoute>
     ),
   },
+  // Rutas existentes
   {
     path: '/teachers',
     element: <AllTeachers />,
@@ -179,4 +210,3 @@ const router = createBrowserRouter([
 export default function AppRouter() {
   return <RouterProvider router={router} />;
 }
-

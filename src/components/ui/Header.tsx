@@ -31,6 +31,34 @@ const Header: React.FC = () => {
     }
   };
 
+  // Menú dinámico según rol (solo diseño; no se crean rutas nuevas)
+  const menuItems = (() => {
+    if (isTeacher) {
+      return [
+        { to: '/teacher/availability', label: 'Agenda' },
+        { to: '/teacher/booking', label: 'Reservas' },
+        { to: '/teacher/chat', label: 'Chat' },
+        { to: '/teacher/subscription', label: 'Suscripción' },
+        { to: '/teacher/confirmation', label: 'Confirmación' },
+      ];
+    }
+    if (isStudent) {
+      return [
+        { to: '/teachers', label: 'Docentes' },
+        { to: '/student/chat', label: 'Chat' },
+        { to: '/student/booking', label: 'Reservas' },
+        { to: '/student/confirmation', label: 'Confirmación' },
+      ];
+    }
+    // Sin sesión: menú público
+    return [
+      { to: '/', label: 'Inicio' },
+      { to: '/be-teacher', label: '¿Ser docente?' },
+      { to: '/about-us', label: 'Sobre nosotros' },
+      { to: '/register', label: 'Regístrate' },
+    ];
+  })();
+
   // Componente NavItem con CSS puro - sin Tailwind
   const NavItem: React.FC<{ to: string; label: string; onClick?: () => void; mobile?: boolean }> = ({ to, label, onClick, mobile = false }) => {
     const isActive = location.pathname === to;
@@ -136,10 +164,14 @@ const Header: React.FC = () => {
 
           {/* Navigation Menu */}
           <nav className="flex items-center space-x-12">
-            <NavItem to="/" label="Inicio" />
-            <NavItem to="/be-teacher" label="¿Ser docente?" />
-            <NavItem to="/about-us" label="Sobre nosotros" />
-            <NavItem to="/register" label="Registrate" />
+            {menuItems.map((item) => (
+              <NavItem
+                key={item.label}
+                to={item.to}
+                label={item.label}
+                onClick={item.placeholder ? (e => { e?.preventDefault?.(); }) : undefined}
+              />
+            ))}
           </nav>
 
           {/* Perfil Dropdown */}
@@ -202,20 +234,28 @@ const Header: React.FC = () => {
           <div className="fixed inset-0 bg-[#294954]/20 backdrop-blur-sm" onClick={() => setIsMenuOpen(false)}></div>
           <div className="fixed top-24 left-4 right-4 bg-[#FAF9F5]/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-[#68B2C9]/20 p-8">
             <nav className="flex flex-col space-y-6 font-['Roboto']">
-              <NavItem to="/" label="Inicio" onClick={() => setIsMenuOpen(false)} mobile />
-              <NavItem to="/teachers" label="Tutores" onClick={() => setIsMenuOpen(false)} mobile />
-              <NavItem to="/about-us" label="Sobre nosotros" onClick={() => setIsMenuOpen(false)} mobile />
-              <NavItem to="/be-teacher" label="¿Ser docente?" onClick={() => setIsMenuOpen(false)} mobile />
-              
-              <div className="pt-6 border-t border-[#68B2C9]/20">
-                <button className="w-full bg-[#68B2C9] text-[#FAF9F5] rounded-2xl px-6 py-4 text-base font-medium shadow-lg hover:bg-[#294954] hover:shadow-xl transition-all duration-300 font-['Roboto']">
-                  Perfil
-                </button>
-              </div>
-            </nav>
-          </div>
-        </div>
-      )}
+              {menuItems.map((item) => (
+                <NavItem
+                  key={`m-${item.label}`}
+                  to={item.to}
+                  label={item.label}
+                  onClick={(e) => {
+                    if (item.placeholder) { e?.preventDefault?.(); }
+                    setIsMenuOpen(false);
+                  }}
+                  mobile
+                />
+              ))}
+               
+               <div className="pt-6 border-t border-[#68B2C9]/20">
+                 <button className="w-full bg-[#68B2C9] text-[#FAF9F5] rounded-2xl px-6 py-4 text-base font-medium shadow-lg hover:bg-[#294954] hover:shadow-xl transition-all duration-300 font-['Roboto']">
+                   Perfil
+                 </button>
+               </div>
+             </nav>
+           </div>
+         </div>
+       )}
     </>
   );
 };

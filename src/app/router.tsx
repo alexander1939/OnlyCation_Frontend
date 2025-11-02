@@ -1,14 +1,14 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Home from '../pages/home/Home';
-import AllTeachers from '../pages/teachers/AllTeachers';
+import AllTeachers from '../pages/home/AllTeachers';
 import AboutUs from '../pages/about-us/AboutUs';
-import BeTeacher from '../pages/teachers/BeTeacher';
+import BeTeacher from '../pages/home/BeTeacher';
 import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
 import ForgotPassword from '../pages/auth/ForgotPassword';
 import ResetPassword from '../pages/auth/ResetPassword';
 import TeacherHome from '../pages/teacher/home';
-import DocenteGeneral from '../pages/teacher/General';
+import MyNextBooking from '../pages/booking/my_next_booking';
 import AgendaDocente from '../pages/teacher/Agenda';
 import DocenteDatosPersonales from '../pages/teacher/DatosPersonales';
 import DocenteDocumentos from '../pages/teacher/Documentos';
@@ -27,6 +27,12 @@ import { AgendaProvider } from '../context/wallet';
 import Agenda from '../pages/profile/Availability';
 import { BookingProvider } from '../context/availability';
 import ContinueOnboarding from '../pages/profile/ContinueOnboarding';
+// NUEVOS: páginas básicas por carpeta
+import TeacherBooking from '../pages/booking/my_next_booking';
+import TeacherSubscription from '../pages/subscription/TeacherSubscription';
+import TeacherConfirmation from '../pages/confirmation/my_confimaction';
+import TeacherChat from '../pages/chat/my_chat';
+import EstudianteDatosPersonales from '../pages/student/DatosPersonales';
 
 const router = createBrowserRouter([
   {
@@ -114,15 +120,31 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/docente/general',
+    path: '/student/personal-data',
     element: (
-      <PrivateRoute roles={["teacher"]}>
-        <DocenteGeneral />
+      <PrivateRoute roles={["student"]}>
+        <EstudianteDatosPersonales />
       </PrivateRoute>
     ),
   },
   {
-    path: '/docente/agenda',
+    path: '/student/my_next_booking',
+    element: (
+      <PrivateRoute roles={["student"]}>
+        <MyNextBooking />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/teacher/my_next_booking',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <MyNextBooking />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/teacher/availability',
     element: (
       <PrivateRoute roles={["teacher"]}>
         <AgendaDocente />
@@ -130,7 +152,31 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/docente/datos-personales',
+    path: '/teacher/subscription',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <TeacherSubscription />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/teacher/confirmation',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <TeacherConfirmation />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/teacher/chat',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <TeacherChat />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/teacher/personal-data',
     element: (
       <PrivateRoute roles={["teacher"]}>
         <DocenteDatosPersonales />
@@ -138,13 +184,14 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/docente/documentos',
+    path: '/teacher/documents',
     element: (
       <PrivateRoute roles={["teacher"]}>
         <DocenteDocumentos />
       </PrivateRoute>
     ),
   },
+  // Rutas existentes
   {
     path: '/teachers',
     element: <AllTeachers />,
@@ -179,4 +226,3 @@ const router = createBrowserRouter([
 export default function AppRouter() {
   return <RouterProvider router={router} />;
 }
-

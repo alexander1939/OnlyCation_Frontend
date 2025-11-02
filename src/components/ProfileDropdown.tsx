@@ -58,11 +58,7 @@ export default function ProfileDropdown({ user, isTeacher, isStudent, onClose, o
 
         {isStudent && (
           <>
-            <Link to="/estudiante/general" className="profile-dropdown-item" onClick={onClose}>
-              <span className="profile-dropdown-icon">📊</span>
-              General
-            </Link>
-            <Link to="/estudiante/datos-personales" className="profile-dropdown-item" onClick={onClose}>
+            <Link to="/student/personal-data" className="profile-dropdown-item" onClick={onClose}>
               <span className="profile-dropdown-icon">👤</span>
               Actualizar Datos Personales
             </Link>
@@ -76,21 +72,13 @@ export default function ProfileDropdown({ user, isTeacher, isStudent, onClose, o
 
         {isTeacher && (
           <>
-            <Link to="/docente/general" className="profile-dropdown-item" onClick={onClose}>
-              <span className="profile-dropdown-icon">📊</span>
-              General
-            </Link>
-            <Link to="/docente/datos-personales" className="profile-dropdown-item" onClick={onClose}>
+            <Link to="/teacher/personal-data" className="profile-dropdown-item" onClick={onClose}>
               <span className="profile-dropdown-icon">👤</span>
               Actualizar Datos Personales
             </Link>
-            <Link to="/docente/documentos" className="profile-dropdown-item" onClick={onClose}>
+            <Link to="/teacher/documents" className="profile-dropdown-item" onClick={onClose}>
               <span className="profile-dropdown-icon">📁</span>
               Documentos
-            </Link>
-            <Link to="/docente/agenda" className="profile-dropdown-item" onClick={onClose}>
-              <span className="profile-dropdown-icon">📅</span>
-              Agenda
             </Link>
             <div className="profile-dropdown-divider"></div>
             <button className="profile-dropdown-item profile-dropdown-button" onClick={onLogout}>

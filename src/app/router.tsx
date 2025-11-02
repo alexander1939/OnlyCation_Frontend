@@ -8,15 +8,15 @@ import Register from '../pages/auth/Register';
 import ForgotPassword from '../pages/auth/ForgotPassword';
 import ResetPassword from '../pages/auth/ResetPassword';
 import TeacherHome from '../pages/teacher/home';
-import DocenteGeneral from '../pages/booking/my_next_booking';
+import MyNextBooking from '../pages/booking/my_next_booking';
 import AgendaDocente from '../pages/teacher/Agenda';
-import DocenteDatosPersonales from '../pages/personal-data/DatosPersonales';
+import DocenteDatosPersonales from '../pages/teacher/DatosPersonales';
 import DocenteDocumentos from '../pages/teacher/Documentos';
 import StudentHome from '../pages/student/home';
 import PrivateRoute from "../components/PrivateRoute";
 import Preferences from '../pages/profile/Preferences';
-import CreateDocument from '../pages/documents/CreateDocument';
-import CreatePrice from '../pages/prices/CreatePrice';
+import CreateDocument from '../pages/teacher/CreateDocument';
+import CreatePrice from '../pages/teacher/CreatePrice';
 import { DocumentsProvider } from '../context/documents';
 import { PreferencesProvider } from '../context/preferences';
 import { CatalogsProvider } from '../context/catalogs/CatalogsContext';
@@ -30,8 +30,9 @@ import ContinueOnboarding from '../pages/profile/ContinueOnboarding';
 // NUEVOS: páginas básicas por carpeta
 import TeacherBooking from '../pages/booking/my_next_booking';
 import TeacherSubscription from '../pages/subscription/TeacherSubscription';
-import TeacherConfirmation from '../pages/confirmation/TeacherConfirmation';
-import TeacherChat from '../pages/chat/TeacherChat';
+import TeacherConfirmation from '../pages/confirmation/my_confimaction';
+import TeacherChat from '../pages/chat/my_chat';
+import EstudianteDatosPersonales from '../pages/student/DatosPersonales';
 
 const router = createBrowserRouter([
   {
@@ -118,12 +119,27 @@ const router = createBrowserRouter([
       </PrivateRoute>
     ),
   },
-  // AJUSTES TEACHER
   {
-    path: '/teacher/booking',
+    path: '/student/personal-data',
+    element: (
+      <PrivateRoute roles={["student"]}>
+        <EstudianteDatosPersonales />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/student/my_next_booking',
+    element: (
+      <PrivateRoute roles={["student"]}>
+        <MyNextBooking />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/teacher/my_next_booking',
     element: (
       <PrivateRoute roles={["teacher"]}>
-        <TeacherBooking />
+        <MyNextBooking />
       </PrivateRoute>
     ),
   },

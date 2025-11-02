@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import axios, { AxiosError } from 'axios';
-import type { WalletCreateRequest, WalletCreateResponse } from '../../context/cartera/types';
+import type { WalletCreateRequest, WalletCreateResponse } from '../../context/wallet/types';
 import { useAuthToken } from '../auth/useAuthToken';
 
 const API_URL = import.meta.env.VITE_API_URL as string;

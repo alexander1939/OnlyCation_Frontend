@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useActivation } from '../../context/activation/ActivationContext';
+import { useActivation } from '../../context/activation/useActivation';
 
 const ContinueOnboarding: React.FC = () => {
   const { check, getNextRoute } = useActivation();

@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import type { WalletCreateRequest, WalletCreateResponse } from './types';
-import { useAgendaApi } from '../../hooks/profile/useCarteraApi';
+import { useAgendaApi } from '../../hooks/wallet/useWalletApi';
 
 export interface AgendaContextType {
   creating: boolean;

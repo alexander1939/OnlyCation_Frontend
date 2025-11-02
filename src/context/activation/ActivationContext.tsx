@@ -1,16 +1,6 @@
-import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
-import { useActivationApi, type ActivationCheckData } from '../../hooks/profile/useActivationApi';
-
-interface ActivationContextType {
-  loading: boolean;
-  error: string | null;
-  data: ActivationCheckData | null;
-  check: () => Promise<ActivationCheckData>;
-  activate: () => Promise<ActivationCheckData>;
-  getNextRoute: (fallback?: string) => string;
-}
-
-const ActivationContext = createContext<ActivationContextType | undefined>(undefined);
+import React, { useCallback, useMemo, useState } from 'react';
+import { useActivationApi, type ActivationCheckData } from '../../hooks/activation/useActivationApi';
+import { ActivationContext } from './context';
 
 export const ActivationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { checkActivation, activateTeacher } = useActivationApi();
@@ -61,16 +51,16 @@ export const ActivationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     // If backend provides missing list and it's empty, treat as complete
     if (Array.isArray((d as any).missing) && (d as any).missing.length === 0) {
-      return '/profile/cartera';
+      return '/profile/wallet';
     }
 
     if (!hasPref) return '/profile/preferences';
-    if (!hasDocs) return '/profile/documentos';
+    if (!hasDocs) return '/profile/document';
     if (!hasPrice) return '/profile/price';
     if (!hasVideo) return '/profile/video';
-    if (!hasAvail) return '/profile/agenda';
-    if (!hasWallet) return '/profile/cartera';
-    return '/profile/cartera';
+    if (!hasAvail) return '/profile/availability';
+    if (!hasWallet) return '/profile/wallet';
+    return '/profile/wallet';
   }, [data]);
 
   const value = useMemo(() => ({ loading, error, data, check, activate, getNextRoute }), [loading, error, data, check, activate, getNextRoute]);
@@ -82,8 +72,3 @@ export const ActivationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   );
 };
 
-export const useActivation = (): ActivationContextType => {
-  const ctx = useContext(ActivationContext);
-  if (!ctx) throw new Error('useActivation must be used within an ActivationProvider');
-  return ctx;
-};

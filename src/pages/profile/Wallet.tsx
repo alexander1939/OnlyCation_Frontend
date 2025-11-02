@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAgendaContext } from '../../context/cartera';
+import { useAgendaContext } from '../../context/wallet';
 import '../../styles/Agenda.css';
 import OnboardingSteps from '../../components/OnboardingSteps';
 
@@ -19,7 +19,10 @@ const AgendaPage: React.FC = () => {
           <p className="agenda-subtitle agenda-text-sm">
             Necesitas una cartera para administrar pagos. Crea tu cuenta de Stripe Connect.
           </p>
-        </div>
+          <div style={{ position: 'fixed', left: '2rem', bottom: '1rem', pointerEvents: 'none' }}>
+        <img src="/Activar_cuenta.png" alt="activar cuenta" style={{ width: '330px', height: 'auto' }} />
+      </div>
+    </div>
 
         <div className="agenda-card">
           <div className="agenda-body">

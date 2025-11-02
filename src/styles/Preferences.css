@@ -1,3 +1,20 @@
+/* Decorative top-left crescent (small, subtle) */
+.pref-page::before {
+  content: "";
+  position: fixed;
+  left: -4rem; /* slightly out for crescent feel */
+  top: -3rem;
+  width: clamp(180px, 20vw, 320px);
+  height: clamp(180px, 20vw, 320px);
+  border-radius: 9999px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
+  background:
+    radial-gradient(60% 60% at 55% 55%, rgba(142, 212, 190, 0.55) 0%, rgba(142, 212, 190, 0.22) 55%, transparent 72%),
+    radial-gradient(42% 42% at 70% 30%, rgba(104, 178, 201, 0.22) 0%, transparent 68%), /* Sky Blue */
+    radial-gradient(40% 40% at 40% 40%, rgba(255, 222, 151, 0.30) 0%, transparent 70%);
+}
 /* Preferences page reusable styles */
 :root {
   /* Paleta del README */
@@ -33,19 +50,39 @@
 @media (min-width: 640px) { .pref-col-2 { grid-column: span 2 / span 2; } }
 
 /* Page */
-.pref-page { background: var(--pref-surface); font-family: 'Roboto', system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif; }
+.pref-page { background: var(--pref-surface); font-family: 'Roboto', system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif; position: relative; }
 
 /* Limitar contenido para que no ocupe toda la página */
 .pref-wrap {
   max-width: 960px; /* ~container md/lg */
   margin-left: auto;
   margin-right: auto;
+  position: relative;
+  z-index: 1; /* ensure content overlays decorative blob */
+}
+
+/* Mid-right faint crescent near steps (extra subtle, different size) */
+.pref-container::before {
+  content: "";
+  position: fixed;
+  right: 16rem;
+  top: 6rem;
+  width: clamp(140px, 16vw, 260px);
+  height: clamp(140px, 16vw, 260px);
+  border-radius: 9999px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.78;
+  background:
+    radial-gradient(60% 60% at 50% 50%, rgba(142, 212, 190, 0.6) 0%, rgba(142, 212, 190, 0.28) 55%, transparent 72%),
+    radial-gradient(38% 38% at 55% 40%, rgba(104, 178, 201, 0.18) 0%, transparent 70%), /* Sky Blue */
+    radial-gradient(30% 30% at 45% 65%, rgba(255, 153, 120, 0.12) 0%, transparent 72%); /* Coral */
 }
 
 /* Contenedor principal (sustituye min-h-screen y paddings responsivos) */
 .pref-container {
   min-height: 100vh;
-  padding: 2.5rem 1rem; /* py-10 px-4 */
+  padding: 4rem 1rem 2.5rem; /* top right/left bottom: baja título y formulario */
 }
 @media (min-width: 640px) { /* sm */
   .pref-container { padding-left: 1.5rem; padding-right: 1.5rem; }
@@ -76,7 +113,7 @@
 .pref-text-sm { font-size: 0.875rem; line-height: 1.25rem; }
 
 /* Header container */
-.pref-header { text-align: center; margin-bottom: 2rem; }
+.pref-header { text-align: center; margin-top: 3rem; margin-bottom: 3rem; }
 
 /* Labels */
 .pref-label {
@@ -169,3 +206,23 @@
 .pref-page input::placeholder,
 .pref-page textarea::placeholder,
 .pref-page select::placeholder { font-family: inherit; }
+
+/* Decorative right-side blobs to balance left mascot */
+/* Decorative bottom-right crescent (half-moon) */
+.pref-page::after {
+  content: "";
+  position: fixed;
+  right: -6rem; /* push out to create crescent feel */
+  bottom: -6rem;
+  width: clamp(260px, 28vw, 420px);
+  height: clamp(260px, 28vw, 420px);
+  border-radius: 9999px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.9;
+  background:
+    radial-gradient(60% 60% at 40% 40%, rgba(142, 212, 190, 0.65) 0%, rgba(142, 212, 190, 0.28) 55%, transparent 72%),
+    radial-gradient(45% 45% at 75% 35%, rgba(104, 178, 201, 0.20) 0%, transparent 68%), /* Sky Blue */
+    radial-gradient(36% 36% at 60% 70%, rgba(255, 153, 120, 0.20) 0%, transparent 72%), /* Coral */
+    radial-gradient(40% 40% at 65% 65%, rgba(255, 222, 151, 0.45) 0%, transparent 70%);
+}

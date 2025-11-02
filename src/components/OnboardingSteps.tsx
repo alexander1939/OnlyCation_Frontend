@@ -25,6 +25,25 @@ export const OnboardingSteps: React.FC = () => {
     return idx >= 0 ? steps[idx].index : 1;
   }, [location.pathname]);
 
+  const iconFor = (step: StepDef) => {
+    switch (step.label) {
+      case 'Preferencias':
+        return '⚙️';
+      case 'Documentos':
+        return '📄';
+      case 'Precios':
+        return '💲';
+      case 'Video':
+        return '🎥';
+      case 'Agenda':
+        return '📅';
+      case 'Cartera':
+        return '💼';
+      default:
+        return '•';
+    }
+  };
+
   return (
     <nav className="obs-steps" aria-label="Onboarding steps">
       <ol className="obs-list">
@@ -34,8 +53,8 @@ export const OnboardingSteps: React.FC = () => {
           const isDisabled = step.index > current;
           const content = (
             <>
-              <span className="obs-circle" aria-hidden>
-                {step.index}
+              <span className="obs-circle" aria-hidden title={step.label}>
+                {iconFor(step)}
               </span>
               <span className="obs-label">{step.label}</span>
             </>

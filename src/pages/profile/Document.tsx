@@ -134,6 +134,9 @@ const CreateDocument: React.FC = () => {
           </form>
         </div>
       </div>
+      <div style={{ position: 'fixed', left: '2rem', bottom: '1rem', pointerEvents: 'none' }}>
+        <img src="/Activar_cuenta.png" alt="activar cuenta" style={{ width: '330px', height: 'auto' }} />
+      </div>
     </div>
   );
 };

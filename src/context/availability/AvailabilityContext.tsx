@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import type { BookingPaymentResponse } from './types';
-import { useAgendaApi } from '../../hooks/profile/useAgendaApi';
+import { useAgendaApi } from '../../hooks/availability/useavailabilityApi';
 
 export interface BookingContextType {
   creating: boolean;

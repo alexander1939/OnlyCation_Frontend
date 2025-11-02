@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import type { VideoSaveRequest, VideoSaveResponse } from './types';
-import { useVideosApi } from '../../hooks/profile/useVideosApi';
+import { useVideosApi } from '../../hooks/videos/useVideosApi';
 
 export interface VideosContextType {
   saving: boolean;

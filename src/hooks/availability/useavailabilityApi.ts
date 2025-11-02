@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import axios, { AxiosError } from 'axios';
-import type { BookingPaymentResponse } from '../../context/booking/types';
+import type { BookingPaymentResponse } from '../../context/availability/types';
 import { useAuthToken } from '../auth/useAuthToken';
 
 const API_URL = import.meta.env.VITE_API_URL as string;

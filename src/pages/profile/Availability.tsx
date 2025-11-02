@@ -5,7 +5,7 @@ import OnboardingSteps from '../../components/OnboardingSteps';
 import AvailabilityConfig from '../../components/AvailabilityConfig';
 import { ScheduleProvider } from '../../context/availability/ScheduleContext';
 import { useSchedule } from '../../context/availability/ScheduleContext';
-import { useAgendaApi } from '../../hooks/profile/useAgendaApi';
+import { useAgendaApi } from '../../hooks/availability/useavailabilityApi';
 
 const BookingPage: React.FC = () => {
 
@@ -16,7 +16,10 @@ const BookingPage: React.FC = () => {
         <div className="booking-header">
           <h1 className="booking-title booking-title-lg">Crear disponibilidad</h1>
           <p className="booking-subtitle booking-text-sm">Registra tus bloques de disponibilidad para la agenda.</p>
-        </div>
+          <div style={{ position: 'fixed', left: '2rem', bottom: '1rem', pointerEvents: 'none' }}>
+        <img src="/Activar_cuenta.png" alt="activar cuenta" style={{ width: '330px', height: 'auto' }} />
+      </div>
+    </div>
 
         <div className="booking-card">
           <div className="booking-body">

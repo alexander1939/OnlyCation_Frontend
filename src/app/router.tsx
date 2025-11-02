@@ -1,25 +1,108 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Home from '../pages/home/Home';
-import AllTeachers from '../pages/teachers/AllTeachers';
+import AllTeachers from '../pages/home/AllTeachers';
 import AboutUs from '../pages/about-us/AboutUs';
-import BeTeacher from '../pages/teachers/BeTeacher';
+import BeTeacher from '../pages/home/BeTeacher';
 import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
 import ForgotPassword from '../pages/auth/ForgotPassword';
 import ResetPassword from '../pages/auth/ResetPassword';
-import TeacherHome from '../pages/teachervista/home';
-import DocenteGeneral from '../pages/docente/General';
-import AgendaDocente from '../pages/docente/Agenda';
-import DocenteDatosPersonales from '../pages/docente/DatosPersonales';
-import DocenteDocumentos from '../pages/docente/Documentos';
-import StudentHome from '../pages/studentvista/home';
+import TeacherHome from '../pages/teacher/home';
+import MyNextBooking from '../pages/booking/my_next_booking';
+import AgendaDocente from '../pages/teacher/Agenda';
+import DocenteDatosPersonales from '../pages/teacher/DatosPersonales';
+import DocenteDocumentos from '../pages/teacher/Documentos';
+import StudentHome from '../pages/student/home';
 import PrivateRoute from "../components/PrivateRoute";
 import DocenteProfile from '../pages/docente/Profile';
+import Preferences from '../pages/profile/Preferences';
+import CreateDocument from '../pages/profile/Document';
+import CreatePrice from '../pages/profile/Price';
+import { DocumentsProvider } from '../context/documents';
+import { PreferencesProvider } from '../context/preferences';
+import { CatalogsProvider } from '../context/catalogs/CatalogsContext';
+import { ActivationProvider } from '../context/activation/ActivationContext';
+import Video from '../pages/profile/Video';
+import Cartera from '../pages/profile/Wallet';
+import { AgendaProvider } from '../context/wallet';
+import Agenda from '../pages/profile/Availability';
+import { BookingProvider } from '../context/availability';
+import ContinueOnboarding from '../pages/profile/ContinueOnboarding';
+// NUEVOS: páginas básicas por carpeta
+import TeacherBooking from '../pages/booking/my_next_booking';
+import TeacherSubscription from '../pages/subscription/TeacherSubscription';
+import TeacherConfirmation from '../pages/confirmation/my_confimaction';
+import TeacherChat from '../pages/chat/my_chat';
+import EstudianteDatosPersonales from '../pages/student/DatosPersonales';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <Home />,
+  },
+  {
+    path: '/profile/preferences',
+    element: (
+        <ActivationProvider>
+          <CatalogsProvider>
+            <PreferencesProvider>
+              <Preferences />
+            </PreferencesProvider>
+          </CatalogsProvider>
+        </ActivationProvider>
+    ),
+  },
+  {
+    path: '/profile/wallet',
+    element: (
+      <AgendaProvider>
+        <Cartera />
+      </AgendaProvider>
+    ),
+  },
+  {
+    path: '/profile/availability',
+    element: (
+      <ActivationProvider>
+        <BookingProvider>
+          <Agenda />
+        </BookingProvider>
+      </ActivationProvider>
+    ),
+  },
+  {
+    path: '/profile/document',
+    element: (
+      <ActivationProvider>
+        <DocumentsProvider>
+          <CreateDocument />
+        </DocumentsProvider>
+      </ActivationProvider>
+    ),
+  },
+  {
+    path: '/profile/price',
+    element: (
+      <ActivationProvider>
+        <CreatePrice />
+      </ActivationProvider>
+    ),
+  },
+  {
+    path: '/profile/video',
+    element: (
+      <ActivationProvider>
+        <Video />
+      </ActivationProvider>
+    ),
+  },
+  {
+    path: '/profile/continue',
+    element: (
+      <ActivationProvider>
+        <ContinueOnboarding />
+      </ActivationProvider>
+    ),
   },
   {
     path: "/teacher-home",
@@ -38,10 +121,26 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/docente/general',
+    path: '/student/personal-data',
+    element: (
+      <PrivateRoute roles={["student"]}>
+        <EstudianteDatosPersonales />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/student/my_next_booking',
+    element: (
+      <PrivateRoute roles={["student"]}>
+        <MyNextBooking />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/teacher/my_next_booking',
     element: (
       <PrivateRoute roles={["teacher"]}>
-        <DocenteGeneral />
+        <MyNextBooking />
       </PrivateRoute>
     ),
   },
@@ -54,7 +153,15 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/docente/agenda',
+    path: '/docente/profile',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <DocenteProfile />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/teacher/availability',
     element: (
       <PrivateRoute roles={["teacher"]}>
         <AgendaDocente />
@@ -62,7 +169,31 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/docente/datos-personales',
+    path: '/teacher/subscription',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <TeacherSubscription />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/teacher/confirmation',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <TeacherConfirmation />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/teacher/chat',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <TeacherChat />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/teacher/personal-data',
     element: (
       <PrivateRoute roles={["teacher"]}>
         <DocenteDatosPersonales />
@@ -70,13 +201,14 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/docente/documentos',
+    path: '/teacher/documents',
     element: (
       <PrivateRoute roles={["teacher"]}>
         <DocenteDocumentos />
       </PrivateRoute>
     ),
   },
+  // Rutas existentes
   {
     path: '/teachers',
     element: <AllTeachers />,

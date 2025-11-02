@@ -76,7 +76,7 @@ export default function ProfileDropdown({ user, isTeacher, isStudent, onClose, o
 
         {isTeacher && (
           <>
-            <Link to="/docente/general" className="profile-dropdown-item" onClick={onClose}>
+            <Link to="/docente/profile" className="profile-dropdown-item" onClick={onClose}>
               <span className="profile-dropdown-icon">📊</span>
               General
             </Link>

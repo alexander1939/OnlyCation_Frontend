@@ -1,0 +1,444 @@
+.booking-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.booking-modal-container {
+  background-color: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+.booking-modal-header {
+  background: linear-gradient(135deg, #294954 0%, #3d6b7a 100%);
+  padding: 24px 32px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.booking-modal-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: white;
+  margin: 0 0 8px 0;
+}
+
+.booking-modal-id {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  margin: 0;
+}
+
+.booking-modal-close {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+  border: none;
+  cursor: pointer;
+  font-size: 32px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.booking-modal-close:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.booking-modal-content {
+  max-height: calc(90vh - 120px);
+  overflow-y: auto;
+  padding: 32px;
+}
+
+.booking-modal-loading {
+  text-align: center;
+  padding: 64px 0;
+}
+
+.booking-modal-spinner {
+  width: 64px;
+  height: 64px;
+  border: 4px solid #68B2C9;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 24px;
+}
+
+.booking-modal-loading-text {
+  color: #6b7280;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.booking-modal-loading-text::after {
+  content: '...';
+  animation: dots 1.5s steps(4, end) infinite;
+}
+
+.booking-modal-error {
+  background-color: #fef2f2;
+  border-left: 4px solid #ef4444;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.booking-modal-error-icon {
+  font-size: 28px;
+  margin-right: 12px;
+}
+
+.booking-modal-error-title {
+  color: #991b1b;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.booking-modal-error-message {
+  color: #dc2626;
+  margin: 0;
+}
+
+.booking-modal-section {
+  margin-bottom: 24px;
+}
+
+.booking-detail-materia {
+  background: linear-gradient(to right, #FAF9F5, white);
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.booking-detail-materia h3 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #294954;
+  margin: 0 0 8px 0;
+}
+
+.booking-detail-materia p {
+  color: #6b7280;
+  margin: 0;
+}
+
+.booking-detail-status {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+}
+
+.booking-detail-horario {
+  background-color: white;
+  padding: 24px;
+  border-radius: 12px;
+  border: 2px solid rgba(104, 178, 201, 0.2);
+}
+
+.booking-detail-horario h4 {
+  font-size: 18px;
+  font-weight: bold;
+  color: #294954;
+  margin-bottom: 16px;
+}
+
+.booking-detail-time {
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.booking-detail-time:last-child {
+  margin-bottom: 0;
+}
+
+.booking-detail-time-start {
+  background-color: #f0fdf4;
+}
+
+.booking-detail-time-end {
+  background-color: #fef2f2;
+}
+
+.booking-detail-time-label {
+  font-weight: 600;
+}
+
+.booking-detail-time-start .booking-detail-time-label {
+  color: #059669;
+}
+
+.booking-detail-time-end .booking-detail-time-label {
+  color: #dc2626;
+}
+
+.booking-detail-time-value {
+  color: #374151;
+}
+
+.booking-detail-participants {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.booking-detail-participant {
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid;
+}
+
+.booking-detail-teacher {
+  background: linear-gradient(to bottom right, #eff6ff, white);
+  border-color: #bfdbfe;
+}
+
+.booking-detail-student {
+  background: linear-gradient(to bottom right, #faf5ff, white);
+  border-color: #e9d5ff;
+}
+
+.booking-detail-participant-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.booking-detail-participant-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  overflow: hidden;
+}
+
+.booking-detail-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.booking-detail-teacher .booking-detail-participant-avatar {
+  background-color: #3b82f6;
+}
+
+.booking-detail-student .booking-detail-participant-avatar {
+  background-color: #a855f7;
+}
+
+.booking-detail-participant-title {
+  font-weight: bold;
+  color: #294954;
+  margin: 0;
+}
+
+.booking-detail-participant-name {
+  color: #1f2937;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.booking-detail-confirmation {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.booking-detail-confirmation-confirmed {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.booking-detail-confirmation-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.booking-detail-link {
+  background: linear-gradient(to right, rgba(104, 178, 201, 0.1), white);
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid rgba(104, 178, 201, 0.3);
+}
+
+.booking-detail-link h4 {
+  font-size: 16px;
+  font-weight: bold;
+  color: #294954;
+  margin-bottom: 12px;
+}
+
+.booking-detail-link a {
+  color: #68B2C9;
+  font-weight: 500;
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+.booking-detail-link a:hover {
+  color: #294954;
+}
+
+.booking-detail-payment {
+  background: linear-gradient(to right, #f0fdf4, white);
+  padding: 24px;
+  border-radius: 12px;
+  border: 2px solid #86efac;
+}
+
+.booking-detail-payment h4 {
+  font-size: 16px;
+  font-weight: bold;
+  color: #294954;
+  margin-bottom: 12px;
+}
+
+.booking-detail-payment-amount {
+  font-size: 36px;
+  font-weight: bold;
+  color: #059669;
+  margin: 0;
+}
+
+.booking-detail-payment-currency {
+  font-size: 18px;
+  color: #6b7280;
+}
+
+.booking-modal-footer {
+  text-align: center;
+  font-size: 14px;
+  color: #6b7280;
+  padding-top: 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.booking-detail-reschedule {
+  background: linear-gradient(to right, rgba(104, 178, 201, 0.08), white);
+  padding: 24px;
+  border-radius: 12px;
+  border: 2px solid rgba(104, 178, 201, 0.3);
+}
+
+.booking-reschedule-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.booking-reschedule-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.booking-reschedule-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.booking-reschedule-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #294954;
+  margin: 0 0 4px 0;
+}
+
+.booking-reschedule-description {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.booking-reschedule-btn {
+  width: 100%;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #68B2C9 0%, #4a9bb5 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(104, 178, 201, 0.3);
+}
+
+.booking-reschedule-btn:hover {
+  background: linear-gradient(135deg, #4a9bb5 0%, #3d8aa1 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(104, 178, 201, 0.4);
+}
+
+.booking-reschedule-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(104, 178, 201, 0.3);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes dots {
+  0%, 20% {
+    content: '';
+  }
+  40% {
+    content: '.';
+  }
+  60% {
+    content: '..';
+  }
+  80%, 100% {
+    content: '...';
+  }
+}
+
+@media (max-width: 768px) {
+  .booking-detail-participants {
+    grid-template-columns: 1fr;
+  }
+  
+  .booking-reschedule-info {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}

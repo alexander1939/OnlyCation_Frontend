@@ -1,0 +1,108 @@
+.load-more-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 100px;
+  margin-bottom: 80px;
+}
+
+.load-more-btn {
+  padding: 20px 64px;
+  background-color: #8ED4BE;
+  color: #294954;
+  font-weight: bold;
+  font-size: 20px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.load-more-btn:hover {
+  background-color: #7BC4AE;
+  transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.load-more-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.clases-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.clases-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #294954;
+}
+
+.view-all-btn-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background-color: #294954;
+  color: #FAF9F5;
+  font-weight: 600;
+  font-size: 15px;
+  border: none;
+  border-radius: 10px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(41, 73, 84, 0.2);
+}
+
+.view-all-btn-header:hover {
+  background-color: #3d6b7a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(41, 73, 84, 0.3);
+}
+
+.view-all-btn-header:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(41, 73, 84, 0.2);
+}
+
+.view-all-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+  margin-bottom: 60px;
+}
+
+.view-all-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 40px;
+  background-color: transparent;
+  color: #294954;
+  font-weight: 600;
+  font-size: 16px;
+  border: 2px solid #294954;
+  border-radius: 12px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.view-all-btn:hover {
+  background-color: #294954;
+  color: #FAF9F5;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(41, 73, 84, 0.2);
+}
+
+.view-all-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(41, 73, 84, 0.1);
+}

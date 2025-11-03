@@ -15,7 +15,7 @@ export const useBookingApi = () => {
     });
   }, []);
 
-  const getMyNextClasses = async (): Promise<{ 
+  const getMyNextClasses = async (limit: number = 6, offset: number = 0): Promise<{ 
     success: boolean; 
     data?: MyNextClassesResponse; 
     message: string 
@@ -25,7 +25,7 @@ export const useBookingApi = () => {
       if (!token) throw new Error('No hay token de acceso. Inicia sesión nuevamente.');
 
       const response = await client.get<MyNextClassesResponse>(
-        '/bookings/my-next-classes/',
+        `/bookings/my-next-classes/?limit=${limit}&offset=${offset}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -38,6 +38,74 @@ export const useBookingApi = () => {
     } catch (err) {
       const axErr = err as AxiosError<{ detail?: string }>;
       const message = axErr.response?.data?.detail || axErr.message || 'Error al obtener las clases';
+      return { success: false, message };
+    }
+  };
+
+  const getMyAllClasses = async (limit: number = 6, offset: number = 0): Promise<{ 
+    success: boolean; 
+    data?: MyNextClassesResponse; 
+    message: string 
+  }> => {
+    try {
+      const token = getAccessToken();
+      if (!token) throw new Error('No hay token de acceso. Inicia sesión nuevamente.');
+
+      const response = await client.get<MyNextClassesResponse>(
+        `/bookings/my-classes/?limit=${limit}&offset=${offset}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const data = response.data;
+      return {
+        success: !!data?.success,
+        data,
+        message: data?.message ?? 'Todas las clases obtenidas exitosamente',
+      };
+    } catch (err) {
+      const axErr = err as AxiosError<{ detail?: string }>;
+      const message = axErr.response?.data?.detail || axErr.message || 'Error al obtener todas las clases';
+      return { success: false, message };
+    }
+  };
+
+  const searchMyClasses = async (params: {
+    status?: string;
+    date_from?: string;
+    min_price?: number;
+    limit?: number;
+    offset?: number;
+  } = {}): Promise<{ 
+    success: boolean; 
+    data?: MyNextClassesResponse; 
+    message: string 
+  }> => {
+    try {
+      const token = getAccessToken();
+      if (!token) throw new Error('No hay token de acceso. Inicia sesión nuevamente.');
+
+      const queryParams = new URLSearchParams();
+      
+      if (params.status) queryParams.append('status', params.status);
+      if (params.date_from) queryParams.append('date_from', params.date_from);
+      if (params.min_price !== undefined) queryParams.append('min_price', params.min_price.toString());
+      queryParams.append('limit', (params.limit ?? 6).toString());
+      queryParams.append('offset', (params.offset ?? 0).toString());
+
+      const response = await client.get<MyNextClassesResponse>(
+        `/bookings/my-classes/search/?${queryParams.toString()}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const data = response.data;
+      return {
+        success: !!data?.success,
+        data,
+        message: data?.message ?? 'Búsqueda completada exitosamente',
+      };
+    } catch (err) {
+      const axErr = err as AxiosError<{ detail?: string }>;
+      const message = axErr.response?.data?.detail || axErr.message || 'Error al buscar clases';
       return { success: false, message };
     }
   };
@@ -69,5 +137,5 @@ export const useBookingApi = () => {
     }
   };
 
-  return { getMyNextClasses, getBookingDetail };
+  return { getMyNextClasses, getMyAllClasses, searchMyClasses, getBookingDetail };
 };

@@ -2,33 +2,51 @@ import React, { createContext, useCallback, useContext, useMemo, useState } from
 import type { NextClass, MyNextClassesResponse } from './types';
 import { useBookingApi } from '../../hooks/booking/useBookingApi';
 
-export interface MyNextClassesContextType {
+export interface SearchParams {
+  status?: string;
+  date_from?: string;
+  min_price?: number;
+}
+
+export interface AllClassesContextType {
   loading: boolean;
   error: string | null;
   classes: NextClass[];
   hasMore: boolean;
-  fetchMyNextClasses: () => Promise<{ success: boolean; data?: MyNextClassesResponse; message: string }>;
+  searchParams: SearchParams;
+  setSearchParams: (params: SearchParams) => void;
+  fetchAllClasses: (params?: SearchParams) => Promise<{ success: boolean; data?: MyNextClassesResponse; message: string }>;
   loadMoreClasses: () => Promise<void>;
   resetStatus: () => void;
 }
 
-const MyNextClassesContext = createContext<MyNextClassesContextType | undefined>(undefined);
+const AllClassesContext = createContext<AllClassesContextType | undefined>(undefined);
 
-export const MyNextClassesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { getMyNextClasses } = useBookingApi();
+export const AllClassesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { searchMyClasses } = useBookingApi();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [classes, setClasses] = useState<NextClass[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [offset, setOffset] = useState(0);
+  const [searchParams, setSearchParams] = useState<SearchParams>({});
   const LIMIT = 6;
 
-  const fetchMyNextClasses = useCallback(async () => {
+  const fetchAllClasses = useCallback(async (params?: SearchParams) => {
     setLoading(true);
     setError(null);
     setOffset(0);
+    
+    const finalParams = params || searchParams;
+    setSearchParams(finalParams);
+    
     try {
-      const res = await getMyNextClasses(LIMIT, 0);
+      const res = await searchMyClasses({
+        ...finalParams,
+        limit: LIMIT,
+        offset: 0
+      });
+      
       if (res.success && res.data) {
         setClasses(res.data.data);
         setHasMore(res.data.has_more ?? false);
@@ -38,20 +56,25 @@ export const MyNextClassesProvider: React.FC<{ children: React.ReactNode }> = ({
       }
       return res;
     } catch (e: any) {
-      const message = e?.message || 'Error al obtener las clases';
+      const message = e?.message || 'Error al obtener todas las clases';
       setError(message);
       return { success: false, message } as { success: boolean; message: string };
     } finally {
       setLoading(false);
     }
-  }, [getMyNextClasses, LIMIT]);
+  }, [searchMyClasses, searchParams, LIMIT]);
 
   const loadMoreClasses = useCallback(async () => {
     if (loading || !hasMore) return;
     
     setLoading(true);
     try {
-      const res = await getMyNextClasses(LIMIT, offset);
+      const res = await searchMyClasses({
+        ...searchParams,
+        limit: LIMIT,
+        offset
+      });
+      
       if (res.success && res.data) {
         setClasses(prev => [...prev, ...res.data.data]);
         setHasMore(res.data.has_more ?? false);
@@ -65,29 +88,30 @@ export const MyNextClassesProvider: React.FC<{ children: React.ReactNode }> = ({
     } finally {
       setLoading(false);
     }
-  }, [getMyNextClasses, loading, hasMore, offset, LIMIT]);
+  }, [searchMyClasses, loading, hasMore, offset, searchParams, LIMIT]);
 
   const resetStatus = useCallback(() => {
     setError(null);
     setClasses([]);
     setHasMore(true);
     setOffset(0);
+    setSearchParams({});
   }, []);
 
   const value = useMemo(
-    () => ({ loading, error, classes, hasMore, fetchMyNextClasses, loadMoreClasses, resetStatus }),
-    [loading, error, classes, hasMore, fetchMyNextClasses, loadMoreClasses, resetStatus]
+    () => ({ loading, error, classes, hasMore, searchParams, setSearchParams, fetchAllClasses, loadMoreClasses, resetStatus }),
+    [loading, error, classes, hasMore, searchParams, fetchAllClasses, loadMoreClasses, resetStatus]
   );
 
   return (
-    <MyNextClassesContext.Provider value={value}>
+    <AllClassesContext.Provider value={value}>
       {children}
-    </MyNextClassesContext.Provider>
+    </AllClassesContext.Provider>
   );
 };
 
-export const useMyNextClassesContext = (): MyNextClassesContextType => {
-  const ctx = useContext(MyNextClassesContext);
-  if (!ctx) throw new Error('useMyNextClassesContext must be used within a MyNextClassesProvider');
+export const useAllClassesContext = (): AllClassesContextType => {
+  const ctx = useContext(AllClassesContext);
+  if (!ctx) throw new Error('useAllClassesContext must be used within an AllClassesProvider');
   return ctx;
 };

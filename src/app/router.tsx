@@ -26,7 +26,7 @@ import Cartera from '../pages/profile/Wallet';
 import { AgendaProvider } from '../context/wallet';
 import Agenda from '../pages/profile/Availability';
 import { BookingProvider } from '../context/availability';
-import { MyNextClassesProvider, BookingDetailProvider } from '../context/booking';
+import { MyNextClassesProvider, BookingDetailProvider, AllClassesProvider } from '../context/booking';
 import ContinueOnboarding from '../pages/profile/ContinueOnboarding';
 // NUEVOS: páginas básicas por carpeta
 import TeacherBooking from '../pages/booking/my_next_booking';
@@ -34,6 +34,7 @@ import TeacherSubscription from '../pages/subscription/TeacherSubscription';
 import TeacherConfirmation from '../pages/confirmation/my_confimaction';
 import TeacherChat from '../pages/chat/my_chat';
 import EstudianteDatosPersonales from '../pages/student/DatosPersonales';
+import AllBookings from '../pages/booking/all_bookings';
 
 const router = createBrowserRouter([
   {
@@ -141,6 +142,18 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: '/student/all-bookings',
+    element: (
+      <PrivateRoute roles={["student"]}>
+        <AllClassesProvider>
+          <BookingDetailProvider>
+            <AllBookings />
+          </BookingDetailProvider>
+        </AllClassesProvider>
+      </PrivateRoute>
+    ),
+  },
+  {
     path: '/teacher/my_next_booking',
     element: (
       <PrivateRoute roles={["teacher"]}>
@@ -149,6 +162,18 @@ const router = createBrowserRouter([
             <MyNextBooking />
           </BookingDetailProvider>
         </MyNextClassesProvider>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/teacher/all-bookings',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <AllClassesProvider>
+          <BookingDetailProvider>
+            <AllBookings />
+          </BookingDetailProvider>
+        </AllClassesProvider>
       </PrivateRoute>
     ),
   },

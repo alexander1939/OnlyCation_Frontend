@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAuthContext } from '../../context/auth';
-import { useMyNextClassesContext, useBookingDetailContext } from '../../context/booking';
-import BookingView from '../../components/shared/BookingView';
+import { useAllClassesContext, useBookingDetailContext } from '../../context/booking';
+import AllBookingsView from '../../components/shared/AllBookingsView';
 
-export default function MyNextBooking() {
+export default function AllBookings() {
   const { user } = useAuthContext();
-  const { loading, error, classes, hasMore, fetchMyNextClasses, loadMoreClasses } = useMyNextClassesContext();
+  const { loading, error, classes, hasMore, fetchAllClasses, loadMoreClasses } = useAllClassesContext();
   const { loading: detailLoading, error: detailError, bookingDetail, fetchBookingDetail } = useBookingDetailContext();
   const hasFetched = useRef(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -13,7 +13,7 @@ export default function MyNextBooking() {
   useEffect(() => {
     if (!hasFetched.current) {
       hasFetched.current = true;
-      fetchMyNextClasses();
+      fetchAllClasses();
     }
   }, []);
 
@@ -30,8 +30,12 @@ export default function MyNextBooking() {
     loadMoreClasses();
   };
 
+  const handleSearch = (params: { status?: string; date_from?: string; min_price?: number }) => {
+    fetchAllClasses(params);
+  };
+
   return (
-    <BookingView 
+    <AllBookingsView 
       user={user} 
       loading={loading} 
       error={error} 
@@ -44,8 +48,9 @@ export default function MyNextBooking() {
       detailError={detailError}
       hasMore={hasMore}
       onLoadMore={handleLoadMore}
-      pageTitle="Próximas Clases"
-      showViewAllButton={true}
+      onSearch={handleSearch}
+      pageTitle="Mis Reservas"
+      showViewAllButton={false}
     />
   );
 }

@@ -108,6 +108,17 @@ const CreatePriceForm: React.FC = () => {
                 </select>
                 {availError && <div className="price-alert price-alert--error" style={{ marginTop: '0.25rem' }}>{availError}</div>}
               </div>
+              <div>
+                <label className="price-label">Precio por hora extra</label>
+                <input
+                  type="number"
+                  min={0}
+                  className="price-input"
+                  placeholder="0"
+                  value={extraHourPrice}
+                  onChange={(e) => setExtraHourPrice(Number(e.target.value))}
+                />
+              </div>
             </div>
 
             <div className="price-grid">
@@ -131,19 +142,7 @@ const CreatePriceForm: React.FC = () => {
               </div>
             </div>
 
-            <div className="price-grid">
-              <div>
-                <label className="price-label">Precio por hora extra</label>
-                <input
-                  type="number"
-                  min={0}
-                  className="price-input"
-                  placeholder="0"
-                  value={extraHourPrice}
-                  onChange={(e) => setExtraHourPrice(Number(e.target.value))}
-                />
-              </div>
-            </div>
+            
 
             <div className="price-actions">
               <button type="button" className="price-btn--secondary" onClick={onCancel}>Cancelar</button>

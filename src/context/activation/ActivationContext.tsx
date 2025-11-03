@@ -39,9 +39,10 @@ export const ActivationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   }, [activateTeacher]);
 
   const getNextRoute = useCallback(() => {
-    const d = data || {} as ActivationCheckData & { missing?: string[] };
-    if ((d as any).is_active) return '/profile/cartera';
+    const d = (data || {}) as ActivationCheckData & { missing?: string[] };
+
     // Normalize flags using backend keys with fallbacks
+    const isActive = (d as any).is_active === true;
     const hasPref = (d as any).has_preference ?? (d as any).has_preferences ?? false;
     const hasDocs = (d as any).has_documents ?? false;
     const hasPrice = (d as any).has_price ?? false;
@@ -49,18 +50,26 @@ export const ActivationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const hasAvail = (d as any).has_availability ?? (d as any).has_agenda ?? false;
     const hasWallet = (d as any).has_wallet ?? false;
 
-    // If backend provides missing list and it's empty, treat as complete
-    if (Array.isArray((d as any).missing) && (d as any).missing.length === 0) {
-      return '/profile/wallet';
-    }
+    // If backend provides missing list and it's empty, treat as complete of steps
+    const stepsCompleteFromMissing = Array.isArray((d as any).missing) && (d as any).missing.length === 0;
+    const stepsComplete = stepsCompleteFromMissing || (hasPref && hasDocs && hasPrice && hasVideo && hasAvail && hasWallet);
 
+    // If already active, ir a home docente (o la ruta que definas)
+    if (isActive) return '/teacher-home';
+
+    // Si todos los pasos están completos pero aún no está activa, ir a activar
+    if (stepsComplete) return '/profile/activate';
+
+    // De lo contrario, enviar al primer paso pendiente
     if (!hasPref) return '/profile/preferences';
     if (!hasDocs) return '/profile/document';
     if (!hasPrice) return '/profile/price';
     if (!hasVideo) return '/profile/video';
     if (!hasAvail) return '/profile/availability';
     if (!hasWallet) return '/profile/wallet';
-    return '/profile/wallet';
+
+    // Fallback
+    return '/profile/preferences';
   }, [data]);
 
   const value = useMemo(() => ({ loading, error, data, check, activate, getNextRoute }), [loading, error, data, check, activate, getNextRoute]);

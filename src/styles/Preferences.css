@@ -135,6 +135,7 @@
   padding: 10px 12px; /* Asegurar altura cómoda */
   min-height: 44px;   /* Touch target */
   font-size: 0.95rem;
+  font-family: inherit; /* asegura Roboto en inputs/textarea */
 }
 .pref-input:focus,
 .pref-select:focus,

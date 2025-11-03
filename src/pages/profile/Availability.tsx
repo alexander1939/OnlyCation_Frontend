@@ -4,7 +4,7 @@ import '../../styles/Booking.css';
 import OnboardingSteps from '../../components/OnboardingSteps';
 import AvailabilityConfig from '../../components/AvailabilityConfig';
 import { ScheduleProvider } from '../../context/availability/ScheduleContext';
-import { useSchedule } from '../../context/availability/ScheduleContext';
+import { useSchedule, type DayKey } from '../../context/availability/ScheduleContext';
 import { useAgendaApi } from '../../hooks/availability/useavailabilityApi';
 
 const BookingPage: React.FC = () => {
@@ -37,22 +37,15 @@ const BookingPage: React.FC = () => {
 export default BookingPage;
 
 const SaveAvailabilityBar: React.FC = () => {
-  const { enabledDays, slots } = useSchedule();
+  const { enabledDays, slots, dayKeyToIndex } = useSchedule();
   const { createAvailability } = useAgendaApi();
   const [creating, setCreating] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [success, setSuccess] = React.useState<string | null>(null);
   const navigate = useNavigate();
 
-  const dayNumber: Record<string, number> = {
-    monday: 1,
-    tuesday: 2,
-    wednesday: 3,
-    thursday: 4,
-    friday: 5,
-    saturday: 6,
-    sunday: 7,
-  };
+  // Map DayKey -> backend day_of_week (1=Mon..7=Sun) using context indices (Sun=0..Sat=6)
+  const toBackendDow = (dayKey: DayKey): number => ((dayKeyToIndex[dayKey] + 6) % 7) + 1;
 
   const onSave = async () => {
     setCreating(true);
@@ -70,7 +63,7 @@ const SaveAvailabilityBar: React.FC = () => {
 
       // Build requests per selected hour
       const requests: Array<Promise<any>> = [];
-      (Object.keys(enabledDays) as Array<keyof typeof enabledDays>).forEach((dayKey) => {
+      (Object.keys(enabledDays) as DayKey[]).forEach((dayKey) => {
         if (!enabledDays[dayKey]) return;
         const daySlots = slots[dayKey] || [];
         daySlots.forEach((s) => {
@@ -80,7 +73,7 @@ const SaveAvailabilityBar: React.FC = () => {
           const end_time = `${datePrefix} ${endHour}:00`;
           const payload = {
             preference_id,
-            day_of_week: dayNumber[String(dayKey)],
+            day_of_week: toBackendDow(dayKey),
             start_time,
             end_time,
           };
@@ -98,7 +91,7 @@ const SaveAvailabilityBar: React.FC = () => {
         if (!res?.success) throw new Error(res?.message || 'Error al crear disponibilidad');
       }
       setSuccess('Disponibilidad guardada correctamente.');
-      navigate('/profile/cartera');
+      navigate('/profile/wallet');
     } catch (e: any) {
       setError(e?.message || 'Error al guardar');
     } finally {

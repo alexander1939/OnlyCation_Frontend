@@ -49,6 +49,9 @@
 
 .avail-card{background:#fff;border:1px solid rgba(0,0,0,0.08);border-color:var(--oc-border,rgba(104,178,201,0.22));border-radius:16px;box-shadow:0 10px 24px rgba(41,73,84,0.06);padding:16px}
 
+.bio-card{background:#fff;border:1px solid var(--oc-border,rgba(104,178,201,0.22));border-radius:16px;box-shadow:0 10px 24px rgba(41,73,84,0.06);padding:16px;margin:20px 0}
+.bio-text{margin:10px 0 0 0;color:#35586a;line-height:1.75}
+
 .legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:6px;padding-left:4px}
 .legend-item{display:flex;align-items:center;gap:8px}
 .legend-dot{width:16px;height:16px;border-radius:4px}

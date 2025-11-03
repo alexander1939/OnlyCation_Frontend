@@ -25,6 +25,7 @@ type TeacherProfile = {
   hourlyRate: number;
   videoUrl: string;
   reviews: TeacherReview[];
+  bio: string;
 };
 
 export default function DocenteProfile() {
@@ -32,14 +33,16 @@ export default function DocenteProfile() {
   const fullName = user ? `${user.first_name} ${user.last_name}` : 'Docente';
   
   const [showVideo, setShowVideo] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // const [loading, setLoading] = useState(false);
+  // const [error, setError] = useState<string | null>(null);
   const [profile, setProfile] = useState<TeacherProfile>({
     level: 'Universidad',
     subject: 'Matemáticas',
     rating: 4.9,
     hourlyRate: 50,
     videoUrl: 'https://youtu.be/tdFNA7YBM4c',
+    bio:
+      '¡Hola! Soy docente con más de 5 años de experiencia impartiendo clases a nivel universitario. Me apasiona ayudar a que cada estudiante comprenda los conceptos desde lo básico hasta lo avanzado, con ejemplos prácticos y un enfoque claro. Mis clases son dinámicas, personalizadas y enfocadas en objetivos reales: aprobar exámenes, reforzar bases y desarrollar pensamiento crítico.',
     reviews: [
       {
         id: 'r1',
@@ -69,7 +72,7 @@ export default function DocenteProfile() {
       const res = await fetch(`/api/teachers/${id}/core`);
       if (!res.ok) throw new Error('core');
       const j = await res.json();
-      return { level: j.level, subject: j.subject, rating: Number(j.rating) };
+      return { level: j.level, subject: j.subject, rating: Number(j.rating), bio: String(j.bio ?? '') };
     } catch {
       return {};
     }
@@ -121,8 +124,8 @@ export default function DocenteProfile() {
   useEffect(() => {
     let cancelled = false;
     const run = async () => {
-      setLoading(true);
-      setError(null);
+      // setLoading(true);
+      // setError(null);
       try {
         const [core, pricing, video, reviews] = await Promise.all([
           getTeacherCore(teacherId),
@@ -136,14 +139,15 @@ export default function DocenteProfile() {
           ...(core.level ? { level: core.level } : {}),
           ...(core.subject ? { subject: core.subject } : {}),
           ...(core.rating ? { rating: core.rating } : {}),
+          ...(core.bio ? { bio: core.bio } : {}),
           ...(pricing.hourlyRate ? { hourlyRate: pricing.hourlyRate } : {}),
           ...(video.videoUrl ? { videoUrl: video.videoUrl } : {}),
           ...(reviews.reviews ? { reviews: reviews.reviews } : {}),
         }));
       } catch (e: any) {
-        setError(e?.message ?? 'error');
+        // setError(e?.message ?? 'error');
       } finally {
-        if (!cancelled) setLoading(false);
+        // if (!cancelled) setLoading(false);
       }
     };
     run();
@@ -218,11 +222,18 @@ export default function DocenteProfile() {
                 </div>
 
                 <div className="profile-actions-row">
-                  <Link to="/docente/datos-personales" className="profile-action primary">Editar datos personales</Link>
-                  <Link to="/docente/documentos" className="profile-action secondary">Gestionar documentos</Link>
+                  <Link to="/teacher/personal-data" className="profile-action primary">Editar datos personales</Link>
+                  <Link to="/teacher/documents" className="profile-action secondary">Gestionar documentos</Link>
                 </div>
               </div>
             </div>
+          </div>
+
+          <hr className="separator-mint" />
+
+          <div className="bio-card">
+            <h2 className="section-heading">Descripción</h2>
+            <p className="bio-text">{profile.bio}</p>
           </div>
 
           <hr className="separator-mint" />

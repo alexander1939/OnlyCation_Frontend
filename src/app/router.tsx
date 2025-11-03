@@ -14,6 +14,7 @@ import DocenteDatosPersonales from '../pages/teacher/DatosPersonales';
 import DocenteDocumentos from '../pages/teacher/Documentos';
 import StudentHome from '../pages/student/home';
 import PrivateRoute from "../components/PrivateRoute";
+import DocenteProfile from '../pages/teacher/Profile';
 import Preferences from '../pages/profile/Preferences';
 import CreateDocument from '../pages/profile/Document';
 import CreatePrice from '../pages/profile/Price';
@@ -181,6 +182,22 @@ const router = createBrowserRouter([
     element: (
       <PrivateRoute roles={["teacher"]}>
         <MyNextBooking />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/docente/profile',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <DocenteProfile />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/docente/profile',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <DocenteProfile />
       </PrivateRoute>
     ),
   },

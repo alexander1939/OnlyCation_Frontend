@@ -47,7 +47,11 @@ const PreferencesPage: React.FC = () => {
   }, [success, navigate]);
 
   // Guard: si el backend dice que ya completó este paso, redirigir al siguiente
+  // Evita llamadas repetidas re-ejecutando solo una vez en el primer montaje
+  const didCheckRef = React.useRef(false);
   React.useEffect(() => {
+    if (didCheckRef.current) return;
+    didCheckRef.current = true;
     (async () => {
       try {
         await check();
@@ -55,7 +59,8 @@ const PreferencesPage: React.FC = () => {
         if (next !== '/profile/preferences') navigate(next, { replace: true });
       } catch {}
     })();
-  }, [check, getNextRoute, navigate]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="pref-page pref-container">

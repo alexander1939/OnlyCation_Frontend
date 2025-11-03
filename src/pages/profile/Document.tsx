@@ -37,7 +37,7 @@ const CreateDocument: React.FC = () => {
 
   React.useEffect(() => {
     if (lastCreated) {
-      navigate('/prices/create');
+      navigate('/profile/price');
     }
   }, [lastCreated, navigate]);
 

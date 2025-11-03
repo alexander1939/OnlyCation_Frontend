@@ -109,6 +109,7 @@
   padding: 10px 12px;
   min-height: 44px;
   font-size: 0.95rem;
+  font-family: inherit; /* asegura Roboto en inputs/textarea */
 }
 .doc-input:focus, .doc-file:focus, .doc-textarea:focus { outline: none; border-color: var(--doc-brand); box-shadow: 0 0 0 3px color-mix(in oklab, var(--doc-brand) 35%, transparent); }
 .doc-textarea { min-height: 120px; }

@@ -1,25 +1,24 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Settings } from 'lucide-react';
 
-interface DashboardCardProps {
-  title: string;
-  description: string;
-  linkText: string;
-  route: string;
-  icon: React.ElementType; // componente React del icono
+interface GeneralCardProps {
+  title?: string;
+  description?: string;
+  linkText?: string;
+  route?: string;
   iconColor?: string;
   iconBg?: string;
   backgroundColor?: string;
 }
 
-const DashboardCard: React.FC<DashboardCardProps> = ({
-  title,
-  description,
-  linkText,
-  route,
-  icon: Icon,
-  iconColor = '#3B82F6',
-  iconBg = '#E6EEFF',
+const GeneralCard: React.FC<GeneralCardProps> = ({
+  title = 'General',
+  description = 'Configura opciones generales de tu perfil y cuenta.',
+  linkText = 'Ir a general',
+  route = '/teacher/personal-data',
+  iconColor = '#0EA5E9',
+  iconBg = '#E0F2FE',
   backgroundColor = 'white',
 }) => {
   const navigate = useNavigate();
@@ -34,6 +33,9 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
         transition: 'transform 0.2s ease, box-shadow 0.2s ease',
         cursor: 'pointer',
         fontFamily: 'Roboto, sans-serif',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
       }}
       onClick={() => navigate(route)}
       onMouseEnter={(e) =>
@@ -43,7 +45,6 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
         (e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.05)')
       }
     >
-      {/* Icono circular */}
       <div
         style={{
           backgroundColor: iconBg,
@@ -56,7 +57,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
           marginBottom: '1rem',
         }}
       >
-        <Icon color={iconColor} size={24} />
+        <Settings color={iconColor} size={24} />
       </div>
 
       <h3
@@ -83,6 +84,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
           color: iconColor,
           fontWeight: 600,
           fontSize: '0.95rem',
+          marginTop: 'auto',
         }}
       >
         {linkText} →
@@ -91,4 +93,4 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   );
 };
 
-export default DashboardCard;
+export default GeneralCard;

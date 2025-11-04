@@ -1,22 +1,44 @@
 import React from 'react';
-import { History } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const HistoryCard: React.FC = () => {
+interface DashboardCardProps {
+  title: string;
+  description: string;
+  linkText: string;
+  route: string;
+  icon: React.ElementType; // componente React del icono
+  iconColor?: string;
+  iconBg?: string;
+  backgroundColor?: string;
+}
+
+const DashboardCard: React.FC<DashboardCardProps> = ({
+  title,
+  description,
+  linkText,
+  route,
+  icon: Icon,
+  iconColor = '#3B82F6',
+  iconBg = '#E6EEFF',
+  backgroundColor = 'white',
+}) => {
   const navigate = useNavigate();
 
   return (
     <div
       style={{
-        backgroundColor: 'white',
+        backgroundColor,
         borderRadius: '1rem',
         padding: '1.5rem',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.05)',
+        boxShadow: '0 4px 8px rgba(0,0,0,0.05)',
         transition: 'transform 0.2s ease, box-shadow 0.2s ease',
         cursor: 'pointer',
-        fontFamily: 'Roboto, sans-serif', // 👈 aquí aplicas Roboto
+        fontFamily: 'Roboto, sans-serif',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
       }}
-      onClick={() => navigate('/historial')}
+      onClick={() => navigate(route)}
       onMouseEnter={(e) =>
         (e.currentTarget.style.boxShadow = '0 6px 14px rgba(0,0,0,0.1)')
       }
@@ -24,10 +46,9 @@ const HistoryCard: React.FC = () => {
         (e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.05)')
       }
     >
-      {/* Icono circular */}
       <div
         style={{
-          backgroundColor: '#E6F4EA',
+          backgroundColor: iconBg,
           width: '50px',
           height: '50px',
           borderRadius: '50%',
@@ -37,7 +58,7 @@ const HistoryCard: React.FC = () => {
           marginBottom: '1rem',
         }}
       >
-        <History color="#22C55E" size={24} />
+        <Icon color={iconColor} size={24} />
       </div>
 
       <h3
@@ -48,27 +69,29 @@ const HistoryCard: React.FC = () => {
           color: '#1F2937',
         }}
       >
-        Historia de Clases
+        {title}
       </h3>
+
       <p style={{ color: '#4B5563', marginBottom: '1rem', fontSize: '0.95rem' }}>
-        Revisa tus clases pasadas y el material de estudio.
+        {description}
       </p>
 
       <span
         onClick={(e) => {
           e.stopPropagation();
-          navigate('/historial');
+          navigate(route);
         }}
         style={{
-          color: '#16A34A',
+          color: iconColor,
           fontWeight: 600,
           fontSize: '0.95rem',
+          marginTop: 'auto',
         }}
       >
-        Ver historial →
+        {linkText} →
       </span>
     </div>
   );
 };
 
-export default HistoryCard;
+export default DashboardCard;

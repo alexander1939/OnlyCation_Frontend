@@ -1,5 +1,9 @@
 import React from "react";
-import { GraduationCap, BookOpen, LibraryBig } from "lucide-react";
+import { GraduationCap, BookOpen, LibraryBig, Tag } from "lucide-react";
+
+interface SubjectListProps {
+  role?: "student" | "teacher"; // 👈 definimos el tipo de usuario
+}
 
 const levels = [
   { name: "Media Superior", icon: GraduationCap },
@@ -7,7 +11,90 @@ const levels = [
   { name: "Posgrado", icon: LibraryBig },
 ];
 
-const SubjectList: React.FC = () => {
+const SubjectList: React.FC<SubjectListProps> = ({ role = "student" }) => {
+  // Si es teacher, renderiza la tarjeta de precios
+  if (role === "teacher") {
+    return (
+      <div
+        style={{
+          backgroundColor: "#fff",
+          borderRadius: "0.75rem",
+          padding: "1.25rem",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+          fontFamily: "'Roboto', sans-serif",
+          width: "100%",
+          height: "100%",
+          display: 'flex',
+          flexDirection: 'column',
+          transition: "all 0.2s ease",
+          cursor: "pointer",
+        }}
+        onMouseEnter={(e) =>
+          ((e.currentTarget.style.backgroundColor = "#f9fafb"),
+          (e.currentTarget.style.transform = "scale(1.02)"))
+        }
+        onMouseLeave={(e) =>
+          ((e.currentTarget.style.backgroundColor = "#fff"),
+          (e.currentTarget.style.transform = "scale(1)"))
+        }
+      >
+        <div
+          style={{
+            backgroundColor: "#f3e8ff",
+            borderRadius: "50%",
+            width: "40px",
+            height: "40px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: "0.8rem",
+          }}
+        >
+          <Tag size={20} color="#9333ea" />
+        </div>
+
+        <h3
+          style={{
+            fontWeight: 600,
+            color: "#1e293b",
+            marginBottom: "0.3rem",
+            fontSize: "1rem",
+          }}
+        >
+          Precios
+        </h3>
+
+        <p
+          style={{
+            color: "#475569",
+            fontSize: "0.9rem",
+            marginBottom: "0.75rem",
+            lineHeight: "1.4",
+          }}
+        >
+          Establece y ajusta las tarifas de tus servicios de asesoría y clases.
+        </p>
+
+        <a
+          href="#"
+          style={{
+            color: "#2563eb",
+            fontWeight: 500,
+            fontSize: "0.9rem",
+            textDecoration: "none",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.3rem",
+            marginTop: 'auto',
+          }}
+        >
+          Definir precios →
+        </a>
+      </div>
+    );
+  }
+
+  // 👇 Si es student, muestra los niveles educativos
   return (
     <div
       style={{
@@ -35,10 +122,10 @@ const SubjectList: React.FC = () => {
       <div
         style={{
           display: "flex",
-          justifyContent: "space-between", // 👈 Los distribuye en una sola fila
+          justifyContent: "space-between",
           alignItems: "stretch",
           gap: "1rem",
-          flexWrap: "nowrap", // 👈 Evita que se rompan de línea
+          flexWrap: "nowrap",
         }}
       >
         {levels.map((level) => {
@@ -47,7 +134,7 @@ const SubjectList: React.FC = () => {
             <div
               key={level.name}
               style={{
-                flex: "1 1 0", // 👈 Misma proporción para todos
+                flex: "1 1 0",
                 backgroundColor: "#f8fafc",
                 borderRadius: "0.75rem",
                 padding: "1rem",
@@ -65,7 +152,11 @@ const SubjectList: React.FC = () => {
                 (e.currentTarget.style.transform = "scale(1)"))
               }
             >
-              <Icon size={26} color="#1e3a3a" style={{ marginBottom: "0.4rem" }} />
+              <Icon
+                size={26}
+                color="#1e3a3a"
+                style={{ marginBottom: "0.4rem" }}
+              />
               <p
                 style={{
                   fontWeight: 500,

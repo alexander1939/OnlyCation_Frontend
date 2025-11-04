@@ -1,14 +1,33 @@
 import React from "react";
-import { CalendarCheck } from "lucide-react"; // 🔹 Ícono más acorde con "reservas"
 import { useNavigate } from "react-router-dom";
 
-const ReservationCard: React.FC = () => {
+interface InfoCardProps {
+  title: string;
+  description: string;
+  linkText: string;
+  route: string;
+  icon: React.FC<{ size?: number; color?: string }>;
+  iconColor?: string;
+  iconBg?: string;
+  backgroundColor?: string;
+}
+
+const InfoCard: React.FC<InfoCardProps> = ({
+  title,
+  description,
+  linkText,
+  route,
+  icon: Icon,
+  iconColor = "#3B82F6",
+  iconBg = "#E6EEFF",
+  backgroundColor = "white",
+}) => {
   const navigate = useNavigate();
 
   return (
     <div
       style={{
-        backgroundColor: "white",
+        backgroundColor,
         borderRadius: "1rem",
         padding: "1.5rem",
         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.05)",
@@ -16,7 +35,7 @@ const ReservationCard: React.FC = () => {
         cursor: "pointer",
         fontFamily: "Roboto, sans-serif",
       }}
-      onClick={() => navigate("/reservas")} // 🔹 Nueva ruta
+      onClick={() => navigate(route)}
       onMouseEnter={(e) =>
         (e.currentTarget.style.boxShadow = "0 6px 14px rgba(0,0,0,0.1)")
       }
@@ -24,10 +43,10 @@ const ReservationCard: React.FC = () => {
         (e.currentTarget.style.boxShadow = "0 4px 8px rgba(0,0,0,0.05)")
       }
     >
-      {/* 🔹 Icono circular */}
+      {/* 🔹 Ícono circular */}
       <div
         style={{
-          backgroundColor: "#E6EEFF",
+          backgroundColor: iconBg,
           width: "50px",
           height: "50px",
           borderRadius: "50%",
@@ -37,7 +56,7 @@ const ReservationCard: React.FC = () => {
           marginBottom: "1rem",
         }}
       >
-        <CalendarCheck color="#3B82F6" size={24} />
+        <Icon color={iconColor} size={24} />
       </div>
 
       <h3
@@ -48,7 +67,7 @@ const ReservationCard: React.FC = () => {
           color: "#1F2937",
         }}
       >
-        Reservas
+        {title}
       </h3>
 
       <p
@@ -56,15 +75,16 @@ const ReservationCard: React.FC = () => {
           color: "#4B5563",
           marginBottom: "1rem",
           fontSize: "0.95rem",
+          lineHeight: 1.5,
         }}
       >
-        Gestiona y consulta tus reservas de asesorías fácilmente.
+        {description}
       </p>
 
       <span
         onClick={(e) => {
           e.stopPropagation();
-          navigate("/reservas");
+          navigate(route);
         }}
         style={{
           color: "#2563EB",
@@ -72,10 +92,25 @@ const ReservationCard: React.FC = () => {
           fontSize: "0.95rem",
         }}
       >
-        Ver mis reservas →
+        {linkText} →
       </span>
+
+      {/* 🔹 Responsividad */}
+      <style>{`
+        @media (max-width: 768px) {
+          div {
+            padding: 1.2rem !important;
+          }
+          h3 {
+            font-size: 1rem !important;
+          }
+          p, span {
+            font-size: 0.9rem !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };
 
-export default ReservationCard;
+export default InfoCard;

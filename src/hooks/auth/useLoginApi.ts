@@ -7,7 +7,6 @@ import {
   type LoginResponse,
 } from "../../context/auth/LoginContext";
 
-// 🧩 Configuración base de Axios
 const API_BASE_URL = import.meta.env.VITE_API_URL?.trim();
 
 if (!API_BASE_URL) {
@@ -69,17 +68,21 @@ export const useLoginApi = () => {
         first_name,
         last_name,
         role,
+        status,
+        preference_id,
       } = data.data;
 
-      // Guardar en localStorage
+      // Guardar en localStorage 🧠
       localStorage.setItem("access_token", access_token);
       localStorage.setItem("refresh_token", refresh_token);
       localStorage.setItem("user_email", email);
       localStorage.setItem("user_role", role);
       localStorage.setItem("user_name", `${first_name} ${last_name}`);
+      localStorage.setItem("user_status", status || "");
+      localStorage.setItem("user_preference_id", preference_id?.toString() || "");
 
       // Actualizar estado global
-      setUser({ email, first_name, last_name, role });
+      setUser({ email, first_name, last_name, role, status, preference_id });
 
       return data;
     } catch (error: any) {
@@ -97,11 +100,16 @@ export const useLoginApi = () => {
 
   // 🟢 Logout
   const logout = () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-    localStorage.removeItem("user_email");
-    localStorage.removeItem("user_role");
-    localStorage.removeItem("user_name");
+    [
+      "access_token",
+      "refresh_token",
+      "user_email",
+      "user_role",
+      "user_name",
+      "user_status",
+      "user_preference_id",
+    ].forEach((key) => localStorage.removeItem(key));
+
     setUser(null);
   };
 
@@ -110,10 +118,19 @@ export const useLoginApi = () => {
     const email = localStorage.getItem("user_email");
     const name = localStorage.getItem("user_name");
     const role = localStorage.getItem("user_role");
+    const status = localStorage.getItem("user_status");
+    const preference_id = localStorage.getItem("user_preference_id");
 
     if (email && name && role) {
       const [first_name, last_name = ""] = name.split(" ");
-      return { email, first_name, last_name, role };
+      return {
+        email,
+        first_name,
+        last_name,
+        role,
+        status,
+        preference_id: preference_id ? Number(preference_id) : null,
+      };
     }
     return null;
   };

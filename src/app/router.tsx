@@ -36,6 +36,8 @@ import TeacherSubscription from '../pages/subscription/TeacherSubscription';
 import TeacherConfirmation from '../pages/confirmation/my_confimaction';
 import TeacherChat from '../pages/chat/my_chat';
 import EstudianteDatosPersonales from '../pages/student/DatosPersonales';
+import TeacherCatalog from '../pages/catalog/TeacherCatalog';
+import PublicOrStudentRoute from '../components/PublicOrStudentRoute';
 import AllBookings from '../pages/booking/all_bookings';
 
 const router = createBrowserRouter([
@@ -287,6 +289,14 @@ const router = createBrowserRouter([
   {
     path: '/teachers',
     element: <AllTeachers />,
+  },
+  {
+    path: '/catalog/teachers',
+    element: (
+      <PublicOrStudentRoute>
+        <TeacherCatalog />
+      </PublicOrStudentRoute>
+    ),
   },
   {
     path: '/about-us',

@@ -92,6 +92,7 @@ const PublicHeader: React.FC = () => {
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-12">
               <NavItem to="/" label="Inicio" />
+              <NavItem to="/catalog/teachers" label="Docentes" />
               <NavItem to="/be-teacher" label="¿Ser docente?" />
               <NavItem to="/about-us" label="Sobre nosotros" />
               <NavItem to="/register" label="Regístrate" />
@@ -146,6 +147,7 @@ const PublicHeader: React.FC = () => {
           <div className="fixed top-24 left-4 right-4 bg-[#FAF9F5]/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-[#68B2C9]/20 p-8">
             <nav className="flex flex-col space-y-6">
               <NavItem to="/" label="Inicio" mobile />
+              <NavItem to="/catalog/teachers" label="Docentes" mobile />
               <NavItem to="/be-teacher" label="¿Ser docente?" mobile />
               <NavItem to="/about-us" label="Sobre nosotros" mobile />
               <NavItem to="/register" label="Regístrate" mobile />

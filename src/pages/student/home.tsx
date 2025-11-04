@@ -11,6 +11,16 @@ import KnowledgeCenter from "../../components/comptHome/KnowledgeCenter";
 import { Footer } from "../../components";
 import { useLoginApi } from "../../hooks/auth/useLoginApi";
 import WelcomeAlert from "../../components/WelcomeAlert";
+import { CalendarCheck, History, CheckCircle, GraduationCap, 
+BookOpen, Library
+} from "lucide-react";
+
+
+const levels = [
+  { name: "Media Superior", icon: GraduationCap },
+  { name: "Superior", icon: BookOpen },
+  { name: "Posgrado", icon: Library },
+];
 
 const StudentHome: React.FC = () => {
   const { user } = useLoginApi();
@@ -42,7 +52,11 @@ const StudentHome: React.FC = () => {
         <div>
           {/* 🔹 KnowledgeCenter */}
           <div style={{ marginBottom: "1.5rem" }}>
-            <KnowledgeCenter />
+            <KnowledgeCenter
+              title="¿NECESITAS AYUDA CON TUS ESTUDIOS?"
+              linkText="Centro de Asesorías Académicas"
+              description="Conecta con un docente dispuesto a guiarte y resolver tus dudas paso a paso."
+            />
           </div>
 
           {/* 🔹 Publicar consulta + Agenda */}
@@ -54,8 +68,23 @@ const StudentHome: React.FC = () => {
               marginBottom: "1.5rem",
             }}
           >
-            <PublishConsult />
-            <AgendaCard />
+            <PublishConsult
+              title="Historia de Clases"
+              description="Revisa tus clases pasadas y el material de estudio."
+              linkText="Ver historial"
+              route="/historial"
+              icon={History}
+              iconColor="#22C55E"
+              iconBg="#E6F4EA"
+            />
+
+            <AgendaCard
+              title="Reservas"
+              description="Gestiona tus próximas asesorías o clases programadas."
+              linkText="Ver reservas"
+              route="/reservas"
+              icon={CalendarCheck}
+            />
           </div>
 
           {/* 🔹 PriceCard y SubjectList */}
@@ -67,8 +96,18 @@ const StudentHome: React.FC = () => {
               marginBottom: "1.5rem",
             }}
           >
-            <PriceCard />
-            <SubjectList />
+            <PriceCard
+              title="Confirmación de Asesoría"
+              description="Verifica los datos y confirma tu próxima sesión personalizada."
+              linkText="Confirmar asesoría"
+              route="/confirmacion"
+              icon={CheckCircle}
+              iconColor="#16A34A"
+              iconBg="#E6FFFA"
+            />
+            <SubjectList 
+            title="Explorar Niveles Educativos" options={levels} mode="student"
+            />
           </div>
         </div>
 

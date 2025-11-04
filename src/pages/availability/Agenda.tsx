@@ -5,7 +5,7 @@ import DispAgenda from '../../components/DispAgenda';
 import AvailabilityConfig from '../../components/AvailabilityConfig';
 import { ScheduleProvider, useSchedule, type DayKey } from '../../context/availability/ScheduleContext';
 import { useAgendaApi } from '../../hooks/availability/useavailabilityApi';
-import { useWeeklyAgendaContext } from '../../context/availability/WeeklyAgendaContext';
+import { useWeeklyAgendaContext, WeeklyAgendaProvider } from '../../context/availability/WeeklyAgendaContext';
 
 export default function AgendaDocente() {
   return (
@@ -16,9 +16,11 @@ export default function AgendaDocente() {
           <h1 className="agenda-title">Mi Agenda</h1>
           <p className="agenda-subtitle">Gestiona tu disponibilidad y revisa las clases programadas</p>
           
-          <ScheduleProvider>
-            <AgendaContent />
-          </ScheduleProvider>
+          <WeeklyAgendaProvider>
+            <ScheduleProvider>
+              <AgendaContent />
+            </ScheduleProvider>
+          </WeeklyAgendaProvider>
         </section>
       </main>
       <Footer />

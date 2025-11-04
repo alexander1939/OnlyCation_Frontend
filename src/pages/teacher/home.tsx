@@ -9,6 +9,7 @@ import GeneralCard from "../../components/comptHome/GeneralCard";
 import AdaptiveList from "../../components/comptHome/SubjectList";
 import UpcomingSessions from "../../components/comptHome/NextSession";
 import { CreditCard, FileText, CalendarCheck } from "lucide-react";
+import TeacherStatus from "../../components/comptHome/TeacherStatus";
 
 const TeacherHome: React.FC = () => {
   const { user } = useLoginContext();
@@ -84,6 +85,13 @@ const TeacherHome: React.FC = () => {
                 title="Próximas Sesiones"
                 sessions={upcomingSessions}
               />
+            </div>
+          </div>
+
+          {/* TeacherStatus al lado de UpcomingSessions */}
+          <div style={{ flex: 1, minWidth: "300px", display: "flex", flexDirection: "column" }}>
+            <div style={{ flex: 1, display: "flex" }}> {/* 👈 contenedor extra para estirar */}
+              <TeacherStatus />
             </div>
           </div>
         </div>

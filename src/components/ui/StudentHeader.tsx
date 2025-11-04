@@ -16,7 +16,7 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
     : '';
 
   const menuItems = [
-    { to: '/teachers', label: 'Docentes' },
+    { to: '/catalog/teachers', label: 'Docentes' },
     { to: '/student/chat', label: 'Chat' },
     { to: '/student/my_next_booking', label: 'Reservas' },
     { to: '/student/confirmation', label: 'Confirmación' },

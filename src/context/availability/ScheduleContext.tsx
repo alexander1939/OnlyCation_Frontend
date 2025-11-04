@@ -50,6 +50,7 @@ interface ScheduleContextValue {
   removeSlot: (day: DayKey, id: string) => void;
   toggleDay: (day: DayKey) => void;
   onSlotClick?: (slot: TimeSlot) => void;
+  loadFromAgenda?: (agendaData: any) => void;
 }
 
 const ScheduleContext = createContext<ScheduleContextValue | undefined>(undefined);
@@ -65,6 +66,76 @@ export const ScheduleProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [enabledDays, setEnabledDays] = useState<Record<DayKey, boolean>>({
     monday: false, tuesday: false, wednesday: false, thursday: false, friday: false, saturday: false, sunday: false,
   });
+
+  // Función para cargar datos desde agenda del backend
+  const loadFromAgenda = (agendaData: any) => {
+    if (!agendaData || !agendaData.days) return;
+
+    console.log('🔍 Loading from agenda:', agendaData);
+
+    const newSlots: Record<DayKey, Slot[]> = {
+      monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: [],
+    };
+    const newEnabledDays: Record<DayKey, boolean> = {
+      monday: false, tuesday: false, wednesday: false, thursday: false, friday: false, saturday: false, sunday: false,
+    };
+
+    agendaData.days.forEach((day: any) => {
+      // Convertir nombre del día a DayKey
+      const dayName = day.day_name.toLowerCase();
+      const dayKeyMap: Record<string, DayKey> = {
+        'lunes': 'monday',
+        'martes': 'tuesday',
+        'miércoles': 'wednesday',
+        'jueves': 'thursday',
+        'viernes': 'friday',
+        'sábado': 'saturday',
+        'domingo': 'sunday',
+      };
+      const dayKey = dayKeyMap[dayName];
+      
+      if (dayKey) {
+        if (day.slots && day.slots.length > 0) {
+          // Filtrar solo horarios recurrentes (ignorar fechas específicas)
+          const recurringSlots = day.slots.filter((slot: any) => {
+            // Si tiene specific_date, es una cita específica → ignorar
+            if (slot.specific_date) {
+              console.log(`⏭️ Ignorando slot con fecha específica: ${slot.specific_date} ${slot.start_time}`);
+              return false;
+            }
+            // Si no tiene specific_date, es recurrente → incluir
+            return true;
+          });
+
+          if (recurringSlots.length > 0) {
+            newEnabledDays[dayKey] = true;
+            newSlots[dayKey] = recurringSlots.map((slot: any) => {
+              // Limpiar formato: "09:00:00" → "09:00"
+              let cleanTime = slot.start_time;
+              if (cleanTime && cleanTime.includes(':')) {
+                const parts = cleanTime.split(':');
+                cleanTime = `${parts[0]}:${parts[1]}`; // Solo HH:MM
+              }
+              
+              return {
+                id: `${slot.availability_id}`,
+                hour: cleanTime
+              };
+            });
+            console.log(`✅ ${dayKey}: ${recurringSlots.length} slots recurrentes`, newSlots[dayKey]);
+          } else {
+            console.log(`⚠️ ${dayKey}: sin slots recurrentes`);
+          }
+        }
+      }
+    });
+
+    console.log('📅 Final slots (solo recurrentes):', newSlots);
+    console.log('🔓 Final enabledDays:', newEnabledDays);
+
+    setSlots(newSlots);
+    setEnabledDays(newEnabledDays);
+  };
 
   // Generar slots semanales a partir de configuración
   useEffect(() => {
@@ -128,6 +199,7 @@ export const ScheduleProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     addHours,
     removeSlot,
     toggleDay,
+    loadFromAgenda,
     onSlotClick: (slot) => {
       if (!slot.isBooked) {
         // Placeholder: se puede reemplazar desde fuera si se desea

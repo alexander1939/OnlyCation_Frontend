@@ -9,7 +9,7 @@ import ForgotPassword from '../pages/auth/ForgotPassword';
 import ResetPassword from '../pages/auth/ResetPassword';
 import TeacherHome from '../pages/teacher/home';
 import MyNextBooking from '../pages/booking/my_next_booking';
-import AgendaDocente from '../pages/teacher/Agenda';
+import AgendaDocente from '../pages/availability/Agenda';
 import DocenteDatosPersonales from '../pages/teacher/DatosPersonales';
 import DocenteDocumentos from '../pages/teacher/Documentos';
 import StudentHome from '../pages/student/home';
@@ -28,6 +28,8 @@ import { AgendaProvider } from '../context/wallet';
 import Agenda from '../pages/profile/Availability';
 import { BookingProvider } from '../context/availability';
 import { MyNextClassesProvider, BookingDetailProvider, AllClassesProvider } from '../context/booking';
+import { WeeklyAgendaProvider } from '../context/availability';
+import { ScheduleProvider } from '../context/availability/ScheduleContext';
 import ContinueOnboarding from '../pages/profile/ContinueOnboarding';
 import ActivateAccount from '../pages/profile/ActivateAccount';
 import StepLock from '../components/StepLock';
@@ -241,7 +243,11 @@ const router = createBrowserRouter([
     path: '/teacher/availability',
     element: (
       <PrivateRoute roles={["teacher"]}>
-        <AgendaDocente />
+        <WeeklyAgendaProvider>
+          <ScheduleProvider>
+            <AgendaDocente />
+          </ScheduleProvider>
+        </WeeklyAgendaProvider>
       </PrivateRoute>
     ),
   },

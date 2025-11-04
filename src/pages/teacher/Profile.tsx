@@ -3,7 +3,7 @@ import Header from '../../components/ui/Header';
 import Footer from '../../components/ui/Footer';
 import { Link } from 'react-router-dom';
 import { useAuthContext } from '../../context/auth';
-import { ScheduleProvider } from '../../context/availability/ScheduleContext';
+import { WeeklyAgendaProvider } from '../../context/availability/WeeklyAgendaContext';
 import DispAgenda from '../../components/DispAgenda';
 import { Play, Star, BadgeDollarSign } from 'lucide-react';
 import '../../styles/docente-general.css';
@@ -243,9 +243,9 @@ export default function DocenteProfile() {
             <p className="section-sub">Para reservar, selecciona una hora disponible en la agenda.</p>
 
             <div className="avail-card" style={{ marginTop: 12 }}>
-              <ScheduleProvider>
+              <WeeklyAgendaProvider>
                 <DispAgenda />
-              </ScheduleProvider>
+              </WeeklyAgendaProvider>
             </div>
 
             <div className="legend">

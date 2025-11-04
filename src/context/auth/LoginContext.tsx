@@ -12,6 +12,8 @@ export interface User {
   first_name: string;
   last_name: string;
   role: string;
+  preference_id?: number;
+  status?: string;
 }
 
 export interface LoginResponse {
@@ -25,6 +27,8 @@ export interface LoginResponse {
     first_name: string;
     last_name: string;
     role: string;
+    preference_id?: number;
+    status?: string;
   } | null;
 }
 

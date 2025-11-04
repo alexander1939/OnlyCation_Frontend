@@ -3,15 +3,23 @@ import { format } from 'date-fns';
 import '../styles/docente-agenda.css';
 import { useSchedule } from '../context/availability/ScheduleContext';
 import type { DayKey } from '../context/availability/ScheduleContext';
+import { useAgendaApi } from '../hooks/availability/useavailabilityApi';
 
-const AvailabilityConfig: React.FC = () => {
+interface AvailabilityConfigProps {
+  onAvailabilityAdded?: () => void;
+  onAvailabilityDeleted?: () => void;
+}
+
+const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityAdded, onAvailabilityDeleted }) => {
   const { dayLabels, enabledDays, slots, availableSlots, addHours, removeSlot, toggleDay, dayKeyToIndex, toHH } = useSchedule();
+  const { deleteAvailability, createAvailability } = useAgendaApi();
   const weekKeys = useMemo<DayKey[]>(() => ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'], []);
 
   // Modal local state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalDay, setModalDay] = useState<DayKey | null>(null);
   const [selectedHours, setSelectedHours] = useState<Set<number>>(new Set());
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   const openAddModal = (day: DayKey) => {
     if (!enabledDays[day]) return;
@@ -28,17 +36,58 @@ const AvailabilityConfig: React.FC = () => {
     });
   };
 
-  const confirmAdd = () => {
+  const confirmAdd = async () => {
     if (!modalDay) return;
     const hours = Array.from(selectedHours);
     if (hours.length === 0) {
       setIsModalOpen(false);
       return;
     }
+    
+    // Agregar al estado local
     addHours(modalDay, hours);
+    
+    // Guardar automáticamente en el backend
+    try {
+      const pref = localStorage.getItem('preference_id');
+      if (!pref) {
+        alert('❌ No se detectó preference_id. Inicia sesión nuevamente.');
+        setIsModalOpen(false);
+        return;
+      }
+      const preference_id = Number(pref);
+      
+      const dayMap: Record<DayKey, number> = {
+        monday: 1, tuesday: 2, wednesday: 3, thursday: 4,
+        friday: 5, saturday: 6, sunday: 7,
+      };
+      
+      const payloads = hours.map(h => ({
+        preference_id,
+        day_of_week: dayMap[modalDay],
+        start_time: `${String(h).padStart(2, '0')}:00`,
+        end_time: `${String(h + 1).padStart(2, '0')}:00`,
+      }));
+      
+      console.log('💾 Guardando horarios automáticamente:', payloads);
+      
+      const results = await Promise.all(payloads.map(payload => createAvailability(payload)));
+      
+      const failed = results.filter(r => !r.success);
+      if (failed.length > 0) {
+        alert(`⚠️ Algunos horarios no se pudieron guardar: ${failed[0].message}`);
+      } else {
+        console.log(`✅ ${results.length} horario(s) guardado(s)`);
+      }
+    } catch (e: any) {
+      console.error('Error al guardar:', e);
+      alert(`❌ Error al guardar: ${e?.message || 'Error desconocido'}`);
+    }
+    
     setIsModalOpen(false);
     setModalDay(null);
     setSelectedHours(new Set());
+    if (onAvailabilityAdded) onAvailabilityAdded();
   };
 
   // Validaciones
@@ -64,7 +113,7 @@ const AvailabilityConfig: React.FC = () => {
     toggleDay(day);
   };
 
-  const handleRemove = (day: DayKey, id: string) => {
+  const handleRemove = async (day: DayKey, id: string) => {
     const slotToRemove = slots[day].find(s => s.id === id);
     if (!slotToRemove) return;
     const targetDay = dayKeyToIndex[day];
@@ -73,6 +122,22 @@ const AvailabilityConfig: React.FC = () => {
       alert('⚠️ No puedes eliminar esta hora porque tienes clases reservadas. Primero debes reagendar con tus estudiantes.');
       return;
     }
+    
+    // Si el ID es numérico, es un horario del backend → eliminar del servidor
+    const isExisting = !isNaN(Number(id));
+    if (isExisting) {
+      setDeleting(id);
+      const result = await deleteAvailability(Number(id));
+      setDeleting(null);
+      
+      if (!result.success) {
+        alert(`❌ Error al eliminar: ${result.message}`);
+        return;
+      }
+      console.log(`✅ Horario ${id} eliminado del servidor`);
+      if (onAvailabilityDeleted) onAvailabilityDeleted();
+    }
+    
     removeSlot(day, id);
   };
 

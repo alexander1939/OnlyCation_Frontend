@@ -69,6 +69,8 @@ export const useLoginApi = () => {
         first_name,
         last_name,
         role,
+        preference_id,
+        status,
       } = data.data;
 
       // Guardar en localStorage
@@ -77,9 +79,17 @@ export const useLoginApi = () => {
       localStorage.setItem("user_email", email);
       localStorage.setItem("user_role", role);
       localStorage.setItem("user_name", `${first_name} ${last_name}`);
+      
+      // Guardar preference_id y status si existen
+      if (preference_id !== undefined) {
+        localStorage.setItem("preference_id", preference_id.toString());
+      }
+      if (status) {
+        localStorage.setItem("user_status", status);
+      }
 
       // Actualizar estado global
-      setUser({ email, first_name, last_name, role });
+      setUser({ email, first_name, last_name, role, preference_id, status });
 
       return data;
     } catch (error: any) {
@@ -102,6 +112,8 @@ export const useLoginApi = () => {
     localStorage.removeItem("user_email");
     localStorage.removeItem("user_role");
     localStorage.removeItem("user_name");
+    localStorage.removeItem("preference_id");
+    localStorage.removeItem("user_status");
     setUser(null);
   };
 
@@ -110,10 +122,19 @@ export const useLoginApi = () => {
     const email = localStorage.getItem("user_email");
     const name = localStorage.getItem("user_name");
     const role = localStorage.getItem("user_role");
+    const preference_id = localStorage.getItem("preference_id");
+    const status = localStorage.getItem("user_status");
 
     if (email && name && role) {
       const [first_name, last_name = ""] = name.split(" ");
-      return { email, first_name, last_name, role };
+      return { 
+        email, 
+        first_name, 
+        last_name, 
+        role,
+        preference_id: preference_id ? Number(preference_id) : undefined,
+        status: status || undefined,
+      };
     }
     return null;
   };

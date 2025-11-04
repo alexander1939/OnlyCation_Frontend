@@ -1,78 +1,97 @@
-import React, { useMemo } from 'react';
-import { format, addDays, startOfWeek, endOfWeek, eachDayOfInterval, parseISO } from 'date-fns';
+import React, { useMemo, useEffect, useState } from 'react';
+import { format, addDays, startOfWeek, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import '../styles/DispAgenda.css';
-import { useSchedule } from '../context/availability/ScheduleContext';
-import type { TimeSlot } from '../context/availability/ScheduleContext';
+import { useWeeklyAgendaContext } from '../context/availability/WeeklyAgendaContext';
 
 const DispAgenda: React.FC = () => {
-  const { availableSlots, selectedDate, setSelectedDate, onSlotClick } = useSchedule();
+  const { agendaData, loading, fetchWeeklyAgenda, currentWeekStart } = useWeeklyAgendaContext();
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
+  useEffect(() => {
+    fetchWeeklyAgenda();
+  }, []);
 
   // Formatear el rango de la semana
   const formatWeekHeader = (date: Date): string => {
     const weekStart = startOfWeek(date, { weekStartsOn: 1 });
-    const weekEnd = endOfWeek(date, { weekStartsOn: 1 });
+    const weekEnd = addDays(weekStart, 6);
     return `${format(weekStart, "d 'de' MMMM", { locale: es })} - ${format(weekEnd, "d 'de' MMMM, yyyy", { locale: es })}`;
   };
 
   // Navegación entre semanas
   const navigateWeeks = (weeks: number) => {
-    const newDate = addDays(selectedDate, weeks * 7);
+    const newDate = addDays(currentWeekStart, weeks * 7);
     setSelectedDate(newDate);
+    fetchWeeklyAgenda(newDate);
   };
 
-  // Obtener los días de la semana
+  // Obtener días de la semana desde agendaData
   const weekDays = useMemo(() => {
-    const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 });
-    const weekEnd = endOfWeek(selectedDate, { weekStartsOn: 1 });
-    return eachDayOfInterval({ start: weekStart, end: weekEnd });
-  }, [selectedDate]);
+    if (!agendaData?.days) return [];
+    return agendaData.days.slice(0, 7); // Solo 7 días para la vista semanal
+  }, [agendaData]);
 
   // Agrupar los slots por día y hora
   const { groupedSlots, hours } = useMemo(() => {
-    const slotsByDayAndHour: Record<string, Record<string, TimeSlot | null>> = {};
+    if (!agendaData?.days) return { groupedSlots: {}, hours: [] };
+
+    const slotsByDayAndHour: Record<string, Record<string, any>> = {};
     const hoursSet = new Set<number>();
 
-    // Inicializar estructura para cada día de la semana
-    weekDays.forEach(day => {
-      const dayKey = format(day, 'yyyy-MM-dd');
-      slotsByDayAndHour[dayKey] = {};
-    });
-
-    // Llenar con los slots disponibles
-    availableSlots.forEach(slot => {
-      const slotDate = typeof slot.start === 'string' ? parseISO(slot.start) : slot.start;
-      const dayKey = format(slotDate, 'yyyy-MM-dd');
-      const hour = slotDate.getHours();
-      const hourKey = `${hour.toString().padStart(2, '0')}:00`;
+    agendaData.days.forEach(day => {
+      slotsByDayAndHour[day.date] = {};
       
-      if (slotsByDayAndHour[dayKey]) {
-        slotsByDayAndHour[dayKey][hourKey] = slot;
+      day.slots?.forEach(slot => {
+        const hour = parseInt(slot.start_time.split(':')[0]);
+        const hourKey = `${hour.toString().padStart(2, '0')}:00`;
+        
+        slotsByDayAndHour[day.date][hourKey] = {
+          ...slot,
+          status: slot.status, // "available" o "occupied"
+          availability_id: slot.availability_id
+        };
+        
         hoursSet.add(hour);
-      }
+      });
     });
 
-    // Ordenar las horas
     const sortedHours = Array.from(hoursSet).sort((a, b) => a - b);
 
     return {
       groupedSlots: slotsByDayAndHour,
       hours: sortedHours
     };
-  }, [availableSlots, weekDays]);
+  }, [agendaData]);
 
   // Calcular estadísticas
   const stats = useMemo(() => {
-    const totalSlots = availableSlots.length;
-    const bookedSlots = availableSlots.filter(slot => slot.isBooked).length;
-    const availableSlotsCount = totalSlots - bookedSlots;
-
+    if (!agendaData?.summary) return { total: 0, occupied: 0, available: 0 };
+    
     return {
-      total: totalSlots,
-      booked: bookedSlots,
-      available: availableSlotsCount,
+      total: agendaData.summary.total_slots || 0,
+      occupied: agendaData.summary.occupied_slots || 0,
+      available: agendaData.summary.available_slots || 0,
     };
-  }, [availableSlots]);
+  }, [agendaData]);
+
+  if (loading) {
+    return (
+      <div className="disp-agenda">
+        <div className="disp-agenda-header">
+          <div className="date-navigation">
+            <button className="nav-button" disabled>←</button>
+            <h3>Cargando...</h3>
+            <button className="nav-button" disabled>→</button>
+          </div>
+        </div>
+        <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
+          <div style={{ fontSize: '24px', marginBottom: '10px' }}>🔄</div>
+          <p>Cargando agenda...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="disp-agenda">
@@ -82,16 +101,18 @@ const DispAgenda: React.FC = () => {
             onClick={() => navigateWeeks(-1)} 
             className="nav-button"
             aria-label="Semana anterior"
+            disabled={loading}
           >
             ←
           </button>
           
-          <h3>{formatWeekHeader(selectedDate)}</h3>
+          <h3>{formatWeekHeader(currentWeekStart)}</h3>
           
           <button 
             onClick={() => navigateWeeks(1)} 
             className="nav-button"
             aria-label="Siguiente semana"
+            disabled={loading}
           >
             →
           </button>
@@ -99,8 +120,8 @@ const DispAgenda: React.FC = () => {
         
         <div className="stats-container">
           <div className="stat-item">
-            <span className="stat-value">{stats.booked}</span>
-            <span className="stat-label">Reservados</span>
+            <span className="stat-value">{stats.occupied}</span>
+            <span className="stat-label">Ocupados</span>
           </div>
           <div className="stat-item">
             <span className="stat-value">{stats.available}</span>
@@ -113,9 +134,9 @@ const DispAgenda: React.FC = () => {
         <div className="week-header">
           <div className="time-column-header"></div>
           {weekDays.map(day => (
-            <div key={day.toString()} className="day-header">
-              <div className="day-name">{format(day, 'EEEE', { locale: es })}</div>
-              <div className="day-number">{format(day, 'd')}</div>
+            <div key={day.date} className="day-header">
+              <div className="day-name">{day.day_name}</div>
+              <div className="day-number">{format(parseISO(day.date), 'd')}</div>
             </div>
           ))}
         </div>
@@ -131,23 +152,21 @@ const DispAgenda: React.FC = () => {
                 </div>
                 
                 {weekDays.map(day => {
-                  const dayKey = format(day, 'yyyy-MM-dd');
-                  const slot = groupedSlots[dayKey]?.[hourKey];
+                  const slot = groupedSlots[day.date]?.[hourKey];
+                  const isOccupied = slot?.status === 'occupied';
+                  const isAvailable = slot?.status === 'available';
                   
                   return (
                     <div 
-                      key={`${dayKey}-${hourKey}`}
-                      className={`time-slot ${slot ? (slot.isBooked ? 'booked' : 'available') : 'empty'}`}
-                      onClick={() => slot && onSlotClick?.(slot)}
-                      title={slot ? (slot.isBooked ? `Reservado: ${slot.studentName || ''}` : 'Disponible') : 'Sin horario'}
+                      key={`${day.date}-${hourKey}`}
+                      className={`time-slot ${isOccupied ? 'booked' : isAvailable ? 'available' : 'empty'}`}
+                      title={slot ? (isOccupied ? 'Ocupado' : 'Disponible') : 'Sin horario'}
                     >
-                      {slot && slot.isBooked && slot.studentName ? (
+                      {isOccupied ? (
                         <div className="slot-content">
-                          <span className="student-name">
-                            {slot.studentName.split(' ')[0]}
-                          </span>
+                          <span className="student-name">Ocupado</span>
                         </div>
-                      ) : slot && !slot.isBooked ? (
+                      ) : isAvailable ? (
                         <div className="slot-content available-indicator">
                           ✓
                         </div>

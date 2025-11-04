@@ -137,7 +137,7 @@ const TeacherStatus: React.FC = () => {
             </div>
           </div>
           <div className="agenda-actions">
-            <button className="agenda-btn--primary" onClick={() => navigate('/profile/activate')}>
+            <button className="agenda-btn--primary" onClick={() => navigate('/profile/activate')} style={{ backgroundColor: '#8ED4BE' }}>
               Activar cuenta
             </button>
           </div>

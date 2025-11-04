@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import "../../styles/knowledge-center.css";
 
 interface KnowledgeCenterProps {
   title: string;
@@ -23,6 +24,7 @@ const KnowledgeCenter: React.FC<KnowledgeCenterProps> = ({
 
   return (
     <div
+      className="knowledge-center"
       style={{
         backgroundColor,
         border: "1px solid #C9E2FF",
@@ -81,75 +83,7 @@ const KnowledgeCenter: React.FC<KnowledgeCenterProps> = ({
         {description}
       </p>
 
-      {/* Animaciones + Responsividad */}
-      <style>{`
-        @keyframes slideLeft {
-          from { opacity: 0; transform: translateX(-40px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes slideRight {
-          from { opacity: 0; transform: translateX(40px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        .fade-slide-left, .fade-slide-right, .fade-up {
-          opacity: 0;
-          transition: opacity 0.5s ease;
-        }
-
-        .fade-slide-left.show {
-          animation: slideLeft 0.7s ease forwards;
-        }
-
-        .fade-slide-right.show {
-          animation: slideRight 0.7s ease forwards;
-          animation-delay: 0.2s;
-        }
-
-        .fade-up.show {
-          animation: slideUp 0.8s ease forwards;
-          animation-delay: 0.4s;
-        }
-
-        .fade-slide-right.show:hover {
-          color: #1E40AF;
-        }
-
-        /* ✅ RESPONSIVIDAD */
-        @media (max-width: 768px) {
-          div {
-            padding: 1.2rem !important;
-            text-align: center !important;
-          }
-          h2 {
-            font-size: 1rem !important;
-          }
-          a {
-            font-size: 0.95rem !important;
-            margin-top: 0.4rem !important;
-          }
-          p {
-            font-size: 0.9rem !important;
-            margin-top: 0.5rem !important;
-          }
-        }
-
-        @media (max-width: 480px) {
-          h2 {
-            font-size: 0.95rem !important;
-          }
-          a {
-            font-size: 0.9rem !important;
-          }
-          p {
-            font-size: 0.85rem !important;
-          }
-        }
-      `}</style>
+      {/* Animaciones movidas a styles/knowledge-center.css */}
     </div>
   );
 };

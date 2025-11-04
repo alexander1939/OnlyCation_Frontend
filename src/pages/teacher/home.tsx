@@ -10,6 +10,7 @@ import AdaptiveList from "../../components/comptHome/SubjectList";
 import UpcomingSessions from "../../components/comptHome/NextSession";
 import { CreditCard, FileText, CalendarCheck } from "lucide-react";
 import TeacherStatus from "../../components/comptHome/TeacherStatus";
+import "../../styles/teacher-home.css";
 
 const TeacherHome: React.FC = () => {
   const { user } = useLoginContext();
@@ -38,23 +39,6 @@ const TeacherHome: React.FC = () => {
       <WelcomeAlert name={user?.first_name || "Teacher"} />
 
       <div style={{ padding: "7.5rem 2rem 2rem" }}>
-        <style>{`
-          .teacher-grid {
-            display: grid;
-            gap: 1.5rem;
-            align-items: stretch;
-            grid-auto-rows: 1fr;
-          }
-          @media (min-width: 1024px) {
-            .teacher-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-          }
-          @media (min-width: 640px) and (max-width: 1023.98px) {
-            .teacher-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-          }
-          @media (max-width: 639.98px) {
-            .teacher-grid { grid-template-columns: 1fr; }
-          }
-        `}</style>
         {/* Contenedor superior: KnowledgeCenter + UpcomingSessions */}
         <div
           style={{

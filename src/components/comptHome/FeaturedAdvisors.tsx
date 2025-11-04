@@ -1,4 +1,5 @@
 import React from "react";
+import "../../styles/featured-advisors.css";
 
 const advisors = [
   { name: "Prof. Carlos Mendoza", video: "https://www.youtube.com/embed/3icoSeGqQtY" },
@@ -33,24 +34,7 @@ const FeaturedAdvisors: React.FC = () => {
       }}
       className="scroll-vertical"
     >
-      <style>
-        {`
-          .scroll-vertical::-webkit-scrollbar {
-            display: none;
-          }
-
-          @keyframes buttonGlow {
-            0%, 100% { box-shadow: 0 0 3px rgba(37,99,235,0.5); }
-            50% { box-shadow: 0 0 7px rgba(37,99,235,0.8); }
-          }
-
-          @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 rgba(37,99,235,0.4); }
-            50% { transform: scale(1.03); box-shadow: 0 0 4px rgba(37,99,235,0.6); }
-            100% { transform: scale(1); box-shadow: 0 0 0 rgba(37,99,235,0.4); }
-          }
-        `}
-      </style>
+      {/* Animaciones movidas a styles/featured-advisors.css */}
 
       {advisors.map((a) => (
         <div

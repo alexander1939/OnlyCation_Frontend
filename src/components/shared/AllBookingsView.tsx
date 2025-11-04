@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../ui/Header';
 import Footer from '../ui/Footer';
@@ -7,7 +7,7 @@ import '../../styles/docente-general.css';
 import BookingDetailModal from './BookingDetailModal';
 import '../../styles/booking-view.css';
 
-type BookingViewProps = {
+type AllBookingsViewProps = {
   user: {
     first_name?: string;
     last_name?: string;
@@ -25,11 +25,10 @@ type BookingViewProps = {
   detailError: string | null;
   hasMore: boolean;
   onLoadMore: () => void;
-  pageTitle?: string;
-  showViewAllButton?: boolean;
+  onSearch: (params: { status?: string; date_from?: string; min_price?: number }) => void;
 };
 
-export default function BookingView({ 
+export default function AllBookingsView({ 
   user, 
   loading, 
   error, 
@@ -42,19 +41,37 @@ export default function BookingView({
   detailError,
   hasMore,
   onLoadMore,
-  pageTitle = "Próximas Clases",
-  showViewAllButton = true
-}: BookingViewProps) {
-  const fullName = user ? `${user.first_name} ${user.last_name}`.trim() : '-';
-  const initials = user ? `${user.first_name?.[0] ?? ''}${user.last_name?.[0] ?? ''}`.toUpperCase() || '-' : '-';
-  const getRoleLabel = (role?: string) => {
-    if (role === 'teacher') return 'Docente';
-    if (role === 'student') return 'Estudiante';
-    return 'Usuario';
+  onSearch
+}: AllBookingsViewProps) {
+  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [dateFilter, setDateFilter] = useState<string>('');
+  const [minPriceFilter, setMinPriceFilter] = useState<string>('');
+
+  const handleSearch = () => {
+    const searchParams: { status?: string; date_from?: string; min_price?: number } = {};
+    
+    if (statusFilter && statusFilter !== 'all') {
+      searchParams.status = statusFilter;
+    }
+    
+    if (dateFilter) {
+      // Convertir fecha a formato ISO con hora
+      searchParams.date_from = `${dateFilter}T00:00:00`;
+    }
+    
+    if (minPriceFilter) {
+      searchParams.min_price = parseFloat(minPriceFilter);
+    }
+    
+    onSearch(searchParams);
   };
 
-  const roleLabel = getRoleLabel(user?.role);
-  const allBookingsPath = user?.role === 'teacher' ? '/teacher/all-bookings' : '/student/all-bookings';
+  const handleClearFilters = () => {
+    setStatusFilter('');
+    setDateFilter('');
+    setMinPriceFilter('');
+    onSearch({});
+  };
 
   const formatDateTime = (dateTimeStr: string) => {
     const date = new Date(dateTimeStr);
@@ -103,29 +120,131 @@ export default function BookingView({
       <Header />
       <main className="flex-1 main-spacing">
         <section className="docente-container">
-          <div className="perfil-row">
-            <div className="perfil-avatar">
-              <div className="perfil-avatar-initials">{initials}</div>
-            </div>
-            <div className="perfil-info">
-              <h1 className="perfil-nombre">{fullName}</h1>
-              <div className="perfil-email">{user?.email || '-'}</div>
-              <div className="perfil-rol">{roleLabel}</div>
-            </div>
-          </div>
-
           <div className="clases-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <h2 className="clases-title">{pageTitle}</h2>
+              <h2 className="clases-title">Mis Reservas</h2>
               {classes.length > 0 && (
                 <span className="text-sm text-gray-600">({classes.length})</span>
               )}
             </div>
-            {!loading && classes.length > 0 && showViewAllButton && (
-              <Link to={allBookingsPath} className="view-all-btn-header">
-                📋 Ver todas las reservas
-              </Link>
-            )}
+          </div>
+
+          {/* Filtros */}
+          <div className="filters-container" style={{
+            display: 'flex',
+            gap: '16px',
+            marginBottom: '24px',
+            padding: '20px',
+            backgroundColor: '#f9fafb',
+            borderRadius: '12px',
+            border: '1px solid #e5e7eb',
+            flexWrap: 'wrap'
+          }}>
+            <div style={{ flex: '1', minWidth: '200px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#374151' }}>
+                Estado
+              </label>
+              <select 
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  backgroundColor: 'white',
+                  cursor: 'pointer'
+                }}
+              >
+                <option value="">Todos</option>
+                <option value="approved">Aprobada</option>
+                <option value="pending">Pendiente</option>
+                <option value="cancelled">Cancelada</option>
+                <option value="completed">Completada</option>
+              </select>
+            </div>
+
+            <div style={{ flex: '1', minWidth: '200px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#374151' }}>
+                Fecha
+              </label>
+              <input 
+                type="date"
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  backgroundColor: 'white'
+                }}
+              />
+            </div>
+
+            <div style={{ flex: '1', minWidth: '200px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#374151' }}>
+                Precio mínimo
+              </label>
+              <input 
+                type="number"
+                placeholder="$0.00"
+                value={minPriceFilter}
+                onChange={(e) => setMinPriceFilter(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  backgroundColor: 'white'
+                }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end' }}>
+              <button
+                onClick={handleSearch}
+                style={{
+                  padding: '10px 24px',
+                  backgroundColor: '#8ED4BE',
+                  color: '#294954',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#7BC4AE'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#8ED4BE'}
+              >
+                🔍 Buscar
+              </button>
+
+              {(statusFilter || dateFilter || minPriceFilter) && (
+                <button
+                  onClick={handleClearFilters}
+                  style={{
+                    padding: '10px 20px',
+                    backgroundColor: '#ef4444',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#dc2626'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#ef4444'}
+                >
+                  Limpiar
+                </button>
+              )}
+            </div>
           </div>
 
           {loading && (
@@ -142,7 +261,7 @@ export default function BookingView({
 
           {!loading && !error && classes.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">No tienes clases programadas próximamente</p>
+              <p className="text-gray-500 text-lg">No se encontraron reservas con los filtros seleccionados</p>
             </div>
           )}
 

@@ -10,11 +10,11 @@ interface StepDef {
 
 const steps: StepDef[] = [
   { index: 1, label: 'Preferencias', path: '/profile/preferences' },
-  { index: 2, label: 'Documentos', path: '/documents/create' },
-  { index: 3, label: 'Precios', path: '/prices/create' },
+  { index: 2, label: 'Documentos', path: '/profile/document' },
+  { index: 3, label: 'Precios', path: '/profile/price' },
   { index: 4, label: 'Video', path: '/profile/video' },
-  { index: 5, label: 'Agenda', path: '/profile/agenda' },
-  { index: 6, label: 'Cartera', path: '/profile/cartera' },
+  { index: 5, label: 'Agenda', path: '/profile/availability' },
+  { index: 6, label: 'Cartera', path: '/profile/wallet' },
 ];
 
 export const OnboardingSteps: React.FC = () => {

@@ -14,6 +14,7 @@ import DocenteDatosPersonales from '../pages/teacher/DatosPersonales';
 import DocenteDocumentos from '../pages/teacher/Documentos';
 import StudentHome from '../pages/student/home';
 import PrivateRoute from "../components/PrivateRoute";
+import DocenteProfile from '../pages/teacher/Profile';
 import Preferences from '../pages/profile/Preferences';
 import CreateDocument from '../pages/profile/Document';
 import CreatePrice from '../pages/profile/Price';
@@ -26,13 +27,16 @@ import Cartera from '../pages/profile/Wallet';
 import { AgendaProvider } from '../context/wallet';
 import Agenda from '../pages/profile/Availability';
 import { BookingProvider } from '../context/availability';
+import { MyNextClassesProvider, BookingDetailProvider, AllClassesProvider } from '../context/booking';
 import ContinueOnboarding from '../pages/profile/ContinueOnboarding';
+import ActivateAccount from '../pages/profile/ActivateAccount';
+import StepLock from '../components/StepLock';
 // NUEVOS: páginas básicas por carpeta
-import TeacherBooking from '../pages/booking/my_next_booking';
 import TeacherSubscription from '../pages/subscription/TeacherSubscription';
 import TeacherConfirmation from '../pages/confirmation/my_confimaction';
 import TeacherChat from '../pages/chat/my_chat';
 import EstudianteDatosPersonales from '../pages/student/DatosPersonales';
+import AllBookings from '../pages/booking/all_bookings';
 
 const router = createBrowserRouter([
   {
@@ -42,65 +46,105 @@ const router = createBrowserRouter([
   {
     path: '/profile/preferences',
     element: (
-        <ActivationProvider>
-          <CatalogsProvider>
-            <PreferencesProvider>
-              <Preferences />
-            </PreferencesProvider>
-          </CatalogsProvider>
-        </ActivationProvider>
+        <PrivateRoute roles={["teacher"]}>
+          <ActivationProvider>
+            <StepLock>
+              <CatalogsProvider>
+                <PreferencesProvider>
+                  <Preferences />
+                </PreferencesProvider>
+              </CatalogsProvider>
+            </StepLock>
+          </ActivationProvider>
+        </PrivateRoute>
     ),
   },
   {
     path: '/profile/wallet',
     element: (
-      <AgendaProvider>
-        <Cartera />
-      </AgendaProvider>
+      <PrivateRoute roles={["teacher"]}>
+        <ActivationProvider>
+          <StepLock>
+            <AgendaProvider>
+              <Cartera />
+            </AgendaProvider>
+          </StepLock>
+        </ActivationProvider>
+      </PrivateRoute>
     ),
   },
   {
     path: '/profile/availability',
     element: (
-      <ActivationProvider>
-        <BookingProvider>
-          <Agenda />
-        </BookingProvider>
-      </ActivationProvider>
+      <PrivateRoute roles={["teacher"]}>
+        <ActivationProvider>
+          <StepLock>
+            <BookingProvider>
+              <Agenda />
+            </BookingProvider>
+          </StepLock>
+        </ActivationProvider>
+      </PrivateRoute>
     ),
   },
   {
     path: '/profile/document',
     element: (
-      <ActivationProvider>
-        <DocumentsProvider>
-          <CreateDocument />
-        </DocumentsProvider>
-      </ActivationProvider>
+      <PrivateRoute roles={["teacher"]}>
+        <ActivationProvider>
+          <StepLock>
+            <DocumentsProvider>
+              <CreateDocument />
+            </DocumentsProvider>
+          </StepLock>
+        </ActivationProvider>
+      </PrivateRoute>
     ),
   },
   {
     path: '/profile/price',
     element: (
-      <ActivationProvider>
-        <CreatePrice />
-      </ActivationProvider>
+      <PrivateRoute roles={["teacher"]}>
+        <ActivationProvider>
+          <StepLock>
+            <CreatePrice />
+          </StepLock>
+        </ActivationProvider>
+      </PrivateRoute>
     ),
   },
   {
     path: '/profile/video',
     element: (
-      <ActivationProvider>
-        <Video />
-      </ActivationProvider>
+      <PrivateRoute roles={["teacher"]}>
+        <ActivationProvider>
+          <StepLock>
+            <Video />
+          </StepLock>
+        </ActivationProvider>
+      </PrivateRoute>
     ),
   },
   {
     path: '/profile/continue',
     element: (
-      <ActivationProvider>
-        <ContinueOnboarding />
-      </ActivationProvider>
+      <PrivateRoute roles={["teacher"]}>
+        <ActivationProvider>
+          <ContinueOnboarding />
+        </ActivationProvider>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/profile/activate',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <ActivationProvider>
+          <StepLock>
+            <ActivateAccount />
+          </StepLock>
+        </ActivationProvider>
+      </PrivateRoute>
     ),
   },
   {
@@ -131,7 +175,23 @@ const router = createBrowserRouter([
     path: '/student/my_next_booking',
     element: (
       <PrivateRoute roles={["student"]}>
-        <MyNextBooking />
+        <MyNextClassesProvider>
+          <BookingDetailProvider>
+            <MyNextBooking />
+          </BookingDetailProvider>
+        </MyNextClassesProvider>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/student/all-bookings',
+    element: (
+      <PrivateRoute roles={["student"]}>
+        <AllClassesProvider>
+          <BookingDetailProvider>
+            <AllBookings />
+          </BookingDetailProvider>
+        </AllClassesProvider>
       </PrivateRoute>
     ),
   },
@@ -139,7 +199,39 @@ const router = createBrowserRouter([
     path: '/teacher/my_next_booking',
     element: (
       <PrivateRoute roles={["teacher"]}>
-        <MyNextBooking />
+        <MyNextClassesProvider>
+          <BookingDetailProvider>
+            <MyNextBooking />
+          </BookingDetailProvider>
+        </MyNextClassesProvider>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/teacher/all-bookings',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <AllClassesProvider>
+          <BookingDetailProvider>
+            <AllBookings />
+          </BookingDetailProvider>
+        </AllClassesProvider>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/docente/profile',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <DocenteProfile />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/docente/profile',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <DocenteProfile />
       </PrivateRoute>
     ),
   },

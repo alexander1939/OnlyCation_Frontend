@@ -56,7 +56,7 @@ const VideoInner: React.FC = () => {
 
   React.useEffect(() => {
     if (success) {
-      navigate('/profile/agenda');
+      navigate('/profile/availability');
     }
   }, [success, navigate]);
 

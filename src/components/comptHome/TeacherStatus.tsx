@@ -20,13 +20,14 @@ const TeacherStatus: React.FC = () => {
   const panelStyle: React.CSSProperties = {
     backgroundColor: '#fff',
     borderRadius: '0.75rem',
-    padding: '1rem',
+    padding: '0.9rem',
     boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
     fontFamily: "Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji'",
     width: '100%',
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
+    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
   };
 
   const cardBodyStyle: React.CSSProperties = {
@@ -75,7 +76,17 @@ const TeacherStatus: React.FC = () => {
   // ACTIVE VIEW
   if (status === 'active') {
     return (
-      <div style={panelStyle}>
+      <div
+        style={panelStyle}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
+          (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 14px rgba(0,0,0,0.1)';
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
+          (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
+        }}
+      >
         <div style={cardBodyStyle}>
           <div>
             <HeaderRow kind="active" />
@@ -97,7 +108,17 @@ const TeacherStatus: React.FC = () => {
   // PENDING OR UNKNOWN VIEW
   if (status === 'pending' || !status) {
     return (
-      <div style={panelStyle}>
+      <div
+        style={panelStyle}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
+          (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 14px rgba(0,0,0,0.1)';
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
+          (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
+        }}
+      >
         <div style={cardBodyStyle}>
           <div>
             <HeaderRow kind="pending" />
@@ -148,7 +169,17 @@ const TeacherStatus: React.FC = () => {
 
   // FALLBACK VIEW
   return (
-    <div style={panelStyle}>
+    <div
+      style={panelStyle}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
+        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 14px rgba(0,0,0,0.1)';
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
+        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
+      }}
+    >
       <div style={cardBodyStyle}>
         <div>
           <HeaderRow kind="pending" />

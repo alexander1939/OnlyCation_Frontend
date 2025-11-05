@@ -7,13 +7,15 @@ import KnowledgeCenter from "../../components/comptHome/KnowledgeCenter";
 import DashboardCard from "../../components/comptHome/HistoryCard";
 import GeneralCard from "../../components/comptHome/GeneralCard";
 import AdaptiveList from "../../components/comptHome/SubjectList";
-import UpcomingSessions from "../../components/comptHome/NextSession";
-import { CreditCard, FileText, CalendarCheck } from "lucide-react";
+import ChatCard from "../../components/comptHome/ChatCard";
+import { CreditCard, FileText, CalendarCheck, MessageSquare } from "lucide-react";
 import TeacherStatus from "../../components/comptHome/TeacherStatus";
 import "../../styles/teacher-home.css";
+import Footer from "../../components/ui/Footer";
 
 const TeacherHome: React.FC = () => {
   const { user } = useLoginContext();
+
   const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
@@ -25,24 +27,6 @@ const TeacherHome: React.FC = () => {
       }
     } catch {}
   }, []);
-
-  const upcomingSessions = [
-    {
-      title: "Clase de Matemáticas",
-      date: "2 Nov, 10:00 AM",
-      studentName: "Juan Pérez",
-    },
-    {
-      title: "Asesoría Física",
-      date: "3 Nov, 2:00 PM",
-      studentName: "María López",
-    },
-    {
-      title: "Química Avanzada",
-      date: "4 Nov, 11:00 AM",
-      studentName: "Carlos Ruiz",
-    },
-  ];
 
   return (
     <>
@@ -68,7 +52,7 @@ const TeacherHome: React.FC = () => {
           }}
         >
           {/* KnowledgeCenter */}
-          <div style={{ flex: 1, minWidth: "300px", display: "flex", flexDirection: "column" }}>
+          <div className="top-col" style={{ flex: 2, minWidth: "300px", display: "flex", flexDirection: "column" }}>
             <div style={{ flex: 1, display: "flex" }}> {/* 👈 contenedor extra para estirar */}
               <KnowledgeCenter
                 title="¿QUIERES APOYAR A TUS ESTUDIANTES?"
@@ -80,19 +64,34 @@ const TeacherHome: React.FC = () => {
             </div>
           </div>
 
-          {/* UpcomingSessions */}
-          <div style={{ flex: 1, minWidth: "300px", display: "flex", flexDirection: "column" }}>
+          {/* Chat docente */}
+          <div className="top-col" style={{ flex: 1, minWidth: "300px", display: "flex", flexDirection: "column" }}>
             <div style={{ flex: 1, display: "flex" }}> {/* 👈 contenedor extra para estirar */}
-              <UpcomingSessions
-                title="Próximas Sesiones"
-                sessions={upcomingSessions}
+              <ChatCard
+                title="Chat con estudiantes"
+                description="Inicia, continúa y gestiona tus conversaciones con estudiantes."
+                linkText="Ir al chat"
+                route="/teacher/chat"
+                icon={MessageSquare}
+                iconColor="#3B82F6"
+                iconBg="#E6EEFF"
               />
             </div>
           </div>
 
-          {/* TeacherStatus al lado de UpcomingSessions */}
-          <div style={{ flex: 1, minWidth: "300px", display: "flex", flexDirection: "column" }}>
-            <div style={{ flex: 1, display: "flex" }}> {/* 👈 contenedor extra para estirar */}
+          {/* TeacherStatus */}
+          <div className="top-col" style={{ flex: 1, minWidth: "300px", display: "flex", flexDirection: "column" }}>
+            <div
+              style={{ flex: 1, display: "flex", transition: "transform 0.2s ease, box-shadow 0.2s ease", borderRadius: "1rem" }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow = "0 6px 14px rgba(0,0,0,0.1)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 0 0 rgba(0,0,0,0)";
+              }}
+            >
               <TeacherStatus />
             </div>
           </div>
@@ -102,18 +101,19 @@ const TeacherHome: React.FC = () => {
         <div className="teacher-grid" style={{ marginBottom: "2rem" }}>
           <div style={{ height: "100%" }}>
             <GeneralCard
-              title="General"
+              title="Actualizar Datos"
               description="Configura opciones generales de tu perfil y cuenta."
-              linkText="Ir a general"
+              linkText="Ir a datos"
               route="/teacher/personal-data"
             />
           </div>
+          
           <div style={{ height: "100%" }}>
             <DashboardCard
               title="Documentos"
               description="Consulta y administra tus documentos y archivos importantes."
               linkText="Ver documentos"
-              route="/documentos"
+              route="/teacher/documents"
               icon={FileText}
               iconColor="#F59E0B"
               iconBg="#FEF3C7"
@@ -124,7 +124,7 @@ const TeacherHome: React.FC = () => {
               title="Personalizar Agenda"
               description="Crea y organiza tu agenda de asesorías y clases fácilmente."
               linkText="Crear agenda"
-              route="/agenda"
+              route="/teacher/availability"
               icon={CalendarCheck}
               iconColor="#3B82F6"
               iconBg="#E6EEFF"
@@ -147,6 +147,7 @@ const TeacherHome: React.FC = () => {
         </div>
 
       </div>
+      <Footer />
     </>
   );
 };

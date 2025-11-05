@@ -2,13 +2,44 @@ import React from 'react';
 import { useAgendaContext } from '../../context/wallet';
 import '../../styles/Agenda.css';
 import OnboardingSteps from '../../components/OnboardingSteps';
+import { useLoginApi } from '../../hooks/auth/useLoginApi';
+import { useNavigate } from 'react-router-dom';
 
 const AgendaPage: React.FC = () => {
   const { createWallet, creating, error, success, lastResponse, resetStatus } = useAgendaContext();
+  const { logout } = useLoginApi();
+  const navigate = useNavigate();
 
   const handleCreate = async () => {
     await createWallet({});
   };
+
+  // Al volver de Stripe, cerrar sesión automáticamente si marcamos bandera
+  React.useEffect(() => {
+    const checkAndLogout = async () => {
+      const flag = localStorage.getItem('post_stripe_logout');
+      if (flag === '1') {
+        localStorage.removeItem('post_stripe_logout');
+        try { await logout(); } catch {}
+        navigate('/login', { replace: true });
+      }
+    };
+    // Check on mount
+    checkAndLogout();
+    // Check on focus
+    const onFocus = () => { void checkAndLogout(); };
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'post_stripe_logout' && e.newValue === '1') {
+        void checkAndLogout();
+      }
+    };
+    window.addEventListener('focus', onFocus);
+    window.addEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      window.removeEventListener('storage', onStorage);
+    };
+  }, [logout, navigate]);
 
   return (
     <div className="agenda-page agenda-container">
@@ -73,6 +104,9 @@ const AgendaPage: React.FC = () => {
                   href={lastResponse.data.stripe_setup_url}
                   target="_blank"
                   rel="noreferrer"
+                  onClick={() => {
+                    try { localStorage.setItem('post_stripe_logout', '1'); } catch {}
+                  }}
                 >
                   Completar configuración en Stripe
                 </a>

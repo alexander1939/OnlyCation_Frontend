@@ -42,9 +42,12 @@ const PreferencesPage: React.FC = () => {
 
   React.useEffect(() => {
     if (success) {
-      navigate('/profile/document');
+      (async () => {
+        try { await check(true); } catch {}
+        navigate('/profile/document');
+      })();
     }
-  }, [success, navigate]);
+  }, [success, navigate, check]);
 
   // Guard: si el backend dice que ya completó este paso, redirigir al siguiente
   // Evita llamadas repetidas re-ejecutando solo una vez en el primer montaje
@@ -160,7 +163,7 @@ const PreferencesPage: React.FC = () => {
                     name="location"
                     value={form.location}
                     onChange={handleChange}
-                    placeholder="Ej: Madrid, España"
+                    placeholder="Ej: Tuxtla Gutiérrez, Chiapas"
                     className="pref-input with-icon pr-3"
                   />
                 </div>

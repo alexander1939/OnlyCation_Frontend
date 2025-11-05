@@ -22,7 +22,7 @@ const Login: React.FC = () => {
       console.log("Respuesta login:", response);
 
       if (!response || !response.success || !response.data) {
-        setError(response?.message || "Credenciales inválidas");
+        setError(response?.message || "Correo o contraseña incorrectos.");
         return;
       }
 
@@ -40,7 +40,7 @@ const Login: React.FC = () => {
       else navigate("/");
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "No se pudo iniciar sesión");
+      setError("Servidor no disponible. Inténtalo más tarde.");
     }
   };
 

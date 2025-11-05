@@ -41,6 +41,7 @@ import EstudianteDatosPersonales from '../pages/student/DatosPersonales';
 import TeacherCatalog from '../pages/catalog/TeacherCatalog';
 import PublicOrStudentRoute from '../components/PublicOrStudentRoute';
 import AllBookings from '../pages/booking/all_bookings';
+import { TeachersProvider } from '../context/teachers/TeachersContext';
 
 const router = createBrowserRouter([
   {
@@ -302,7 +303,9 @@ const router = createBrowserRouter([
     path: '/catalog/teachers',
     element: (
       <PublicOrStudentRoute>
-        <TeacherCatalog />
+        <TeachersProvider>
+          <TeacherCatalog />
+        </TeachersProvider>
       </PublicOrStudentRoute>
     ),
   },

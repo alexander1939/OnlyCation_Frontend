@@ -70,22 +70,22 @@ const CreateDocument: React.FC = () => {
             {/* Files */}
             <div className="doc-grid">
               <div>
-                <label className="doc-label">Certificado (.enc)</label>
+                <label className="doc-label">Certificado (.pdf)</label>
                 <div>
                   <input
                     type="file"
-                    accept=".enc,.pdf,.txt"
+                    accept=".pdf"
                     onChange={(e) => setCertificate(e.target.files?.[0] || null)}
                     className="doc-file"
                   />
                 </div>
               </div>
               <div>
-                <label className="doc-label">Curriculum (.enc)</label>
+                <label className="doc-label">Curriculum (.pdf)</label>
                 <div>
                   <input
                     type="file"
-                    accept=".enc,.pdf,.txt"
+                    accept=".pdf"
                     onChange={(e) => setCurriculum(e.target.files?.[0] || null)}
                     className="doc-file"
                   />

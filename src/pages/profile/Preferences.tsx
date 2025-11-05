@@ -160,7 +160,7 @@ const PreferencesPage: React.FC = () => {
                     name="location"
                     value={form.location}
                     onChange={handleChange}
-                    placeholder="Ej: Madrid, España"
+                    placeholder="Ej: Tuxtla Gutiérrez, Chiapas"
                     className="pref-input with-icon pr-3"
                   />
                 </div>

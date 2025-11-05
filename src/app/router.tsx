@@ -287,7 +287,9 @@ const router = createBrowserRouter([
     path: '/teacher/documents',
     element: (
       <PrivateRoute roles={["teacher"]}>
-        <DocenteDocumentos />
+        <DocumentsProvider>
+          <DocenteDocumentos />
+        </DocumentsProvider>
       </PrivateRoute>
     ),
   },

@@ -6,17 +6,20 @@ export interface PreferencesContextType {
   creating: boolean;
   error: string | null;
   success: boolean;
+  educationalLevel: string;
   createPreferences: (payload: PreferenceCreateRequest) => Promise<{ success: boolean; data?: PreferenceCreateResponse; message: string }>;
+  getEducationalLevel: () => Promise<void>;
   resetStatus: () => void;
 }
 
 const PreferencesContext = createContext<PreferencesContextType | undefined>(undefined);
 
 export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { createPreferences: apiCreate } = usePreferencesApi();
+  const { createPreferences: apiCreate, getEducationalLevel: apiGetEducationalLevel } = usePreferencesApi();
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [educationalLevel, setEducationalLevel] = useState<string>('');
 
   const createPreferences = useCallback(async (payload: PreferenceCreateRequest) => {
     setCreating(true);
@@ -36,12 +39,26 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   }, [apiCreate]);
 
+  const getEducationalLevel = useCallback(async () => {
+    try {
+      const res = await apiGetEducationalLevel();
+      if (res?.success && res.data) {
+        setEducationalLevel(res.data.educational_level);
+      } else {
+        setError(res?.message || 'No se pudo obtener el nivel educativo');
+      }
+    } catch (e: any) {
+      const message = e?.message || 'Error desconocido';
+      setError(message);
+    }
+  }, [apiGetEducationalLevel]);
+
   const resetStatus = useCallback(() => {
     setError(null);
     setSuccess(false);
   }, []);
 
-  const value = useMemo(() => ({ creating, error, success, createPreferences, resetStatus }), [creating, error, success, createPreferences, resetStatus]);
+  const value = useMemo(() => ({ creating, error, success, educationalLevel, createPreferences, getEducationalLevel, resetStatus }), [creating, error, success, educationalLevel, createPreferences, getEducationalLevel, resetStatus]);
 
   return (
     <PreferencesContext.Provider value={value}>

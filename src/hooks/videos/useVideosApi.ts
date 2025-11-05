@@ -40,5 +40,27 @@ export const useVideosApi = () => {
     }
   };
 
-  return { saveMyVideo };
+  const getMyVideoUrl = async (): Promise<{ success: boolean; message: string; data?: { embed_url: string; original_url: string } }> => {
+    try {
+      const token = getAccessToken();
+      if (!token) throw new Error('No hay token de acceso. Inicia sesión nuevamente.');
+
+      const res = await client.get<{ success: boolean; message: string; data: { embed_url: string; original_url: string } }>(
+        '/videos/my-video-url/',
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      return {
+        success: true,
+        message: res.data.message || 'Video obtenido exitosamente',
+        data: res.data.data
+      };
+    } catch (err) {
+      const axErr = err as AxiosError<{ detail?: string; message?: string }>;
+      const message = axErr.response?.data?.detail || axErr.message || 'Error al obtener el video';
+      return { success: false, message };
+    }
+  };
+
+  return { saveMyVideo, getMyVideoUrl };
 };

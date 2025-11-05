@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useActivationApi } from '../../hooks/activation/useActivationApi';
 import '../../styles/Agenda.css';
+import { useLoginApi } from '../../hooks/auth/useLoginApi';
 
 const ActivateAccount: React.FC = () => {
   const { activateTeacher, checkActivation } = useActivationApi();
@@ -9,6 +10,7 @@ const ActivateAccount: React.FC = () => {
   const [error, setError] = React.useState<string | null>(null);
   const [done, setDone] = React.useState(false);
   const navigate = useNavigate();
+  const { logout } = useLoginApi();
 
   // Run only once (guard StrictMode and changing deps)
   const didRunRef = React.useRef(false);
@@ -34,6 +36,14 @@ const ActivateAccount: React.FC = () => {
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Cuando finaliza la activación, cerrar sesión con logout() y redirigir a /login
+  React.useEffect(() => {
+    if (done && !error) {
+      try { logout(); } catch {}
+      navigate('/login', { replace: true });
+    }
+  }, [done, error, logout, navigate]);
 
   return (
     <div className="agenda-page agenda-container">

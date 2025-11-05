@@ -43,6 +43,7 @@ const CreatePriceForm: React.FC = () => {
     if (!selectedRange) return;
     const next = Math.max(minPrice, Math.min(maxPrice || minPrice, selectedPrice || minPrice));
     setSelectedPrice(next);
+    setExtraHourPrice(next / 2);
   }, [selectedRange, minPrice, maxPrice]);
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -136,7 +137,11 @@ const CreatePriceForm: React.FC = () => {
                     max={Math.max(minPrice, maxPrice)}
                     step={10}
                     value={selectedPrice}
-                    onChange={(e) => setSelectedPrice(Number(e.target.value))}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      setSelectedPrice(val);
+                      setExtraHourPrice(val / 2);
+                    }}
                     className="price-range"
                     disabled={!selectedRange}
                   />

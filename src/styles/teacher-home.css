@@ -1,0 +1,29 @@
+.teacher-grid {
+  display: grid;
+  gap: 1.5rem;
+  align-items: stretch;
+  grid-auto-rows: 1fr;
+}
+
+@media (min-width: 1024px) {
+  .teacher-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023.98px) {
+  .teacher-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 639.98px) {
+  .teacher-grid {
+    grid-template-columns: 1fr;
+  }
+  /* Fuerza las columnas superiores a ocupar todo el ancho en móvil */
+  .top-col {
+    min-width: 100% !important;
+    flex-basis: 100% !important;
+  }
+}

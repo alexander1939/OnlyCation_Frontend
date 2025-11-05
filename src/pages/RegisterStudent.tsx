@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import RegisterForm from '../components/RegisterForm';
+import Header from '../components/ui/Header';
+import Footer from '../components/ui/Footer';
+import RegisterForm from '../components/registerComp/RegisterForm';
 
 interface RegisterFormData {
   first_name: string;

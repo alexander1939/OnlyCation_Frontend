@@ -1,0 +1,38 @@
+:root{
+  --obs-text:#294954;
+  --obs-muted:#6B7280;
+  --obs-done:#8ED4BE;
+  --obs-active:#FFDE97;
+  --obs-sep:#E5E7EB;
+}
+
+.obs-steps{ margin-bottom: 1.25rem; width:100%; max-width: 1200px; margin-left:auto; margin-right:auto; padding: 0 2rem; }
+.obs-list{ display:flex; align-items:center; justify-content:center; gap:1rem; list-style:none; padding:0; margin:0; flex-wrap:nowrap; width:100%; }
+.obs-item{ display:flex; align-items:center; gap:.75rem; flex:0 0 auto; }
+
+.obs-link{ display:inline-flex; align-items:center; gap:.75rem; text-decoration:none; color:var(--obs-text); font-weight:600; }
+.obs-link:hover .obs-label{ text-decoration:underline; }
+
+.obs-circle{ display:inline-flex; align-items:center; justify-content:center; width:48px; height:48px; border-radius:999px; border:2px solid var(--obs-text); font-weight:800; color:var(--obs-text); background:#fff; font-size:22px; transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease; }
+.obs-link:hover .obs-circle{ transform: translateY(-2px) scale(1.08); box-shadow: 0 0 0 6px color-mix(in oklab, var(--obs-active) 30%, transparent); border-color: var(--obs-active); }
+.obs-link.is-done .obs-circle{ border-color: var(--obs-done); color:#0b2a33; background: color-mix(in oklab, var(--obs-done) 30%, white); }
+.obs-link.is-active .obs-circle{ border-color: var(--obs-active); background: color-mix(in oklab, var(--obs-active) 30%, white); }
+
+.obs-label{ font-size:1rem; color:var(--obs-muted); }
+.obs-link.is-active .obs-label{ color:var(--obs-text); }
+
+.obs-sep{ position:relative; display:inline-block; height:4px; background: color-mix(in oklab, var(--obs-text) 45%, white); border-radius:4px; opacity:1; flex:0 1 clamp(80px, 12vw, 200px); margin-left:1rem; margin-right:1rem; transition: background-color 150ms ease, height 150ms ease; }
+.obs-item:hover .obs-sep{ background: color-mix(in oklab, var(--obs-active) 60%, var(--obs-text)); height:5px; }
+.obs-sep.is-done{ background: var(--obs-done); opacity:1; }
+
+@media (min-width: 1280px){
+  .obs-list{ gap:1.25rem; }
+  .obs-circle{ width:52px; height:52px; font-size:24px; }
+  .obs-label{ font-size:1.05rem; }
+}
+
+@keyframes obs-load {
+  0% { transform: scaleX(0); }
+  50% { transform: scaleX(1); }
+  100% { transform: scaleX(0); }
+}

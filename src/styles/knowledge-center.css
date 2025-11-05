@@ -1,0 +1,40 @@
+@keyframes slideLeft {
+  from { opacity: 0; transform: translateX(-40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-slide-left,
+.fade-slide-right,
+.fade-up {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.fade-slide-left.show { animation: slideLeft 0.7s ease forwards; }
+.fade-slide-right.show { animation: slideRight 0.7s ease forwards; animation-delay: 0.2s; }
+.fade-up.show { animation: slideUp 0.8s ease forwards; animation-delay: 0.4s; }
+
+.fade-slide-right.show:hover { color: #1E40AF; }
+
+/* Opcional: ajustes responsivos ligeros y acotados */
+@media (max-width: 768px) {
+  .knowledge-center h2 { font-size: 1rem; }
+  .knowledge-center a { font-size: 0.95rem; margin-top: 0.4rem; }
+  .knowledge-center p { font-size: 0.9rem; margin-top: 0.5rem; }
+}
+
+@media (max-width: 480px) {
+  .knowledge-center h2 { font-size: 0.95rem; }
+  .knowledge-center a { font-size: 0.9rem; }
+  .knowledge-center p { font-size: 0.85rem; }
+}

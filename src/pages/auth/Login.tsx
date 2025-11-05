@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useLoginContext } from "../../context/auth/LoginContext";
 import { useLoginApi } from "../../hooks/auth/useLoginApi"; // ✅ Importa el hook de la lógica
 import LoginForm from "./LoginForm";
@@ -7,14 +7,14 @@ import LoginHeader from "./LoginHeader";
 import "../../styles/Login.css";
 
 const Login: React.FC = () => {
-  // ✅ Separar variables del contexto y funciones del hook
   const { user, loadingUser, loginLoading } = useLoginContext();
   const { login } = useLoginApi();
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as { from?: string } | null)?.from;
   const [error, setError] = useState("");
 
-  // 🔹 Manejo del login
   const handleLogin = async (email: string, password: string) => {
     setError("");
     try {
@@ -22,37 +22,45 @@ const Login: React.FC = () => {
       console.log("Respuesta login:", response);
 
       if (!response || !response.success || !response.data) {
-        setError(response?.message || "Credenciales inválidas");
+        setError(response?.message || "Correo o contraseña incorrectos.");
         return;
       }
 
-      // Redirección según rol
+      try {
+        sessionStorage.setItem("showWelcome", "1");
+      } catch {}
+
       const role = response.data.role.toLowerCase();
+      if (from) {
+        navigate(from, { replace: true });
+        return;
+      }
       if (role === "teacher") navigate("/teacher-home");
       else if (role === "student") navigate("/student-home");
       else navigate("/");
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "No se pudo iniciar sesión");
+      setError("Servidor no disponible. Inténtalo más tarde.");
     }
   };
 
-  // 🔹 Redirección automática según rol
   useEffect(() => {
-    if (!user || loadingUser) return;
+  if (!user || loadingUser) return;
 
-    switch (user.role.toLowerCase()) {
-      case "teacher":
-        navigate("/teacher-home");
-        break;
-      case "student":
-        navigate("/student-home");
-        break;
-      default:
-        navigate("/");
-        break;
-    }
-  }, [user, loadingUser, navigate]);
+  // Siempre redirigir al home principal según el rol
+  switch (user.role.toLowerCase()) {
+    case "teacher":
+      navigate("/teacher-home");
+      break;
+    case "student":
+      navigate("/student-home");
+      break;
+    default:
+      navigate("/");
+      break;
+  }
+}, [user, loadingUser, navigate]);
+
 
   return (
     <div className="login-page">
@@ -60,7 +68,6 @@ const Login: React.FC = () => {
         <div className="login-card animate-card">
           <div className="login-card-content">
 
-            {/* Lado izquierdo */}
             <div className="login-card-left">
               <div className="login-card-left-header">
                 <LoginHeader />
@@ -70,7 +77,6 @@ const Login: React.FC = () => {
               </div>
             </div>
 
-            {/* Lado derecho */}
             <div className="login-card-right">
               <div className="login-icon mb-6">
                 <img src="/usuario.png" alt="Icono Login" />
@@ -86,6 +92,9 @@ const Login: React.FC = () => {
 
               <p className="login-link" onClick={() => navigate("/register")}>
                 ¿No tienes cuenta? <span>Regístrate</span>
+              </p>
+              <p className="login-link" onClick={() => navigate("/forgot-password")}>
+                ¿Olvidaste tu contraseña? <span>Recupérala</span>
               </p>
             </div>
           </div>

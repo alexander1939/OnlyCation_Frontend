@@ -1,45 +1,52 @@
-/* Card del login dividido con degradado */
-.login-page .page-container{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#FAF9F5;animation:fadeIn 0.6s ease-in-out;padding:1rem;}
-/* Card principal */
-.login-page .login-card{background:linear-gradient(135deg,#ffffff 0%,#e0f7fa 50%,#ffffff 100%);border-radius:2rem;box-shadow:0 25px 50px rgba(0,0,0,0.15);width:100%;max-width:900px;display:flex;flex-direction:column;overflow:hidden;position:relative;animation:cardFadeIn 0.8s ease forwards;}
-/* Animación de aparición del card */
-@keyframes cardFadeIn{0%{opacity:0;transform:scale(0.95);}100%{opacity:1;transform:scale(1);}}
-/* Contenedor de contenido dividido */
-.login-page .login-card-content{display:flex;width:100%;min-height:300px;}
-/* Lado izquierdo: Header + Imagen */
-.login-page .login-card-left{display:flex;flex-direction:column;flex:1;background:#68B2C9;color:white;}
-/* Header dentro del lado izquierdo */
-.login-page .login-card-left-header{padding:1.5rem 1rem;text-align:center;z-index:2;}
-/* Animación del header */
-.login-page .login-card-left-header h2{font-size:2.2rem;font-weight:700;color:#000000;margin-bottom:0.5rem;opacity:0;transform:translateY(-20px);animation:headerTextPop 1s ease forwards;animation-delay:0.3s;}
-.login-page .login-card-left-header p{color:#e0f7fa;font-size:1rem;opacity:0;transform:translateY(-10px);animation:headerTextPop 1s ease forwards;animation-delay:0.5s;}
-@keyframes headerTextPop{0%{opacity:0;transform:translateY(-20px);}100%{opacity:1;transform:translateY(0);}}
-/* Imagen debajo del header */
-.login-page .login-card-left-image{flex:1;position:relative;}
-.login-page .login-card-left-image img{width:100%;height:100%;object-fit:cover;opacity:0;transform:translateX(-50px) translateY(0);animation:slideInLeft 0.8s ease forwards,floatImage 6s ease-in-out infinite alternate;animation-delay:0.5s,1.3s;transition:transform 0.5s ease;}
-.login-page .login-card-left-image img:hover{transform:scale(1.05);}
-/* Lado derecho: formulario */
-.login-page .login-card-right{flex:1;padding:2rem 2rem;display:flex;flex-direction:column;justify-content:center;gap:2.5rem;background:#f0f9ff;position:relative;}
-/* Cada contenedor de input */
-.login-page .login-card-right form>div{margin-bottom:1rem;}
-.login-page .login-card-right form>div:last-child{margin-bottom:0;}
-/* Inputs */
-.login-page .login-card-right input{width:100%;padding:0.625rem 0.75rem;border:1px solid #d1d5db;border-radius:1rem;outline:none;font-family:'Inter',sans-serif;transition:all 0.3s ease;}
-.login-page .login-card-right input:focus{border-color:#0F4C81;box-shadow:0 0 0 3px rgba(15,76,129,0.25);}
-/* Botón principal */
-.login-page .login-card-right button{width:100%;padding:0.625rem 1rem;background:#8ED4BE;color:#ffffff;font-weight:600;border-radius:1rem;border:none;cursor:pointer;transition:all 0.3s ease,transform 0.2s ease,box-shadow 0.3s ease;}
-.login-page .login-card-right button:hover{transform:scale(1.05);background:#7BC7AD;box-shadow:0 8px 20px rgba(0,0,0,0.2);}
-/* Texto de enlace */
-.login-page .login-card-right .login-link{text-align:center;color:#68B2C9;text-decoration:underline;cursor:pointer;font-size:0.875rem;font-weight:500;transition:color 0.3s ease;}
-.login-page .login-card-right .login-link span:hover{color:#0F4C81;}
-/* Error */
-.login-page .login-card-right .error-text{color:#dc2626;text-align:center;font-size:0.875rem;font-weight:500;}
-/* Info */
-.login-page .login-card-right .info-text{text-align:center;color:#6b7280;font-size:0.875rem;}
-/* Animaciones de entrada de la imagen */
-@keyframes slideInLeft{0%{transform:translateX(-50px) translateY(0);opacity:0;}100%{transform:translateX(0) translateY(0);opacity:1;}}
-@keyframes floatImage{0%{transform:translateX(0) translateY(0);}25%{transform:translateX(5px) translateY(-5px);}50%{transform:translateX(10px) translateY(0);}75%{transform:translateX(5px) translateY(5px);}100%{transform:translateX(0) translateY(0);}}
-.login-page .login-icon{display:flex;justify-content:center;align-items:center;margin-bottom:2.5rem;}
-.login-page .login-icon img{width:80px;height:80px;object-fit:contain;}
-/* Labels del formulario (Email, Contraseña) */
-.login-page .login-card-right label{font-family:'Inter',sans-serif;font-size:0.9rem;font-weight:500;color:#0f172a;}
+/* Card del login dividido con degradado */ 
+.login-page{font-family:'Roboto',ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol';}
+.login-page .page-container{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#FAF9F5;animation:fadeIn 0.6s ease-in-out;padding:1rem;} 
+/* Card principal */ 
+.login-page .login-card{background:linear-gradient(135deg,#ffffff 0%,#e0f7fa 50%,#ffffff 100%);border-radius:2rem;box-shadow:0 25px 50px rgba(0,0,0,0.15);width:100%;max-width:900px;display:flex;flex-direction:column;overflow:hidden;position:relative;animation:cardFadeIn 0.8s ease forwards;} 
+/* Animación de aparición del card */ 
+@keyframes cardFadeIn{0%{opacity:0;transform:scale(0.95);}100%{opacity:1;transform:scale(1);}} 
+/* Contenedor de contenido dividido */ 
+.login-page .login-card-content{display:flex;width:100%;min-height:300px;} 
+/* Lado izquierdo: Header + Imagen */ 
+.login-page .login-card-left{display:flex;flex-direction:column;flex:1;background:#68B2C9;color:white;} 
+/* Header dentro del lado izquierdo */ 
+.login-page .login-card-left-header{padding:1.5rem 1rem;text-align:center;z-index:2;} 
+/* Animación del header */ 
+.login-page .login-card-left-header h2{font-size:2.2rem;font-weight:700;color:#000000;margin-bottom:0.5rem;opacity:0;transform:translateY(-20px);animation:headerTextPop 1s ease forwards;animation-delay:0.3s;} 
+.login-page .login-card-left-header p{color:#e0f7fa;font-size:1rem;opacity:0;transform:translateY(-10px);animation:headerTextPop 1s ease forwards;animation-delay:0.5s;} 
+@keyframes headerTextPop{0%{opacity:0;transform:translateY(-20px);}100%{opacity:1;transform:translateY(0);}} 
+/* Imagen debajo del header */ 
+.login-page .login-card-left-image{flex:1;position:relative;} 
+.login-page .login-card-left-image img{width:100%;height:100%;object-fit:cover;opacity:0;transform:translateX(-50px) translateY(0);animation:slideInLeft 0.8s ease forwards,floatImage 6s ease-in-out infinite alternate;animation-delay:0.5s,1.3s;transition:transform 0.5s ease;} 
+.login-page .login-card-left-image img:hover{transform:scale(1.05);} 
+/* Lado derecho: formulario */ 
+.login-page .login-card-right{flex:1;padding:2rem 2rem;display:flex;flex-direction:column;justify-content:center;gap:1.25rem;background:#f0f9ff;position:relative;} 
+/* Cada contenedor de input */ 
+.login-page .login-card-right form>div{margin-bottom:1rem;} 
+.login-page .login-card-right form>div:last-child{margin-bottom:0;} 
+/* Inputs */ 
+.login-page .login-card-right input{width:100%;padding:0.625rem 0.75rem;border:1px solid #d1d5db;border-radius:1rem;outline:none;font-family:'Roboto',sans-serif;transition:all 0.3s ease;} 
+.login-page .login-card-right input:focus{border-color:#0F4C81;box-shadow:0 0 0 3px rgba(15,76,129,0.25);} 
+/* Botón principal */ 
+.login-page .login-card-right button{width:100%;padding:0.625rem 1rem;background:#8ED4BE;color:#ffffff;font-weight:600;border-radius:1rem;border:none;cursor:pointer;transition:all 0.3s ease,transform 0.2s ease,box-shadow 0.3s ease;} 
+.login-page .login-card-right button:hover{transform:scale(1.05);background:#7BC7AD;box-shadow:0 8px 20px rgba(0,0,0,0.2);} 
+/* Texto de enlace */ 
+.login-page .login-card-right .login-link{text-align:center;color:#68B2C9;text-decoration:underline;cursor:pointer;font-size:0.875rem;font-weight:500;transition:color 0.3s ease;} 
+.login-page .login-card-right .login-link span:hover{color:#0F4C81;} 
+/* Error */ 
+.login-page .login-card-right .error-text{color:#dc2626;text-align:center;font-size:0.875rem;font-weight:500;} 
+/* Info */ 
+.login-page .login-card-right .info-text{text-align:center;color:#6b7280;font-size:0.875rem;margin-top:0.5rem;} 
+/* Ajustes de espaciado para enlaces debajo del botón */
+.login-page .login-card-right .login-link{display:inline-block;margin-top:0.25rem;margin-bottom:0;}
+.login-page .login-card-right .login-link + .login-link{margin-top:0.25rem;}
+/* Animaciones de entrada de la imagen */ 
+@keyframes slideInLeft{0%{transform:translateX(-50px) translateY(0);opacity:0;}100%{transform:translateX(0) translateY(0);opacity:1;}} 
+@keyframes floatImage{0%{transform:translateX(0) translateY(0);}25%{transform:translateX(5px) translateY(-5px);}50%{transform:translateX(10px) translateY(0);}75%{transform:translateX(5px) translateY(5px);}100%{transform:translateX(0) translateY(0);}} 
+.login-page .login-icon{display:flex;justify-content:center;align-items:center;margin-bottom:2.5rem;} 
+.login-page .login-icon img{width:80px;height:80px;object-fit:contain;} 
+/* Labels del formulario (Email, Contraseña) */ 
+.login-page .login-card-right label{font-family:'Roboto',sans-serif;font-size:0.9rem;font-weight:500;color:#0f172a;} 
+/* --- 🔹 Responsividad agregada 🔹 --- */ 
+@media(max-width:900px){.login-page .login-card{max-width:95%;flex-direction:column;border-radius:1.5rem;}.login-page .login-card-left{display:none;}.login-page .login-card-right{padding:2rem 1.5rem;}} 
+@media(max-width:600px){.login-page .login-card-right{padding:1.5rem 1rem;}.login-page .login-card-right input,.login-page .login-card-right button{font-size:0.9rem;}.login-page .login-card-right .info-text,.login-page .login-card-right .login-link{font-size:0.8rem;}}

@@ -1,0 +1,448 @@
+/* Estilos base */
+.disp-agenda {
+  font-family: 'Inter', 'Roboto', sans-serif;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(41, 73, 84, 0.1);
+  overflow: hidden;
+  margin-bottom: 2rem;
+  font-size: 14px;
+  min-width: 320px;
+  border: 1px solid #dee2e6;
+}
+
+/* Encabezado */
+.disp-agenda-header {
+  padding: 1rem 1.25rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  background-color: #FAF9F5;
+}
+
+/* Navegación de fechas */
+.date-navigation {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-right: auto;
+}
+
+.date-navigation h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #294954;
+  min-width: 300px;
+  text-align: center;
+  white-space: nowrap;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* Botones de navegación */
+.nav-button {
+  background: white;
+  color: #294954;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(41, 73, 84, 0.08);
+}
+
+.nav-button:hover {
+  background: #294954;
+  border-color: #294954;
+  color: white;
+  box-shadow: 0 4px 8px rgba(41, 73, 84, 0.15);
+}
+
+.nav-button:active {
+  transform: scale(0.95);
+}
+
+/* Vista semanal */
+.week-view {
+  display: flex;
+  flex-direction: column;
+}
+
+.week-header {
+  display: grid;
+  grid-template-columns: 70px repeat(7, 1fr);
+  background-color: #294954;
+  border-bottom: 2px solid #294954;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.time-column-header {
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: #294954;
+}
+
+.day-header {
+  padding: 1rem 0.5rem;
+  text-align: center;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  background-color: #294954;
+}
+
+.day-header:last-child {
+  border-right: none;
+}
+
+.day-name {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #68B2C9;
+  letter-spacing: 0.8px;
+  font-family: 'Inter', sans-serif;
+}
+
+.day-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Estadísticas */
+.stats-container {
+  display: flex;
+  gap: 0.75rem;
+  margin-left: auto;
+  background: transparent;
+  padding: 0;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  min-width: 90px;
+  background: #FAF9F5;
+  border: 2px solid #dee2e6;
+}
+
+.stat-item:first-child {
+  background: #FFE8E0;
+  border-color: #FF9978;
+}
+
+.stat-item:first-child .stat-value {
+  color: #FF9978;
+}
+
+.stat-item:last-child {
+  background: #E0F5ED;
+  border-color: #8ED4BE;
+}
+
+.stat-item:last-child .stat-value {
+  color: #0F9D68;
+}
+
+.stat-value {
+  font-weight: 800;
+  color: #294954;
+  font-size: 1.5rem;
+  line-height: 1;
+  font-family: 'Inter', sans-serif;
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-top: 0.25rem;
+  font-weight: 600;
+}
+
+/* Lista de horarios */
+.time-slots {
+  max-height: 600px;
+  overflow-y: auto;
+  background-color: #fff;
+}
+
+.time-slot-row {
+  display: grid;
+  grid-template-columns: 70px repeat(7, 1fr);
+  border-bottom: 1px solid #dee2e6;
+  min-height: 65px;
+}
+
+.time-slot-row:last-child {
+  border-bottom: none;
+}
+
+.time-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #294954;
+  font-weight: 700;
+  font-size: 0.875rem;
+  border-right: 2px solid #dee2e6;
+  background-color: #FAF9F5;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Estilos de los slots de tiempo */
+.time-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-right: 1px solid #dee2e6;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.15s ease;
+  position: relative;
+  min-height: 65px;
+}
+
+.time-slot:last-child {
+  border-right: none;
+}
+
+/* Hora disponible - Verde menta #8ED4BE */
+.time-slot.available {
+  background-color: #8ED4BE;
+  color: white;
+  cursor: pointer;
+}
+
+.time-slot.available:hover {
+  background-color: #7AC5AF;
+  transform: scale(1.02);
+  box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.4);
+  z-index: 5;
+}
+
+.time-slot.available .available-indicator {
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: white;
+}
+
+/* Hora ocupada - Coral naranja #FF9978 */
+.time-slot.booked {
+  background-color: #FF9978;
+  color: white;
+  cursor: default;
+}
+
+.time-slot.booked .student-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  letter-spacing: 0.02em;
+}
+
+/* Sin horario - Gris muy claro */
+.time-slot.empty {
+  background-color: #FAF9F5;
+  color: #ced4da;
+  cursor: default;
+  border-right: 1px solid #e9ecef;
+}
+
+.time-slot.empty .empty-indicator {
+  font-size: 1.5rem;
+  opacity: 0.3;
+  color: #adb5bd;
+}
+
+/* Contenido del slot */
+.slot-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0.5rem;
+  overflow: hidden;
+  text-align: center;
+}
+
+.student-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.01em;
+}
+
+/* Scrollbar styling */
+.time-slots::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.time-slots::-webkit-scrollbar-track {
+  background: #f8f9fa;
+  border-radius: 3px;
+}
+
+.time-slots::-webkit-scrollbar-thumb {
+  background: #dee2e6;
+  border-radius: 3px;
+}
+
+.time-slots::-webkit-scrollbar-thumb:hover {
+  background: #ced4da;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .week-header {
+    grid-template-columns: 60px repeat(7, 1fr);
+  }
+  
+  .time-slot-row {
+    grid-template-columns: 60px repeat(7, 1fr);
+    min-height: 55px;
+  }
+  
+  .day-name {
+    font-size: 0.65rem;
+  }
+  
+  .day-number {
+    font-size: 1.2rem;
+  }
+  
+  .time-label {
+    font-size: 0.8rem;
+  }
+  
+  .time-slot {
+    font-size: 0.8rem;
+    min-height: 55px;
+  }
+  
+  .stat-value {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .disp-agenda {
+    border-radius: 0;
+    margin: 0;
+    border-left: none;
+    border-right: none;
+  }
+
+  .disp-agenda-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #fff;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .date-navigation {
+    width: 100%;
+    justify-content: space-between;
+    margin-bottom: 0.25rem;
+  }
+  
+  .date-navigation h3 {
+    min-width: auto;
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 0.5rem 0;
+    letter-spacing: -0.01em;
+  }
+  
+  .stats-container {
+    width: 100%;
+    justify-content: space-between;
+    margin: 0.5rem 0 0;
+    padding: 0.75rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+  }
+  
+  .stat-item {
+    flex: 1;
+    min-width: auto;
+    padding: 0.5rem;
+    background-color: white;
+  }
+  
+  .week-header {
+    grid-template-columns: 50px repeat(7, 1fr);
+  }
+  
+  .time-slot-row {
+    grid-template-columns: 50px repeat(7, 1fr);
+    min-height: 50px;
+  }
+  
+  .day-header {
+    padding: 0.75rem 0.25rem;
+  }
+  
+  .day-name {
+    font-size: 0.55rem;
+    letter-spacing: 0.5px;
+  }
+  
+  .day-number {
+    font-size: 1rem;
+  }
+  
+  .time-label {
+    font-size: 0.7rem;
+  }
+  
+  .time-slot {
+    font-size: 0.7rem;
+    min-height: 50px;
+  }
+  
+  .time-slot .student-name {
+    font-size: 0.65rem;
+  }
+  
+  .time-slot .available-indicator {
+    font-size: 1.3rem;
+  }
+  
+  .stat-value {
+    font-size: 1.1rem;
+  }
+  
+  .stat-label {
+    font-size: 0.6rem;
+  }
+}

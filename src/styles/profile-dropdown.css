@@ -1,0 +1,93 @@
+/* Profile Dropdown Container */
+.profile-dropdown {
+  position: absolute;
+  right: -120px;
+  top: calc(100% + 8px);
+  background-color: #FFFFFF;
+  border: 1px solid rgba(104, 178, 201, 0.15);
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(41, 73, 84, 0.15);
+  min-width: 280px;
+  z-index: 1000;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Header con info del usuario */
+.profile-dropdown-header {
+  padding: 20px;
+  border-bottom: 1px solid rgba(104, 178, 201, 0.15);
+  text-align: center;
+}
+
+.profile-dropdown-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #0f9d68;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+}
+
+.profile-dropdown-name {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: #294954;
+  margin-bottom: 4px;
+}
+
+.profile-dropdown-email {
+  font-family: 'Roboto', sans-serif;
+  font-size: 13px;
+  color: #294954;
+  opacity: 0.7;
+}
+
+/* Menu items */
+.profile-dropdown-menu {
+  padding: 8px 0;
+}
+
+.profile-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  color: #294954;
+  font-family: 'Roboto', sans-serif;
+  font-size: 15px;
+  text-decoration: none;
+  transition: background-color 200ms ease;
+  cursor: pointer;
+}
+
+.profile-dropdown-item:hover {
+  background-color: rgba(104, 178, 201, 0.08);
+}
+
+.profile-dropdown-icon {
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Button variant */
+.profile-dropdown-button {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+}
+
+/* Divider */
+.profile-dropdown-divider {
+  border-top: 1px solid rgba(104, 178, 201, 0.15);
+  margin: 8px 0;
+}

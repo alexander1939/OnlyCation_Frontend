@@ -1,5 +1,5 @@
 import React from 'react';
-import Ribbon from '../../components/Ribbon';
+import Ribbon from '../../components/ui/Ribbon';
 
 const AdvantagesSection: React.FC = () => {
   const advantages = [

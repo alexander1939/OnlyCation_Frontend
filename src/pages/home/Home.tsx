@@ -7,6 +7,7 @@ import StepsSection from './StepsSection';
 import TeachersSection from './TeachersSection';
 import SubjectsSection from './SubjectsSection';
 import CallToActionSections from './CallToActionSections';
+import { TeachersProvider } from '../../context/teachers/TeachersContext';
 
 const Home: React.FC = () => {
   return (
@@ -15,7 +16,9 @@ const Home: React.FC = () => {
       <HeroSection />
       <AdvantagesSection />
       <StepsSection />
-      <TeachersSection />
+      <TeachersProvider>
+        <TeachersSection />
+      </TeachersProvider>
       <SubjectsSection />
       <CallToActionSections />
       <Footer />

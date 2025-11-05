@@ -42,6 +42,8 @@ import TeacherCatalog from '../pages/catalog/TeacherCatalog';
 import PublicOrStudentRoute from '../components/PublicOrStudentRoute';
 import AllBookings from '../pages/booking/all_bookings';
 import { TeachersProvider } from '../context/teachers/TeachersContext';
+import Terms from '../pages/legal/Terms';
+import Privacy from '../pages/legal/Privacy';
 
 const router = createBrowserRouter([
   {
@@ -333,6 +335,14 @@ const router = createBrowserRouter([
   {
     path: '/reset-password',
     element: <ResetPassword />,
+  },
+  {
+    path: '/terms',
+    element: <Terms />,
+  },
+  {
+    path: '/privacy',
+    element: <Privacy />,
   },
 ]);
 

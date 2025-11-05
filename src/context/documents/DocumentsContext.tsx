@@ -15,7 +15,9 @@ export const DocumentsProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     updateCurriculum: apiUpdateCurriculum,
     updateRfc: apiUpdateRfc,
     updateDescription: apiUpdateDescription,
-    updateExpertiseArea: apiUpdateExpertiseArea
+    updateExpertiseArea: apiUpdateExpertiseArea,
+    getMyDescription: apiGetMyDescription,
+    getMyExpertiseArea: apiGetMyExpertiseArea
   } = useDocumentsApi();
   const [creating, setCreating] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -23,6 +25,8 @@ export const DocumentsProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [error, setError] = useState<string | null>(null);
   const [lastCreated, setLastCreated] = useState<DocumentMeta | null>(null);
   const [documents, setDocuments] = useState<DocumentData[]>([]);
+  const [myDescription, setMyDescription] = useState<string>('');
+  const [myExpertiseArea, setMyExpertiseArea] = useState<string>('');
 
   const createDocument = useCallback(async (form: Required<Omit<DocumentCreateForm, 'certificate' | 'curriculum'>> & { certificate: File; curriculum: File; }) => {
     setCreating(true);
@@ -111,9 +115,7 @@ export const DocumentsProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setError(null);
     try {
       const res = await apiUpdateCertificate(documentId, certificate);
-      if (res?.success && res.data) {
-        // Actualizar el documento en la lista
-        setDocuments(prev => prev.map(doc => doc.id === documentId ? res.data! : doc));
+      if (res?.success) {
         return { success: true, message: res.message };
       } else {
         setError(res?.message || 'No se pudo actualizar el certificado');
@@ -133,9 +135,7 @@ export const DocumentsProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setError(null);
     try {
       const res = await apiUpdateCurriculum(documentId, curriculum);
-      if (res?.success && res.data) {
-        // Actualizar el documento en la lista
-        setDocuments(prev => prev.map(doc => doc.id === documentId ? res.data! : doc));
+      if (res?.success) {
         return { success: true, message: res.message };
       } else {
         setError(res?.message || 'No se pudo actualizar el currículum');
@@ -155,9 +155,7 @@ export const DocumentsProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setError(null);
     try {
       const res = await apiUpdateRfc(documentId, rfc);
-      if (res?.success && res.data) {
-        // Actualizar el documento en la lista
-        setDocuments(prev => prev.map(doc => doc.id === documentId ? res.data! : doc));
+      if (res?.success) {
         return { success: true, message: res.message };
       } else {
         setError(res?.message || 'No se pudo actualizar el RFC');
@@ -177,9 +175,7 @@ export const DocumentsProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setError(null);
     try {
       const res = await apiUpdateDescription(documentId, description);
-      if (res?.success && res.data) {
-        // Actualizar el documento en la lista
-        setDocuments(prev => prev.map(doc => doc.id === documentId ? res.data! : doc));
+      if (res?.success) {
         return { success: true, message: res.message };
       } else {
         setError(res?.message || 'No se pudo actualizar la descripción');
@@ -199,9 +195,7 @@ export const DocumentsProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setError(null);
     try {
       const res = await apiUpdateExpertiseArea(documentId, expertiseArea);
-      if (res?.success && res.data) {
-        // Actualizar el documento en la lista
-        setDocuments(prev => prev.map(doc => doc.id === documentId ? res.data! : doc));
+      if (res?.success) {
         return { success: true, message: res.message };
       } else {
         setError(res?.message || 'No se pudo actualizar el área de especialización');
@@ -215,6 +209,34 @@ export const DocumentsProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setUpdating(false);
     }
   }, [apiUpdateExpertiseArea]);
+
+  const getMyDescription = useCallback(async () => {
+    try {
+      const res = await apiGetMyDescription();
+      if (res?.success && res.data) {
+        setMyDescription(res.data.description);
+      } else {
+        setError(res?.message || 'No se pudo obtener la descripción');
+      }
+    } catch (e: any) {
+      const message = e?.message || 'Error desconocido';
+      setError(message);
+    }
+  }, [apiGetMyDescription]);
+
+  const getMyExpertiseArea = useCallback(async () => {
+    try {
+      const res = await apiGetMyExpertiseArea();
+      if (res?.success && res.data) {
+        setMyExpertiseArea(res.data.expertise_area);
+      } else {
+        setError(res?.message || 'No se pudo obtener el área de especialización');
+      }
+    } catch (e: any) {
+      const message = e?.message || 'Error desconocido';
+      setError(message);
+    }
+  }, [apiGetMyExpertiseArea]);
 
   const value = useMemo(
     () => ({ 
@@ -233,9 +255,13 @@ export const DocumentsProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       updateCurriculum,
       updateRfc,
       updateDescription,
-      updateExpertiseArea
+      updateExpertiseArea,
+      getMyDescription,
+      getMyExpertiseArea,
+      myDescription,
+      myExpertiseArea
     }), 
-    [creating, loading, updating, error, lastCreated, documents, createDocument, readDocuments, updateDocument, downloadDocument, resetStatus, updateCertificate, updateCurriculum, updateRfc, updateDescription, updateExpertiseArea]
+    [creating, loading, updating, error, lastCreated, documents, createDocument, readDocuments, updateDocument, downloadDocument, resetStatus, updateCertificate, updateCurriculum, updateRfc, updateDescription, updateExpertiseArea, getMyDescription, getMyExpertiseArea, myDescription, myExpertiseArea]
   );
 
   return (

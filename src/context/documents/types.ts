@@ -43,6 +43,7 @@ export interface DocumentsContextType {
   error: string | null;
   lastCreated: DocumentMeta | null;
   documents: DocumentData[];
+  myDescription: string;
   createDocument: (form: Required<Omit<DocumentCreateForm, 'certificate' | 'curriculum'>> & { certificate: File; curriculum: File; }) => Promise<void>;
   readDocuments: () => Promise<void>;
   updateDocument: (documentId: number, payload: UpdateDocumentPayload) => Promise<{ success: boolean; message: string }>;
@@ -52,6 +53,7 @@ export interface DocumentsContextType {
   updateRfc: (documentId: number, rfc: string) => Promise<{ success: boolean; message: string }>;
   updateDescription: (documentId: number, description: string) => Promise<{ success: boolean; message: string }>;
   updateExpertiseArea: (documentId: number, expertiseArea: string) => Promise<{ success: boolean; message: string }>;
+  getMyDescription: () => Promise<void>;
   resetStatus: () => void;
 }
 

@@ -250,6 +250,48 @@ export const useDocumentsApi = () => {
     }
   }, [client, getAccessToken]);
 
+  const getMyDescription = useCallback(async (): Promise<{ success: boolean; message: string; data?: { description: string } }> => {
+    try {
+      const token = getAccessToken();
+      if (!token) throw new Error('No hay token de acceso. Inicia sesión nuevamente.');
+
+      const res = await client.get<{ success: boolean; message: string; data: { description: string } }>('/documents/my-description/', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      return { 
+        success: true, 
+        message: res.data.message || 'Descripción obtenida exitosamente',
+        data: res.data.data 
+      };
+    } catch (err) {
+      const axErr = err as AxiosError<{ detail?: string; message?: string }>;
+      const message = axErr.response?.data?.detail || axErr.message || 'Error al obtener descripción';
+      return { success: false, message };
+    }
+  }, [client, getAccessToken]);
+
+  const getMyExpertiseArea = useCallback(async (): Promise<{ success: boolean; message: string; data?: { expertise_area: string } }> => {
+    try {
+      const token = getAccessToken();
+      if (!token) throw new Error('No hay token de acceso. Inicia sesión nuevamente.');
+
+      const res = await client.get<{ success: boolean; message: string; data: { expertise_area: string } }>('/documents/my-expertise-area/', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      return { 
+        success: true, 
+        message: res.data.message || 'Área de especialidad obtenida exitosamente',
+        data: res.data.data 
+      };
+    } catch (err) {
+      const axErr = err as AxiosError<{ detail?: string; message?: string }>;
+      const message = axErr.response?.data?.detail || axErr.message || 'Error al obtener área de especialidad';
+      return { success: false, message };
+    }
+  }, [client, getAccessToken]);
+
   return { 
     createDocument, 
     readDocuments, 
@@ -260,6 +302,8 @@ export const useDocumentsApi = () => {
     updateCurriculum,
     updateRfc,
     updateDescription,
-    updateExpertiseArea
+    updateExpertiseArea,
+    getMyDescription,
+    getMyExpertiseArea
   };
 };

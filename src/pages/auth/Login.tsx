@@ -26,6 +26,10 @@ const Login: React.FC = () => {
         return;
       }
 
+      try {
+        sessionStorage.setItem("showWelcome", "1");
+      } catch {}
+
       const role = response.data.role.toLowerCase();
       if (from) {
         navigate(from, { replace: true });
@@ -88,6 +92,9 @@ const Login: React.FC = () => {
 
               <p className="login-link" onClick={() => navigate("/register")}>
                 ¿No tienes cuenta? <span>Regístrate</span>
+              </p>
+              <p className="login-link" onClick={() => navigate("/forgot-password")}>
+                ¿Olvidaste tu contraseña? <span>Recupérala</span>
               </p>
             </div>
           </div>

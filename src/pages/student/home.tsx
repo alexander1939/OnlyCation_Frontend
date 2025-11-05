@@ -1,6 +1,5 @@
 // src/pages/student/StudentHome.tsx
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import Header from "../../components/ui/Header";
 import PublishConsult from "../../components/comptHome/HistoryCard";
 import AgendaCard from "../../components/comptHome/AgendaCard";
@@ -24,7 +23,17 @@ const levels = [
 
 const StudentHome: React.FC = () => {
   const { user } = useLoginApi();
-  const navigate = useNavigate();
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    try {
+      const shouldShow = sessionStorage.getItem("showWelcome") === "1";
+      if (shouldShow) {
+        setShowWelcome(true);
+        sessionStorage.removeItem("showWelcome");
+      }
+    } catch {}
+  }, []);
 
   return (
     <div
@@ -37,7 +46,9 @@ const StudentHome: React.FC = () => {
       }}
     >
       <Header />
-      <WelcomeAlert name={user?.first_name || "Student"} />
+      {showWelcome && (
+        <WelcomeAlert name={user?.first_name || "Student"} />
+      )}
 
       {/* Contenido principal centrado y responsivo */}
       <div

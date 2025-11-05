@@ -38,6 +38,7 @@ const KnowledgeCenter: React.FC<KnowledgeCenterProps> = ({
         overflow: "hidden",
         transition: "transform 0.2s ease, box-shadow 0.2s ease",
         height: '100%',
+        width: '100%',
         display: 'flex',
         flexDirection: 'column',
       }}
@@ -85,7 +86,6 @@ const KnowledgeCenter: React.FC<KnowledgeCenterProps> = ({
           marginTop: "0.4rem",
           fontSize: "0.95rem",
           color: "#475569",
-          maxWidth: "600px",
         }}
       >
         {description}

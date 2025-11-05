@@ -89,8 +89,11 @@ export const useLoginApi = () => {
       console.error("[LoginAPI] Error:", error);
 
       let message: string;
+      const status = error?.response?.status;
       if (!error?.response || error?.code === "ERR_NETWORK") {
         message = "Servidor no disponible. Inténtalo más tarde.";
+      } else if (status === 400 || status === 401) {
+        message = "Correo o contraseña incorrectos.";
       } else {
         message =
           error.response?.data?.message ||

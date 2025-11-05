@@ -21,4 +21,9 @@
   .teacher-grid {
     grid-template-columns: 1fr;
   }
+  /* Fuerza las columnas superiores a ocupar todo el ancho en móvil */
+  .top-col {
+    min-width: 100% !important;
+    flex-basis: 100% !important;
+  }
 }

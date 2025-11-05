@@ -5,20 +5,16 @@ import WelcomeAlert from "../../components/WelcomeAlert";
 import Header from "../../components/ui/Header";
 import KnowledgeCenter from "../../components/comptHome/KnowledgeCenter";
 import DashboardCard from "../../components/comptHome/HistoryCard";
-import PriceCard from "../../components/comptHome/PriceCard";
 import GeneralCard from "../../components/comptHome/GeneralCard";
 import AdaptiveList from "../../components/comptHome/SubjectList";
-import UpcomingSessions from "../../components/comptHome/NextSession";
-import { CreditCard, FileText, CalendarCheck, CheckCircle } from "lucide-react";
+import ChatCard from "../../components/comptHome/ChatCard";
+import { CreditCard, FileText, CalendarCheck, MessageSquare } from "lucide-react";
 import TeacherStatus from "../../components/comptHome/TeacherStatus";
 import "../../styles/teacher-home.css";
 import Footer from "../../components/ui/Footer";
-import { useNavigate } from "react-router-dom";
 
 const TeacherHome: React.FC = () => {
   const { user } = useLoginContext();
-
-  const navigate = useNavigate();
 
   const [showWelcome, setShowWelcome] = useState(false);
 
@@ -31,25 +27,6 @@ const TeacherHome: React.FC = () => {
       }
     } catch {}
   }, []);
-
-
-  const upcomingSessions = [
-    {
-      title: "Clase de Matemáticas",
-      date: "2 Nov, 10:00 AM",
-      studentName: "Juan Pérez",
-    },
-    {
-      title: "Asesoría Física",
-      date: "3 Nov, 2:00 PM",
-      studentName: "María López",
-    },
-    {
-      title: "Química Avanzada",
-      date: "4 Nov, 11:00 AM",
-      studentName: "Carlos Ruiz",
-    },
-  ];
 
   return (
     <>
@@ -70,7 +47,7 @@ const TeacherHome: React.FC = () => {
           }}
         >
           {/* KnowledgeCenter */}
-          <div style={{ flex: 1, minWidth: "300px", display: "flex", flexDirection: "column" }}>
+          <div className="top-col" style={{ flex: 2, minWidth: "300px", display: "flex", flexDirection: "column" }}>
             <div style={{ flex: 1, display: "flex" }}> {/* 👈 contenedor extra para estirar */}
               <KnowledgeCenter
                 title="¿QUIERES APOYAR A TUS ESTUDIANTES?"
@@ -82,18 +59,23 @@ const TeacherHome: React.FC = () => {
             </div>
           </div>
 
-          {/* UpcomingSessions */}
-          <div style={{ flex: 1, minWidth: "300px", display: "flex", flexDirection: "column" }}>
+          {/* Chat docente */}
+          <div className="top-col" style={{ flex: 1, minWidth: "300px", display: "flex", flexDirection: "column" }}>
             <div style={{ flex: 1, display: "flex" }}> {/* 👈 contenedor extra para estirar */}
-              <UpcomingSessions
-                title="Próximas Sesiones"
-                sessions={upcomingSessions}
+              <ChatCard
+                title="Chat con estudiantes"
+                description="Inicia, continúa y gestiona tus conversaciones con estudiantes."
+                linkText="Ir al chat"
+                route="/teacher/chat"
+                icon={MessageSquare}
+                iconColor="#3B82F6"
+                iconBg="#E6EEFF"
               />
             </div>
           </div>
 
-          {/* TeacherStatus compacto: columna angosta fija */}
-          <div style={{ flex: "0 0 280px", maxWidth: "280px", minWidth: "260px", display: "flex", flexDirection: "column" }}>
+          {/* TeacherStatus */}
+          <div className="top-col" style={{ flex: 1, minWidth: "300px", display: "flex", flexDirection: "column" }}>
             <div
               style={{ flex: 1, display: "flex", transition: "transform 0.2s ease, box-shadow 0.2s ease", borderRadius: "1rem" }}
               onMouseEnter={(e) => {
@@ -120,17 +102,7 @@ const TeacherHome: React.FC = () => {
               route="/teacher/personal-data"
             />
           </div>
-          <div style={{ height: "100%" }}>
-            <PriceCard
-              title="Confirmación de Asesoría"
-              description="Verifica los datos y confirma tu próxima sesión personalizada."
-              linkText="Confirmar asesoría"
-              route="/confirmacion"
-              icon={CheckCircle}
-              iconColor="#16A34A"
-              iconBg="#E6FFFA"
-            />
-          </div>
+          
           <div style={{ height: "100%" }}>
             <DashboardCard
               title="Documentos"
@@ -165,7 +137,7 @@ const TeacherHome: React.FC = () => {
             />
           </div>
           <div style={{ height: "100%" }}>
-            <AdaptiveList role="teacher" onPriceClick={() => navigate('/profile/price')} />
+            <AdaptiveList role="teacher" />
           </div>
         </div>
 

@@ -3,6 +3,7 @@ import Header from '../../components/ui/Header';
 import Footer from '../../components/ui/Footer';
 import TeachersHero from './TeachersHero';
 import TeachersContent from './TeachersContent';
+import { TeachersProvider } from '../../context/teachers/TeachersContext';
 
 const AllTeachers: React.FC = () => {
   return (
@@ -12,7 +13,9 @@ const AllTeachers: React.FC = () => {
       <main className="py-[80px] px-[50px]">
         <div className="max-w-[1200px] mx-auto">
           <TeachersHero />
-          <TeachersContent />
+          <TeachersProvider>
+            <TeachersContent />
+          </TeachersProvider>
         </div>
       </main>
       

@@ -34,14 +34,19 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
         transition: 'transform 0.2s ease, box-shadow 0.2s ease',
         cursor: 'pointer',
         fontFamily: 'Roboto, sans-serif',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
       }}
       onClick={() => navigate(route)}
-      onMouseEnter={(e) =>
-        (e.currentTarget.style.boxShadow = '0 6px 14px rgba(0,0,0,0.1)')
-      }
-      onMouseLeave={(e) =>
-        (e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.05)')
-      }
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = '0 6px 14px rgba(0,0,0,0.1)';
+        e.currentTarget.style.transform = 'translateY(-2px)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.05)';
+        e.currentTarget.style.transform = 'translateY(0)';
+      }}
     >
       {/* Icono circular */}
       <div
@@ -83,6 +88,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
           color: iconColor,
           fontWeight: 600,
           fontSize: '0.95rem',
+          marginTop: 'auto',
         }}
       >
         {linkText} →

@@ -36,10 +36,18 @@ const KnowledgeCenter: React.FC<KnowledgeCenterProps> = ({
         lineHeight: 1.6,
         boxShadow: "0 2px 4px rgba(0,0,0,0.03)",
         overflow: "hidden",
-        transition: "all 0.3s ease",
+        transition: "transform 0.2s ease, box-shadow 0.2s ease",
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = "0 6px 14px rgba(0,0,0,0.1)";
+        e.currentTarget.style.transform = "translateY(-2px)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = "0 2px 4px rgba(0,0,0,0.03)";
+        e.currentTarget.style.transform = "translateY(0)";
       }}
     >
       <h2

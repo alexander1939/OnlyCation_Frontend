@@ -5,12 +5,14 @@ import WelcomeAlert from "../../components/WelcomeAlert";
 import Header from "../../components/ui/Header";
 import KnowledgeCenter from "../../components/comptHome/KnowledgeCenter";
 import DashboardCard from "../../components/comptHome/HistoryCard";
+import PriceCard from "../../components/comptHome/PriceCard";
 import GeneralCard from "../../components/comptHome/GeneralCard";
 import AdaptiveList from "../../components/comptHome/SubjectList";
 import UpcomingSessions from "../../components/comptHome/NextSession";
-import { CreditCard, FileText, CalendarCheck } from "lucide-react";
+import { CreditCard, FileText, CalendarCheck, CheckCircle } from "lucide-react";
 import TeacherStatus from "../../components/comptHome/TeacherStatus";
 import "../../styles/teacher-home.css";
+import Footer from "../../components/ui/Footer";
 
 const TeacherHome: React.FC = () => {
   const { user } = useLoginContext();
@@ -72,11 +74,16 @@ const TeacherHome: React.FC = () => {
             </div>
           </div>
 
-          {/* TeacherStatus al lado de UpcomingSessions */}
-          <div style={{ flex: 1, minWidth: "300px", display: "flex", flexDirection: "column" }}>
-            <div style={{ flex: 1, display: "flex" }}> {/* 👈 contenedor extra para estirar */}
-              <TeacherStatus />
-            </div>
+          {/* TeacherStatus compacto */}
+          <div
+            style={{
+              flex: "0 0 280px",
+              maxWidth: "280px",
+              minWidth: "240px",
+              alignSelf: "flex-start",
+            }}
+          >
+            <TeacherStatus />
           </div>
         </div>
 
@@ -88,6 +95,17 @@ const TeacherHome: React.FC = () => {
               description="Configura opciones generales de tu perfil y cuenta."
               linkText="Ir a general"
               route="/teacher/personal-data"
+            />
+          </div>
+          <div style={{ height: "100%" }}>
+            <PriceCard
+              title="Confirmación de Asesoría"
+              description="Verifica los datos y confirma tu próxima sesión personalizada."
+              linkText="Confirmar asesoría"
+              route="/confirmacion"
+              icon={CheckCircle}
+              iconColor="#16A34A"
+              iconBg="#E6FFFA"
             />
           </div>
           <div style={{ height: "100%" }}>
@@ -129,6 +147,7 @@ const TeacherHome: React.FC = () => {
         </div>
 
       </div>
+      <Footer />
     </>
   );
 };

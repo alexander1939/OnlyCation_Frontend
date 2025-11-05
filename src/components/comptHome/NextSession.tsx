@@ -34,6 +34,15 @@ const UpcomingSessions: React.FC<UpcomingSessionsProps> = ({
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
+        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = '0 6px 14px rgba(0,0,0,0.1)';
+        e.currentTarget.style.transform = 'translateY(-2px)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
+        e.currentTarget.style.transform = 'translateY(0)';
       }}
     >
       <h3

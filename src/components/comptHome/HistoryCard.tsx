@@ -39,12 +39,14 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
         flexDirection: 'column',
       }}
       onClick={() => navigate(route)}
-      onMouseEnter={(e) =>
-        (e.currentTarget.style.boxShadow = '0 6px 14px rgba(0,0,0,0.1)')
-      }
-      onMouseLeave={(e) =>
-        (e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.05)')
-      }
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = '0 6px 14px rgba(0,0,0,0.1)';
+        e.currentTarget.style.transform = 'translateY(-2px)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.05)';
+        e.currentTarget.style.transform = 'translateY(0)';
+      }}
     >
       <div
         style={{

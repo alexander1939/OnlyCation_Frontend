@@ -4,6 +4,7 @@ import { VideosProvider, useVideosContext } from '../../context/videos';
 import type { VideoSaveRequest, VideoData } from '../../context/videos/types';
 import '../../styles/Video.css';
 import OnboardingSteps from '../../components/OnboardingSteps';
+import { useActivation } from '../../context/activation/useActivation';
 
 const initialForm: VideoSaveRequest = { url_or_id: '' };
 
@@ -13,6 +14,7 @@ const VideoInner: React.FC = () => {
   const [saved, setSaved] = useState<VideoData | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const navigate = useNavigate();
+  const { check } = useActivation();
 
   // Extrae el ID de YouTube desde una URL completa o devuelve el valor si ya parece un ID
   const extractYouTubeId = (value: string): string | null => {
@@ -56,9 +58,12 @@ const VideoInner: React.FC = () => {
 
   React.useEffect(() => {
     if (success) {
-      navigate('/profile/availability');
+      (async () => {
+        try { await check(true); } catch {}
+        navigate('/profile/availability');
+      })();
     }
-  }, [success, navigate]);
+  }, [success, navigate, check]);
 
   return (
     <div className="video-page video-container">

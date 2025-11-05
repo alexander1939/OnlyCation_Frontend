@@ -50,14 +50,16 @@ const StudentHome: React.FC = () => {
         <WelcomeAlert name={user?.first_name || "Student"} />
       )}
 
-      {/* Contenido principal con padding simétrico */}
+      {/* Contenido principal centrado y responsivo */}
       <div
         style={{
           flex: 1,
-          padding: "7.5rem 2rem 2rem 2rem", // 🔹 mismo espacio a izquierda y derecha
+          padding: "7.5rem clamp(12px, 4vw, 2rem) 2rem",
           display: "grid",
-          gridTemplateColumns: "2fr 1fr",
-          gap: "2rem",
+          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          gap: "clamp(12px, 3vw, 2rem)",
+          maxWidth: "min(1200px, 96vw)",
+          margin: "0 auto",
         }}
       >
         <div>
@@ -74,8 +76,8 @@ const StudentHome: React.FC = () => {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "1rem",
+              gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+              gap: "clamp(10px, 2.5vw, 1rem)",
               marginBottom: "1.5rem",
             }}
           >

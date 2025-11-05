@@ -51,15 +51,20 @@ const TeacherHome: React.FC = () => {
         <WelcomeAlert name={user?.first_name || "Teacher"} />
       )}
 
-      <div style={{ padding: "7.5rem 2rem 2rem" }}>
+      <div style={{ 
+        padding: "7.5rem clamp(12px, 4vw, 2rem) 2rem",
+        maxWidth: "min(1200px, 96vw)",
+        margin: "0 auto"
+      }}>
         {/* Contenedor superior: KnowledgeCenter + UpcomingSessions */}
         <div
           style={{
             display: "flex",
-            gap: "0.75rem",
+            gap: "clamp(12px, 2vw, 0.75rem)",
             flexWrap: "wrap",
             marginBottom: "2rem",
-            alignItems: "stretch", // 👈 estira ambos al mismo alto
+            alignItems: "stretch",
+            justifyContent: "center"
           }}
         >
           {/* KnowledgeCenter */}

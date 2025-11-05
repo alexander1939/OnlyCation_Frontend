@@ -4,6 +4,22 @@ import { Link, useLocation } from 'react-router-dom';
 const PublicHeader: React.FC = () => {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState<boolean>(typeof window !== 'undefined' ? window.innerWidth >= 768 : false);
+
+  React.useEffect(() => {
+    const onResize = () => setIsDesktop(window.innerWidth >= 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  React.useEffect(() => {
+    if (!isDesktop) {
+      document.body.style.overflow = isMenuOpen ? 'hidden' : '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMenuOpen, isDesktop]);
 
   const NavItem: React.FC<{ to: string; label: string; mobile?: boolean }> = ({ to, label, mobile = false }) => {
     const isActive = location.pathname === to;
@@ -12,11 +28,11 @@ const PublicHeader: React.FC = () => {
     const linkStyle: React.CSSProperties = {
       position: 'relative',
       fontWeight: '600',
-      fontSize: '18px',
+      fontSize: '16px',
       textDecoration: 'none',
       color: isActive ? '#68B2C9' : '#294954',
       fontFamily: 'Inter, sans-serif',
-      padding: mobile ? '16px 24px' : '8px 12px',
+      padding: mobile ? '16px 24px' : '4px 6px',
       borderRadius: mobile ? '16px' : '0',
       textAlign: mobile ? 'center' : 'left',
       display: 'block',
@@ -80,71 +96,77 @@ const PublicHeader: React.FC = () => {
             padding: '8px 24px',
             gap: '32px',
             boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-            width: '100%',
-            maxWidth: '1200px',
+            width: 'auto',
+            maxWidth: '100%',
             justifyContent: 'space-between'
           }}>
             <Link to="/" className="flex items-center space-x-2" style={{ textDecoration: 'none' }}>
-              <img src="/logo.png" alt="OnlyCation Logo" className="w-[50px] h-[50px] md:w-[60px] md:h-[60px]" style={{ objectFit: 'contain' }} />
-              <span className="font-semibold text-base md:text-lg" style={{ color: '#294954', fontFamily: 'Inter, sans-serif' }}>OnlyCation</span>
+              <img src="/logo.png" alt="OnlyCation Logo" className="w-[60px] h-[60px]" style={{ objectFit: 'contain' }} />
+              <span className="font-semibold text-lg" style={{ color: '#294954', fontFamily: 'Inter, sans-serif' }}>OnlyCation</span>
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-12">
-              <NavItem to="/" label="Inicio" />
-              <NavItem to="/catalog/teachers" label="Docentes" />
-              <NavItem to="/be-teacher" label="¿Ser docente?" />
-              <NavItem to="/about-us" label="Sobre nosotros" />
-              <NavItem to="/register" label="Regístrate" />
-            </nav>
+            {isDesktop && (
+              <nav className="flex items-center" style={{ gap: '48px' }}>
+                <NavItem to="/" label="Inicio" />
+                <NavItem to="/catalog/teachers" label="Docentes" />
+                <NavItem to="/be-teacher" label="¿Ser docente?" />
+                <NavItem to="/about-us" label="Sobre nosotros" />
+                <NavItem to="/register" label="Regístrate" />
+              </nav>
+            )}
 
             {/* Desktop User Icon */}
-            <Link to="/login" className="hidden md:block">
-              <img src="/usuario.png" alt="Usuario" className="w-[30px] h-[30px]" style={{ objectFit: 'contain' }} />
-            </Link>
+            {isDesktop && (
+              <Link to="/login">
+                <img src="/usuario.png" alt="Usuario" className="w-[30px] h-[30px]" style={{ objectFit: 'contain' }} />
+              </Link>
+            )}
 
             {/* Mobile Hamburger */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden flex flex-col justify-center items-center w-8 h-8"
-              style={{ border: 'none', background: 'transparent', cursor: 'pointer' }}
-            >
-              <span style={{
-                display: 'block',
-                width: '24px',
-                height: '2px',
-                backgroundColor: '#294954',
-                marginBottom: '5px',
-                transition: 'all 0.3s',
-                transform: isMenuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none'
-              }} />
-              <span style={{
-                display: 'block',
-                width: '24px',
-                height: '2px',
-                backgroundColor: '#294954',
-                marginBottom: '5px',
-                opacity: isMenuOpen ? 0 : 1,
-                transition: 'all 0.3s'
-              }} />
-              <span style={{
-                display: 'block',
-                width: '24px',
-                height: '2px',
-                backgroundColor: '#294954',
-                transition: 'all 0.3s',
-                transform: isMenuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none'
-              }} />
-            </button>
+            {!isDesktop && (
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="flex flex-col justify-center items-center w-8 h-8"
+                style={{ border: 'none', background: 'transparent', cursor: 'pointer' }}
+              >
+                <span style={{
+                  display: 'block',
+                  width: '24px',
+                  height: '2px',
+                  backgroundColor: '#294954',
+                  marginBottom: '5px',
+                  transition: 'all 0.3s',
+                  transform: isMenuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none'
+                }} />
+                <span style={{
+                  display: 'block',
+                  width: '24px',
+                  height: '2px',
+                  backgroundColor: '#294954',
+                  marginBottom: '5px',
+                  opacity: isMenuOpen ? 0 : 1,
+                  transition: 'all 0.3s'
+                }} />
+                <span style={{
+                  display: 'block',
+                  width: '24px',
+                  height: '2px',
+                  backgroundColor: '#294954',
+                  transition: 'all 0.3s',
+                  transform: isMenuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none'
+                }} />
+              </button>
+            )}
           </div>
         </div>
       </header>
 
       {/* Mobile Menu Overlay */}
-      {isMenuOpen && (
-        <div className="fixed inset-0 z-40 md:hidden">
+      {!isDesktop && isMenuOpen && (
+        <div className="fixed inset-0 z-[60]">
           <div className="fixed inset-0 bg-[#294954]/20 backdrop-blur-sm" onClick={() => setIsMenuOpen(false)}></div>
-          <div className="fixed top-24 left-4 right-4 bg-[#FAF9F5]/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-[#68B2C9]/20 p-8">
+          <div className="fixed top-24 left-4 right-4 bg-[#FAF9F5]/95 backdrop-blur-xl rounded-[28px] shadow-xl border border-[#68B2C9]/20 p-8">
             <nav className="flex flex-col space-y-6">
               <NavItem to="/" label="Inicio" mobile />
               <NavItem to="/catalog/teachers" label="Docentes" mobile />

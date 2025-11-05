@@ -72,34 +72,20 @@ export const useRegisterAuthHook = () => {
 
   // Register student function
   const registerStudent = useCallback(async (userData: RegisterRequest) => {
-    try {
-      const response = await authApi.registerStudent(userData);
-      return { 
-        success: response.success, 
-        error: response.success ? undefined : response.message 
-      };
-    } catch (error) {
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Error en el registro' 
-      };
-    }
+    const response = await authApi.registerStudent(userData);
+    return { 
+      success: response.success, 
+      error: response.success ? undefined : response.message 
+    };
   }, [authApi]);
 
   // Register teacher function
   const registerTeacher = useCallback(async (userData: RegisterRequest) => {
-    try {
-      const response = await authApi.registerTeacher(userData);
-      return { 
-        success: response.success, 
-        error: response.success ? undefined : response.message 
-      };
-    } catch (error) {
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Error en el registro' 
-      };
-    }
+    const response = await authApi.registerTeacher(userData);
+    return { 
+      success: response.success, 
+      error: response.success ? undefined : response.message 
+    };
   }, [authApi]);
 
 

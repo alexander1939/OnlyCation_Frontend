@@ -15,8 +15,8 @@ const Footer: React.FC = () => {
         <div 
           style={{
             display: 'grid',
-            gridTemplateColumns: '3fr 1fr 1fr 1fr 1fr',
-            gap: '60px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+            gap: 'clamp(20px, 4vw, 60px)',
             alignItems: 'start'
           }}
         >
@@ -27,7 +27,11 @@ const Footer: React.FC = () => {
                 src="/logo.png" 
                 alt="OnlyCation Logo" 
                 className="w-[100px] h-[100px]"
-                style={{ objectFit: 'contain' }}
+                style={{ 
+                  objectFit: 'contain',
+                  width: 'clamp(64px, 10vw, 100px)',
+                  height: 'clamp(64px, 10vw, 100px)'
+                }}
               />
               <span 
                 className="font-bold text-2xl"
@@ -43,7 +47,7 @@ const Footer: React.FC = () => {
               className="text-base leading-relaxed mb-8"
               style={{ 
                 color: 'rgba(255, 255, 255, 0.75)',
-                maxWidth: '320px',
+                maxWidth: 'min(100%, 420px)',
                 lineHeight: '1.6'
               }}
             >
@@ -76,6 +80,8 @@ const Footer: React.FC = () => {
                     className="w-[30px] h-[30px]"
                     style={{ 
                       objectFit: 'contain',
+                      width: 'clamp(22px, 6vw, 30px)',
+                      height: 'clamp(22px, 6vw, 30px)'
                      }}
                   />
                 </a>
@@ -90,7 +96,7 @@ const Footer: React.FC = () => {
               style={{ 
                 color: '#68B2C9',
                 letterSpacing: '-0.3px',
-                padding: '40px 0px 0px 0px'
+                padding: 'clamp(12px, 4vw, 40px) 0 0 0'
               }}
             >
               Enlaces Rápidos
@@ -135,7 +141,7 @@ const Footer: React.FC = () => {
               style={{ 
                 color: '#68B2C9',
                 letterSpacing: '-0.3px',
-                padding: '40px 0px 0px 0px'
+                padding: 'clamp(12px, 4vw, 40px) 0 0 0'
               }}
             >
               Soporte
@@ -180,7 +186,7 @@ const Footer: React.FC = () => {
               style={{ 
                 color: '#68B2C9',
                 letterSpacing: '-0.3px',
-                padding: '40px 0px 0px 0px'
+                padding: 'clamp(12px, 4vw, 40px) 0 0 0'
               }}
             >
               Privacidad
@@ -223,7 +229,7 @@ const Footer: React.FC = () => {
               style={{ 
                 color: '#68B2C9',
                 letterSpacing: '-0.3px',
-                padding: '40px 0px 0px 0px'
+                padding: 'clamp(12px, 4vw, 40px) 0 0 0'
               }}
             >
               Contacto

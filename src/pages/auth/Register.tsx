@@ -96,6 +96,7 @@ function Register() {
       }
     } catch (error: any) {
       setError(error.message || `Error al registrar ${userType === 'student' ? 'estudiante' : 'docente'}`);
+      throw error; // Re-lanzar el error para que RegisterForm lo capture
     } finally {
       setIsLoading(false);
     }
@@ -331,9 +332,16 @@ function Register() {
                 
                 {/* Formulario saliendo durante transición */}
                 {userType === 'teacher' && !showForm && isTransitioning && (
-                  <div className="form-container-exit" style={{
+                  <div style={{
+                    position: 'absolute',
+                    top: '0',
+                    left: '0',
                     width: '100%',
-                    maxWidth: '580px',
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     padding: '0 30px 20px 30px',
                     margin: '0 auto'
                   }}>
@@ -346,7 +354,7 @@ function Register() {
                 )}
               </div>
 
-              {/* Línea divisoria */}
+              {/* Separador vertical */}
               <div style={{
                 position: 'absolute',
                 left: '50%',

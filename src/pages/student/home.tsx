@@ -7,11 +7,12 @@ import PriceCard from "../../components/comptHome/PriceCard";
 import SubjectList from "../../components/comptHome/SubjectList";
 import FeaturedAdvisors from "../../components/comptHome/FeaturedAdvisors";
 import KnowledgeCenter from "../../components/comptHome/KnowledgeCenter";
+import ChatCard from "../../components/comptHome/ChatCard";
 import { Footer } from "../../components";
 import { useLoginApi } from "../../hooks/auth/useLoginApi";
 import WelcomeAlert from "../../components/WelcomeAlert";
 import { CalendarCheck, History, CheckCircle, GraduationCap, 
-BookOpen, Library
+BookOpen, Library, MessageSquare
 } from "lucide-react";
 
 
@@ -24,6 +25,7 @@ const levels = [
 const StudentHome: React.FC = () => {
   const { user } = useLoginApi();
   const [showWelcome, setShowWelcome] = useState(false);
+  const [isSmall, setIsSmall] = useState(false);
 
   useEffect(() => {
     try {
@@ -33,6 +35,13 @@ const StudentHome: React.FC = () => {
         sessionStorage.removeItem("showWelcome");
       }
     } catch {}
+  }, []);
+
+  useEffect(() => {
+    const onResize = () => setIsSmall(window.innerWidth <= 640);
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
   return (
@@ -56,18 +65,43 @@ const StudentHome: React.FC = () => {
           flex: 1,
           padding: "7.5rem 2rem 2rem 2rem", // 🔹 mismo espacio a izquierda y derecha
           display: "grid",
-          gridTemplateColumns: "2fr 1fr",
+          gridTemplateColumns: isSmall ? "1fr" : "2fr 1fr",
           gap: "2rem",
         }}
       >
         <div>
-          {/* 🔹 KnowledgeCenter */}
-          <div style={{ marginBottom: "1.5rem" }}>
-            <KnowledgeCenter
-              title="¿NECESITAS AYUDA CON TUS ESTUDIOS?"
-              linkText="Centro de Asesorías Académicas"
-              description="Conecta con un docente dispuesto a guiarte y resolver tus dudas paso a paso."
-            />
+          {/* 🔹 KnowledgeCenter + Chat (lado a lado) */}
+          <div
+            style={{
+              display: "flex",
+              gap: "0.75rem",
+              flexWrap: "wrap",
+              marginBottom: "1.5rem",
+              alignItems: "stretch",
+            }}
+          >
+            <div style={{ flex: 2, minWidth: "300px", display: "flex", flexDirection: "column" }}>
+              <div style={{ flex: 1, display: "flex" }}>
+                <KnowledgeCenter
+                  title="¿NECESITAS AYUDA CON TUS ESTUDIOS?"
+                  linkText="Centro de Asesorías Académicas"
+                  description="Conecta con un docente dispuesto a guiarte y resolver tus dudas paso a paso."
+                />
+              </div>
+            </div>
+            <div style={{ flex: 1, minWidth: "300px", display: "flex", flexDirection: "column" }}>
+              <div style={{ flex: 1, display: "flex" }}>
+                <ChatCard
+                  title="Chat con docentes"
+                  description="Conversa con tus docentes y resuelve tus dudas en tiempo real."
+                  linkText="Ir al chat"
+                  route="/student/chat"
+                  icon={MessageSquare}
+                  iconColor="#3B82F6"
+                  iconBg="#E6EEFF"
+                />
+              </div>
+            </div>
           </div>
 
           {/* 🔹 Publicar consulta + Agenda */}

@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect, useRef } from 'react';
 import Header from '../../components/ui/Header';
 import Footer from '../../components/ui/Footer';
+import { useTeachersContext } from '../../context/teachers';
 import '../../styles/teacher-catalog.css';
 
 type TeacherItem = {
@@ -14,49 +15,6 @@ type TeacherItem = {
   videoUrl: string;
   thumbnailUrl?: string;
 };
-
-const EXAMPLE: TeacherItem[] = [
-  {
-    id: 't1',
-    name: 'Dr. Evelyn Reed',
-    subject: 'Matemáticas',
-    level: 'Universidad',
-    hourlyRate: 350,
-    rating: 4.8,
-    available: true,
-    videoUrl: 'https://youtu.be/tdFNA7YBM4c',
-  },
-  {
-    id: 't2',
-    name: 'Lic. Alan Grant',
-    subject: 'Física',
-    level: 'Preparatoria',
-    hourlyRate: 280,
-    rating: 4.9,
-    available: false,
-    videoUrl: 'https://www.youtube.com/watch?v=ysz5S6PUM-U',
-  },
-  {
-    id: 't3',
-    name: 'Dr. Ian Malcolm',
-    subject: 'Estadística',
-    level: 'Posgrado',
-    hourlyRate: 450,
-    rating: 4.7,
-    available: false,
-    videoUrl: 'https://www.youtube.com/watch?v=jNQXAC9IVRw',
-  },
-  {
-    id: 't4',
-    name: 'Ing. Sarah Connor',
-    subject: 'Programación',
-    level: 'Universidad',
-    hourlyRate: 400,
-    rating: 5.0,
-    available: true,
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-  },
-];
 
 function extractYouTubeId(url: string): string | null {
   try {
@@ -76,6 +34,7 @@ function extractYouTubeId(url: string): string | null {
 }
 
 export default function TeacherCatalog() {
+  const { teachers, loading, total, getTeachers, searchTeachers } = useTeachersContext();
   const [name, setName] = useState('');
   const [subject, setSubject] = useState('');
   const [levels, setLevels] = useState<string[]>([]);
@@ -87,6 +46,7 @@ export default function TeacherCatalog() {
   const [subjectDropdownOpen, setSubjectDropdownOpen] = useState(false);
   const [subjectSearch, setSubjectSearch] = useState('');
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [page, setPage] = useState(1);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -97,6 +57,23 @@ export default function TeacherCatalog() {
     return subjects.filter(s => s.toLowerCase().includes(subjectSearch.toLowerCase()));
   }, [subjectSearch]);
 
+  const handleSearch = async () => {
+    await searchTeachers({
+      name: name || undefined,
+      subject: subject || undefined,
+      min_rating: minRating > 0 ? minRating : undefined,
+      min_price: priceMin,
+      max_price: priceMax,
+      page,
+      page_size: 12
+    });
+    setFiltersOpen(false);
+  };
+
+  useEffect(() => {
+    getTeachers(1, 12);
+  }, []);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -106,25 +83,6 @@ export default function TeacherCatalog() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  const items = useMemo(() => {
-    return EXAMPLE.map((t) => {
-      const id = extractYouTubeId(t.videoUrl);
-      const thumbnailUrl = id ? `https://img.youtube.com/vi/${id}/maxresdefault.jpg` : undefined;
-      return { ...t, thumbnailUrl } as TeacherItem;
-    });
-  }, []);
-
-  const filtered = useMemo(() => {
-    return items.filter((t) => {
-      if (name && !t.name.toLowerCase().includes(name.toLowerCase())) return false;
-      if (subject && t.subject !== subject) return false;
-      if (levels.length && !levels.includes(t.level)) return false;
-      if (t.rating < minRating) return false;
-      if (t.hourlyRate < priceMin || t.hourlyRate > priceMax) return false;
-      return true;
-    });
-  }, [items, name, subject, levels, minRating, priceMin, priceMax]);
 
   const toggleLevel = (lvl: string) => {
     setLevels((prev) => (prev.includes(lvl) ? prev.filter((x) => x !== lvl) : [...prev, lvl]));
@@ -138,19 +96,65 @@ export default function TeacherCatalog() {
   };
 
   const handleCardClick = (teacherId: string) => {
-    // TODO: Navigate to teacher profile page
     console.log('Navigate to teacher profile:', teacherId);
-    // Future: navigate(`/teacher/${teacherId}`);
   };
 
-  const clearFilters = () => {
+  const loadMore = async () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    
+    // Si hay filtros activos, usar searchTeachers
+    if (name || subject || minRating > 0) {
+      await searchTeachers({
+        name: name || undefined,
+        subject: subject || undefined,
+        min_rating: minRating > 0 ? minRating : undefined,
+        min_price: priceMin,
+        max_price: priceMax,
+        page: nextPage,
+        page_size: 12
+      });
+    } else {
+      // Si no hay filtros, usar getTeachers
+      await getTeachers(nextPage, 12);
+    }
+  };
+
+  const clearFilters = async () => {
     setName('');
     setSubject('');
     setLevels([]);
     setMinRating(0);
     setPriceMin(100);
     setPriceMax(1000);
+    setPage(1);
+    await getTeachers(1, 12);
   };
+
+  const items = useMemo(() => {
+    if (!teachers || !Array.isArray(teachers)) return [];
+    
+    return teachers
+      .filter((t) => (t.user_id !== undefined && t.user_id !== null) || (t.teacher_id !== undefined && t.teacher_id !== null))
+      .map((t) => {
+        const thumbnailUrl = t.video_thumbnail_url || 'https://img.youtube.com/vi/ysz5S6PUM-U/maxresdefault.jpg';
+        const id = t.user_id || t.teacher_id;
+        const subject = t.expertise_area || t.subject;
+        const price = t.price_per_hour || t.price_per_class;
+        
+        return {
+          id: id!.toString(),
+          name: `${t.first_name || ''} ${t.last_name || ''}`.trim() || 'Sin nombre',
+          subject: subject || 'Sin materia',
+          level: (t.educational_level || 'Universidad') as 'Preparatoria' | 'Universidad' | 'Posgrado',
+          hourlyRate: price || 0,
+          rating: t.average_rating || 0,
+          available: true,
+          videoUrl: t.video_embed_url || '',
+          thumbnailUrl
+        } as TeacherItem;
+      });
+  }, [teachers]);
 
   return (
     <div className="catalog-page page-container">
@@ -307,7 +311,7 @@ export default function TeacherCatalog() {
               </div>
 
               <div className="filter-actions">
-                <button type="button" className="btn-primary" onClick={() => {}}>
+                <button type="button" className="btn-primary" onClick={handleSearch}>
                   Buscar Docentes
                 </button>
                 <button type="button" className="btn-secondary" onClick={clearFilters}>
@@ -329,7 +333,7 @@ export default function TeacherCatalog() {
               </div>
 
               <div className="cards-grid">
-                {filtered.map((t, idx) => (
+                {items.map((t, idx) => (
                   <article 
                     key={t.id} 
                     className="card card-appear" 
@@ -389,7 +393,7 @@ export default function TeacherCatalog() {
               </div>
 
               <div className="load-more">
-                <button className="btn-primary">
+                <button className="btn-primary" onClick={loadMore}>
                   Cargar más resultados
                 </button>
               </div>

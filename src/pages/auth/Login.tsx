@@ -22,9 +22,13 @@ const Login: React.FC = () => {
       console.log("Respuesta login:", response);
 
       if (!response || !response.success || !response.data) {
-        setError(response?.message || "Credenciales inválidas");
+        setError(response?.message || "Correo o contraseña incorrectos.");
         return;
       }
+
+      try {
+        sessionStorage.setItem("showWelcome", "1");
+      } catch {}
 
       const role = response.data.role.toLowerCase();
       if (from) {
@@ -36,7 +40,7 @@ const Login: React.FC = () => {
       else navigate("/");
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "No se pudo iniciar sesión");
+      setError("Servidor no disponible. Inténtalo más tarde.");
     }
   };
 
@@ -88,6 +92,9 @@ const Login: React.FC = () => {
 
               <p className="login-link" onClick={() => navigate("/register")}>
                 ¿No tienes cuenta? <span>Regístrate</span>
+              </p>
+              <p className="login-link" onClick={() => navigate("/forgot-password")}>
+                ¿Olvidaste tu contraseña? <span>Recupérala</span>
               </p>
             </div>
           </div>

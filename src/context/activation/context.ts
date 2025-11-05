@@ -5,7 +5,7 @@ export interface ActivationContextType {
   loading: boolean;
   error: string | null;
   data: ActivationCheckData | null;
-  check: () => Promise<ActivationCheckData>;
+  check: (force?: boolean) => Promise<ActivationCheckData>;
   activate: () => Promise<ActivationCheckData>;
   getNextRoute: (fallback?: string) => string;
 }

@@ -9,7 +9,7 @@ const ContinueOnboarding: React.FC = () => {
   React.useEffect(() => {
     (async () => {
       try {
-        await check();
+        await check(true);
         navigate(getNextRoute(), { replace: true });
       } catch {
         navigate('/profile/preferences', { replace: true });

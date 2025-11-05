@@ -41,5 +41,27 @@ export const usePreferencesApi = () => {
     }
   };
 
-  return { createPreferences };
+  const getEducationalLevel = async (): Promise<{ success: boolean; message: string; data?: { educational_level: string } }> => {
+    try {
+      const token = getAccessToken();
+      if (!token) throw new Error('No hay token de acceso. Inicia sesión nuevamente.');
+
+      const response = await client.get<{ success: boolean; message: string; data: { educational_level: string } }>(
+        '/profile/preferences/educational_level/',
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      return {
+        success: true,
+        message: response.data.message || 'Nivel educativo obtenido exitosamente',
+        data: response.data.data
+      };
+    } catch (err) {
+      const axErr = err as AxiosError<{ detail?: string }>;
+      const message = axErr.response?.data?.detail || axErr.message || 'Error al obtener nivel educativo';
+      return { success: false, message };
+    }
+  };
+
+  return { createPreferences, getEducationalLevel };
 };

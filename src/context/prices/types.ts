@@ -18,7 +18,9 @@ export interface PricesContextType {
   creating: boolean;
   error: string | null;
   lastCreated: PriceMeta | null;
+  myPrice: number | null;
   createPrice: (payload: PriceCreateRequest) => Promise<void>;
+  getMyPrice: () => Promise<void>;
   resetStatus: () => void;
 }
 

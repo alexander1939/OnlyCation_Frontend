@@ -1,5 +1,5 @@
 // src/pages/teacher/TeacherHome.tsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useLoginContext } from "../../context/auth";
 import WelcomeAlert from "../../components/WelcomeAlert";
 import Header from "../../components/ui/Header";
@@ -17,7 +17,21 @@ import { useNavigate } from "react-router-dom";
 
 const TeacherHome: React.FC = () => {
   const { user } = useLoginContext();
+
   const navigate = useNavigate();
+
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    try {
+      const shouldShow = sessionStorage.getItem("showWelcome") === "1";
+      if (shouldShow) {
+        setShowWelcome(true);
+        sessionStorage.removeItem("showWelcome");
+      }
+    } catch {}
+  }, []);
+
 
   const upcomingSessions = [
     {
@@ -40,7 +54,9 @@ const TeacherHome: React.FC = () => {
   return (
     <>
       <Header />
-      <WelcomeAlert name={user?.first_name || "Teacher"} />
+      {showWelcome && (
+        <WelcomeAlert name={user?.first_name || "Teacher"} />
+      )}
 
       <div style={{ padding: "7.5rem 2rem 2rem" }}>
         {/* Contenedor superior: KnowledgeCenter + UpcomingSessions */}

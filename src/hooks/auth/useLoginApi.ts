@@ -88,9 +88,14 @@ export const useLoginApi = () => {
     } catch (error: any) {
       console.error("[LoginAPI] Error:", error);
 
-      const message =
-        error.response?.data?.message ||
-        "Error durante el inicio de sesión. Intenta nuevamente.";
+      let message: string;
+      if (!error?.response || error?.code === "ERR_NETWORK") {
+        message = "Servidor no disponible. Inténtalo más tarde.";
+      } else {
+        message =
+          error.response?.data?.message ||
+          "Error durante el inicio de sesión. Intenta nuevamente.";
+      }
 
       return { success: false, message, data: null };
     } finally {

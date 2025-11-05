@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useDocumentsContext } from '../../context';
 import '../../styles/documents.css';
 import OnboardingSteps from '../../components/OnboardingSteps';
+import { useActivation } from '../../context/activation/useActivation';
 
 const CreateDocument: React.FC = () => {
   const navigate = useNavigate();
   const { createDocument, creating, error, lastCreated, resetStatus } = useDocumentsContext();
+  const { check } = useActivation();
 
   const [rfc, setRfc] = useState('');
   const [expertise, setExpertise] = useState('');
@@ -37,9 +39,12 @@ const CreateDocument: React.FC = () => {
 
   React.useEffect(() => {
     if (lastCreated) {
-      navigate('/profile/price');
+      (async () => {
+        try { await check(true); } catch {}
+        navigate('/profile/price');
+      })();
     }
-  }, [lastCreated, navigate]);
+  }, [lastCreated, navigate, check]);
 
   return (
     <div className="doc-page doc-container">
@@ -70,22 +75,22 @@ const CreateDocument: React.FC = () => {
             {/* Files */}
             <div className="doc-grid">
               <div>
-                <label className="doc-label">Certificado (.enc)</label>
+                <label className="doc-label">Certificado (.pdf)</label>
                 <div>
                   <input
                     type="file"
-                    accept=".enc,.pdf,.txt"
+                    accept=".pdf"
                     onChange={(e) => setCertificate(e.target.files?.[0] || null)}
                     className="doc-file"
                   />
                 </div>
               </div>
               <div>
-                <label className="doc-label">Curriculum (.enc)</label>
+                <label className="doc-label">Curriculum (.pdf)</label>
                 <div>
                   <input
                     type="file"
-                    accept=".enc,.pdf,.txt"
+                    accept=".pdf"
                     onChange={(e) => setCurriculum(e.target.files?.[0] || null)}
                     className="doc-file"
                   />

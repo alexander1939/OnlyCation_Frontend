@@ -4,11 +4,13 @@ import { PricesProvider, usePricesContext } from '../../context/prices';
 import '../../styles/prices.css';
 import OnboardingSteps from '../../components/OnboardingSteps';
 import { PriceAvailabilityProvider, usePriceAvailabilityContext } from '../../context/catalogs/PriceAvailabilityContext';
+import { useActivation } from '../../context/activation/useActivation';
 
 const CreatePriceForm: React.FC = () => {
   const navigate = useNavigate();
   const { createPrice, creating, error, lastCreated, resetStatus } = usePricesContext();
   const { data: availability, priceRanges, loading: loadingAvail, error: availError } = usePriceAvailabilityContext();
+  const { check } = useActivation();
 
   const [preferenceId, setPreferenceId] = useState('');
   const [priceRangeId, setPriceRangeId] = useState('');
@@ -62,9 +64,12 @@ const CreatePriceForm: React.FC = () => {
 
   React.useEffect(() => {
     if (lastCreated) {
-      navigate('/profile/video');
+      (async () => {
+        try { await check(true); } catch {}
+        navigate('/profile/video');
+      })();
     }
-  }, [lastCreated, navigate]);
+  }, [lastCreated, navigate, check]);
 
   return (
     <div className="price-page price-container">

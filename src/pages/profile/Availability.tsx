@@ -91,7 +91,7 @@ const SaveAvailabilityBar: React.FC = () => {
         if (!res?.success) throw new Error(res?.message || 'Error al crear disponibilidad');
       }
       setSuccess('Disponibilidad guardada correctamente.');
-      navigate('/profile/wallet');
+      navigate('/profile/continue');
     } catch (e: any) {
       setError(e?.message || 'Error al guardar');
     } finally {

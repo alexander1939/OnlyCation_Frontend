@@ -1,6 +1,6 @@
 // src/components/comptHome/UpcomingSessions.tsx
 import React from "react";
-import { Clock, User } from "lucide-react";
+import { Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface Session {
@@ -27,7 +27,7 @@ const UpcomingSessions: React.FC<UpcomingSessionsProps> = ({
       style={{
         backgroundColor,
         borderRadius: "0.75rem",
-        padding: "0.8rem", // 👈 reducimos padding general
+        padding: "0.7rem", // 👈 compactado ligeramente
         boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
         fontFamily: "'Roboto', sans-serif",
         width: "100%",
@@ -65,7 +65,7 @@ const UpcomingSessions: React.FC<UpcomingSessionsProps> = ({
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-            gap: "0.75rem", // 👈 reducimos espacio entre tarjetas
+            gap: "0.6rem", // 👈 aún más compacto
           }}
         >
           {sessions.map((session, index) => (
@@ -73,13 +73,13 @@ const UpcomingSessions: React.FC<UpcomingSessionsProps> = ({
               key={index}
               style={{
                 backgroundColor: "#F8FAFC",
-                padding: "0.6rem 0.8rem", // 👈 mucho más compacto
+                padding: "0.5rem 0.7rem", // 👈 compactado ligeramente
                 borderRadius: "0.5rem",
                 cursor: "pointer",
                 transition: "all 0.2s ease",
                 display: "flex",
                 alignItems: "center",
-                gap: "0.5rem", // 👈 reducimos gap entre icono y texto
+                gap: "0.45rem", // 👈 reducimos gap entre icono y texto
               }}
               onClick={() => navigate("/agenda")}
               onMouseEnter={(e) => {
@@ -108,12 +108,9 @@ const UpcomingSessions: React.FC<UpcomingSessionsProps> = ({
                     color: "#6B7280",
                     fontSize: "0.8rem",
                     margin: 0,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.25rem",
                   }}
                 >
-                  {session.date} • <User size={12} /> {session.studentName}
+                  {session.date}
                 </p>
               </div>
             </div>

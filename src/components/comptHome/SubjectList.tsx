@@ -3,6 +3,7 @@ import { GraduationCap, BookOpen, LibraryBig, Tag } from "lucide-react";
 
 interface SubjectListProps {
   role?: "student" | "teacher"; // 👈 definimos el tipo de usuario
+  onPriceClick?: () => void; // handler para navegar a precios (definido por el padre)
 }
 
 const levels = [
@@ -11,7 +12,7 @@ const levels = [
   { name: "Posgrado", icon: LibraryBig },
 ];
 
-const SubjectList: React.FC<SubjectListProps> = ({ role = "student" }) => {
+const SubjectList: React.FC<SubjectListProps> = ({ role = "student", onPriceClick }) => {
   // Si es teacher, renderiza la tarjeta de precios
   if (role === "teacher") {
     return (
@@ -29,6 +30,7 @@ const SubjectList: React.FC<SubjectListProps> = ({ role = "student" }) => {
           transition: "all 0.2s ease",
           cursor: "pointer",
         }}
+        onClick={() => onPriceClick && onPriceClick()}
         onMouseEnter={(e) =>
           ((e.currentTarget.style.backgroundColor = "#f9fafb"),
           (e.currentTarget.style.transform = "scale(1.02)"))
@@ -77,6 +79,11 @@ const SubjectList: React.FC<SubjectListProps> = ({ role = "student" }) => {
 
         <a
           href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onPriceClick && onPriceClick();
+          }}
           style={{
             color: "#2563eb",
             fontWeight: 500,

@@ -29,7 +29,7 @@ const KnowledgeCenter: React.FC<KnowledgeCenterProps> = ({
         backgroundColor,
         border: "1px solid #C9E2FF",
         borderRadius: "0.75rem",
-        padding: "1.5rem",
+        padding: "1.2rem",
         fontFamily: "Roboto, sans-serif",
         textAlign: "left",
         color: "#1E293B",

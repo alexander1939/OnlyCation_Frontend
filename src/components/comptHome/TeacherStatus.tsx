@@ -20,7 +20,7 @@ const TeacherStatus: React.FC = () => {
   const panelStyle: React.CSSProperties = {
     backgroundColor: '#fff',
     borderRadius: '0.75rem',
-    padding: '1rem',
+    padding: '0.9rem',
     boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
     fontFamily: "Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji'",
     width: '100%',

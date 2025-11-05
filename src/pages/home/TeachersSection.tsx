@@ -1,48 +1,135 @@
-import React, { useState } from 'react';
-import '../../styles/TeachersSection.css';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useTeachersContext } from '../../context/teachers/TeachersContext';
+import '../../styles/teacher-catalog.css';
 
-interface Teacher {
+type TeacherItem = {
+  id: string;
   name: string;
   subject: string;
-  price: string;
+  level: 'Preparatoria' | 'Universidad' | 'Posgrado';
+  hourlyRate: number;
   rating: number;
-  reviews: number;
-  description: string;
+  available: boolean;
   videoUrl: string;
-}
+  thumbnailUrl?: string;
+};
 
 const TeachersSection: React.FC = () => {
-  const [playingVideo, setPlayingVideo] = useState<number | null>(null);
+  const { teachers, loading, getTeachers } = useTeachersContext();
+  const [showVideo, setShowVideo] = useState(false);
+  const [videoEmbed, setVideoEmbed] = useState<string>('');
 
-  const teachers: Teacher[] = [
-    {
-      name: 'Prof. Carlos Mendoza',
-      subject: 'Matemáticas Avanzadas',
-      price: '$450 MX/hora',
-      rating: 4.9,
-      reviews: 234,
-      description: 'Profesor con 15 años de experiencia en matemáticas universitarias, especializado en cálculo diferencial e integral.',
-      videoUrl: 'https://www.youtube.com/embed/3icoSeGqQtY'
-    },
-    {
-      name: 'Lic. María González',
-      subject: 'Inglés Conversacional',
-      price: '$320 MX/hora',
-      rating: 4.8,
-      reviews: 189,
-      description: 'Licenciada en lenguas extranjeras con certificación TESOL, enfoque en conversación y pronunciación nativa.',
-      videoUrl: 'https://www.youtube.com/embed/VqmKSAF4bHI'
-    },
-    {
-      name: 'Dra. Ana López',
-      subject: 'Química para Universidad',
-      price: '$560 MX/hora',
-      rating: 4.7,
-      reviews: 156,
-      description: 'Doctora en química orgánica especializada en bioquímica y química analítica, con métodos didácticos innovadores.',
-      videoUrl: 'https://www.youtube.com/embed/yQhQnyhzC6s'
+  useEffect(() => {
+    getTeachers(1, 3); // Cargar solo 3 profesores para la home
+  }, []);
+
+  const items = useMemo(() => {
+    if (!teachers || !Array.isArray(teachers)) return [];
+    
+    console.log('👥 Teachers from backend:', teachers);
+    
+    return teachers
+      .filter((t) => (t.user_id !== undefined && t.user_id !== null) || (t.teacher_id !== undefined && t.teacher_id !== null))
+      .map((t) => {
+        const id = t.user_id || t.teacher_id;
+        const subject = t.expertise_area || t.subject;
+        const price = t.price_per_hour || t.price_per_class;
+        
+        console.log(`🎬 Processing teacher ${t.first_name}:`, {
+          video_embed_url: t.video_embed_url,
+          video_thumbnail_url: t.video_thumbnail_url
+        });
+        
+        // Usar thumbnail del backend o imagen por defecto
+        const thumbnailUrl = t.video_thumbnail_url || '/Gemini_Generated_Image_ccdndiccdndiccdn.png';
+        
+        const item = {
+          id: id!.toString(),
+          name: `${t.first_name || ''} ${t.last_name || ''}`.trim() || 'Sin nombre',
+          subject: subject || 'Sin materia',
+          level: (t.educational_level || 'Universidad') as 'Preparatoria' | 'Universidad' | 'Posgrado',
+          hourlyRate: price || 0,
+          rating: t.average_rating || 0,
+          available: true,
+          videoUrl: t.video_embed_url || '',
+          thumbnailUrl: thumbnailUrl
+        } as TeacherItem;
+        
+        console.log('📝 Final item:', {
+          name: item.name,
+          videoUrl: item.videoUrl,
+          thumbnailUrl: item.thumbnailUrl
+        });
+        return item;
+      });
+  }, [teachers]);
+
+  const extractYouTubeId = (url: string): string | null => {
+    try {
+      const u = new URL(url);
+      if (u.hostname === 'youtu.be') return u.pathname.slice(1);
+      if (u.hostname.includes('youtube.com')) {
+        const v = u.searchParams.get('v');
+        if (v) return v;
+        const parts = u.pathname.split('/').filter(Boolean);
+        const embedIdx = parts.indexOf('embed');
+        if (embedIdx >= 0 && parts[embedIdx + 1]) return parts[embedIdx + 1];
+      }
+    } catch { }
+    return null;
+  };
+
+  const onPlay = (url: string) => {
+    console.log('🎥 onPlay called with URL:', url);
+    console.log('📊 Current showVideo state:', showVideo);
+    
+    if (!url) {
+      console.log('❌ URL is empty or undefined');
+      return;
     }
-  ];
+    
+    // Si ya es una URL de embed, usarla directamente
+    if (url.includes('youtube.com/embed/')) {
+      const finalUrl = `${url}?autoplay=1`;
+      console.log('✅ Using embed URL directly:', finalUrl);
+      setVideoEmbed(finalUrl);
+      setShowVideo(true);
+      console.log('✅ setShowVideo(true) called - Modal should open');
+      return;
+    }
+    
+    // Si es youtu.be, convertir
+    if (url.includes('youtu.be/')) {
+      const id = url.split('youtu.be/')[1]?.split('?')[0];
+      if (id) {
+        const finalUrl = `https://www.youtube.com/embed/${id}?autoplay=1`;
+        console.log('✅ Converted youtu.be URL:', finalUrl);
+        setVideoEmbed(finalUrl);
+        setShowVideo(true);
+        console.log('✅ setShowVideo(true) called - Modal should open');
+      }
+      return;
+    }
+    
+    // Si no, intentar extraer el ID manualmente
+    const id = extractYouTubeId(url);
+    console.log('🔍 Extracted YouTube ID:', id);
+    if (!id) {
+      console.log('❌ Could not extract YouTube ID');
+      return;
+    }
+    const finalUrl = `https://www.youtube.com/embed/${id}?autoplay=1`;
+    console.log('✅ Final embed URL:', finalUrl);
+    setVideoEmbed(finalUrl);
+    setShowVideo(true);
+    console.log('✅ setShowVideo(true) called - Modal should open');
+  };
+
+  const handleCardClick = (teacherId: string) => {
+    console.log('Navigate to teacher profile:', teacherId);
+    // TODO: Navegar al perfil del profesor
+  };
 
   return (
     <section className="px-[20px] mb-[100px]" style={{backgroundColor: '#FAF9F5'}}>
@@ -56,115 +143,172 @@ const TeachersSection: React.FC = () => {
           </p>
         </div>
         
-        <div className="flex justify-center">
-          <div className="cards-container">
-          {teachers.map((teacher, index) => (
-            <div key={index} className="teacher-card">
-              <div className="teacher-card-content">
-                {/* Sección del video */}
-                <div className="video-section" onClick={() => setPlayingVideo(playingVideo === index ? null : index)}>
-                  <div className="video-container">
-                    {playingVideo === index ? (
-                      <iframe
-                        src={`${teacher.videoUrl}?autoplay=1&rel=0&modestbranding=1`}
-                        className="w-full h-full"
-                        style={{borderRadius: '16px'}}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        title={`Video de ${teacher.name}`}
-                      />
-                    ) : (
-                      <>
-                        <img 
-                          src={`https://img.youtube.com/vi/${teacher.videoUrl.split('/embed/')[1]}/maxresdefault.jpg`}
-                          alt={`Video de ${teacher.name}`}
-                          className="video-thumbnail"
-                        />
-                        <div className="video-overlay"></div>
-                        <div className="play-button">
-                          <div className="play-icon"></div>
+        {loading ? (
+          <div className="text-center py-8">
+            <p className="text-gray-600">Cargando docentes...</p>
+          </div>
+        ) : (
+          <>
+            <div className="cards-grid">
+              {items.map((t, idx) => (
+                <article 
+                  key={t.id} 
+                  className="card card-appear" 
+                  style={{ animationDelay: `${idx * 80}ms` }}
+                  onClick={() => handleCardClick(t.id)}
+                >
+                  <div className="card-video" style={{ backgroundImage: `url(${t.thumbnailUrl})` }} aria-label={`Video de ${t.name}`}>
+                    <button 
+                      className="card-play" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onPlay(t.videoUrl);
+                      }} 
+                      aria-label={`Reproducir video de ${t.name}`}
+                    >
+                      ▶
+                    </button>
+                  </div>
+                  <div className="card-body">
+                    <div className="card-header">
+                      <h3 className="card-name" title={t.name}>{t.name}</h3>
+                      {t.available && <span className="badge-available">Disponible</span>}
+                    </div>
+                    <div className="card-meta">
+                      <span className="chip chip-subject">{t.subject}</span>
+                      <span className="chip chip-level">{t.level}</span>
+                    </div>
+                    <div className="card-actions">
+                      <div className="info-boxes">
+                        <div className="info-box price-box">
+                          <span className="info-value">${t.hourlyRate}</span>
+                          <span className="info-label">MXN/HORA</span>
                         </div>
-                        <div className="video-badge">
-                          <div className="video-badge-dot"></div>
-                          <span className="video-badge-text">Video</span>
+                        <div className="info-box rating-box">
+                          <div className="rating-content">
+                            <span className="star-icon">★</span>
+                            <span className="info-value">{t.rating.toFixed(1)}</span>
+                          </div>
+                          <span className="info-label">CALIFICACIÓN</span>
                         </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-                
-                {/* Sección de información */}
-                <div className="info-section">
-                  <h3 className="teacher-name">{teacher.name}</h3>
-                  
-                  <div className="teacher-subject">
-                    <div className="subject-dot"></div>
-                    <p className="subject-text">{teacher.subject}</p>
-                  </div>
-                  
-                  <div className="rating-section">
-                    <div className="stars">
-                      {[1,2,3,4,5].map((star) => (
-                        <span key={star} className={`star ${star <= Math.floor(teacher.rating) ? 'filled' : ''}`}>
-                          ★
-                        </span>
-                      ))}
-                    </div>
-                    <span className="rating-number">{teacher.rating}</span>
-                    <span className="rating-reviews">({teacher.reviews} reseñas)</span>
-                  </div>
-                  
-                  <div className="teacher-description">
-                    <p>{teacher.description}</p>
-                  </div>
-                  
-                  <div className="additional-info">
-                    <div className="info-item">
-                      <div className="info-dot"></div>
-                      <span className="info-text">Clases online disponibles</span>
-                    </div>
-                    <div className="info-item">
-                      <div className="info-dot"></div>
-                      <span className="info-text">Respuesta rápida</span>
-                    </div>
-                    <div className="info-item">
-                      <div className="info-dot"></div>
-                      <span className="info-text">Primera clase gratis</span>
+                      </div>
+                      <Link 
+                        className="link-profile"
+                        to={`/catalog/teachers/${t.id}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleCardClick(t.id);
+                        }}
+                      >
+                        Ver Perfil
+                        <span className="arrow-icon">→</span>
+                      </Link>
                     </div>
                   </div>
-                  
-                  <div className="price-section">
-                    <div className="price-badge">
-                      <p className="price-text">{teacher.price}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                </article>
+              ))}
             </div>
-          ))}
+
+            {/* Botón Ver más */}
+            <div className="text-center mt-[60px]">
+              <Link 
+                to="/catalog/teachers"
+                className="inline-block text-[18px] font-semibold tracking-[0.5px] transition-colors" 
+                style={{
+                  backgroundColor: '#294954', 
+                  color: '#FAF9F5', 
+                  padding: '12px 24px', 
+                  borderRadius: '20px', 
+                  border: '2px solid #294954',
+                  textDecoration: 'none',
+                  cursor: 'pointer'
+                }} 
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1e3a42'} 
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#294954'}
+              >
+                Ver más docentes
+              </Link>
+            </div>
+          </>
+        )}
+      </div>
+
+      {showVideo && (
+        <div 
+          className="video-modal-overlay" 
+          role="dialog" 
+          aria-modal="true" 
+          onClick={() => setShowVideo(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 9999,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <div 
+            className="video-modal" 
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              maxWidth: '880px',
+              width: '90%',
+              backgroundColor: '#000',
+              borderRadius: '16px',
+              overflow: 'hidden',
+              position: 'relative'
+            }}
+          >
+            <div className="video-aspect" style={{
+              position: 'relative',
+              width: '100%',
+              paddingTop: '56.25%'
+            }}>
+              <iframe 
+                src={videoEmbed} 
+                title="Video de presentación" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowFullScreen
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  border: 0
+                }}
+              />
+              <button 
+                className="video-close" 
+                aria-label="Cerrar video" 
+                onClick={() => setShowVideo(false)}
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '12px',
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '50%',
+                  backgroundColor: '#fff',
+                  border: '1px solid #ccc',
+                  cursor: 'pointer',
+                  fontSize: '24px',
+                  fontWeight: 'bold',
+                  color: '#000',
+                  zIndex: 10
+                }}
+              >
+                ✕
+              </button>
+            </div>
           </div>
         </div>
-        
-        {/* Botón Ver más centrado */}
-        <div className="text-center mt-[60px]">
-          <a 
-            href="/teachers"
-            className="inline-block text-[18px] font-semibold tracking-[0.5px] transition-colors" 
-            style={{
-              backgroundColor: '#294954', 
-              color: '#FAF9F5', 
-              padding: '12px 24px', 
-              borderRadius: '20px', 
-              border: '2px solid #294954',
-              textDecoration: 'none',
-              cursor: 'pointer'
-            }} 
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1e3a42'} 
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#294954'}>
-            Ver más docentes
-          </a>
-        </div>
-      </div>
+      )}
     </section>
   );
 };

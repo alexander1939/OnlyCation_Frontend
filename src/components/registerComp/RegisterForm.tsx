@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Ribbon from '../ui/Ribbon';
+import { Link } from 'react-router-dom';
 
 interface RegisterFormData {
   first_name: string;
@@ -568,11 +569,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ userType, onSubmit, isLoadi
             lineHeight: '1.5',
             fontFamily: 'Inter, sans-serif'
           }}>
-            Acepto la <a href="#" style={{ color: '#68B2C9', textDecoration: 'underline' }}>
+            Acepto la <Link to="/privacy" style={{ color: '#68B2C9', textDecoration: 'underline' }}>
               política de privacidad
-            </a> y los <a href="#" style={{ color: '#68B2C9', textDecoration: 'underline' }}>
+            </Link> y los <Link to="/terms" style={{ color: '#68B2C9', textDecoration: 'underline' }}>
               términos de servicio
-            </a> de OnlyCation *
+            </Link> de OnlyCation *
           </label>
         </div>
         {errors.privacy_policy_accepted && (

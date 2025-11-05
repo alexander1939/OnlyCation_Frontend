@@ -58,15 +58,24 @@ export default function TeacherCatalog() {
   }, [subjectSearch]);
 
   const handleSearch = async () => {
+    console.log('🔍 Buscando con filtros:', {
+      name,
+      subject,
+      minRating,
+      priceMin,
+      priceMax
+    });
+    setPage(1); // Resetear a página 1 cuando se busca
     await searchTeachers({
       name: name || undefined,
       subject: subject || undefined,
       min_rating: minRating > 0 ? minRating : undefined,
       min_price: priceMin,
       max_price: priceMax,
-      page,
+      page: 1, // Siempre empezar desde página 1 en búsqueda nueva
       page_size: 12
     });
+    console.log('✅ Búsqueda completada');
     setFiltersOpen(false);
   };
 
@@ -134,10 +143,12 @@ export default function TeacherCatalog() {
   const items = useMemo(() => {
     if (!teachers || !Array.isArray(teachers)) return [];
     
+    console.log('📊 Teachers en items:', teachers.length);
+    
     return teachers
       .filter((t) => (t.user_id !== undefined && t.user_id !== null) || (t.teacher_id !== undefined && t.teacher_id !== null))
       .map((t) => {
-        const thumbnailUrl = t.video_thumbnail_url || 'https://img.youtube.com/vi/ysz5S6PUM-U/maxresdefault.jpg';
+        const thumbnailUrl = t.video_thumbnail_url || '/Gemini_Generated_Image_ccdndiccdndiccdn.png';
         const id = t.user_id || t.teacher_id;
         const subject = t.expertise_area || t.subject;
         const price = t.price_per_hour || t.price_per_class;
@@ -333,63 +344,100 @@ export default function TeacherCatalog() {
               </div>
 
               <div className="cards-grid">
-                {items.map((t, idx) => (
-                  <article 
-                    key={t.id} 
-                    className="card card-appear" 
-                    style={{ animationDelay: `${idx * 80}ms` }}
-                    onClick={() => handleCardClick(t.id)}
-                  >
-                    <div className="card-video" style={{ backgroundImage: `url(${t.thumbnailUrl})` }} aria-label={`Video de ${t.name}`}>
+                {loading ? (
+                  <div className="text-center py-8" style={{gridColumn: '1 / -1'}}>
+                    <p className="text-gray-600">Cargando profesores...</p>
+                  </div>
+                ) : items.length === 0 ? (
+                  <div className="text-center py-16" style={{gridColumn: '1 / -1'}}>
+                    <div style={{
+                      backgroundColor: '#FAF9F5',
+                      padding: '48px',
+                      borderRadius: '24px',
+                      border: '2px solid #8ED4BE'
+                    }}>
+                      <h3 className="text-[32px] font-bold mb-4" style={{color: '#294954'}}>
+                        No se encontraron docentes
+                      </h3>
+                      <p className="text-[18px] mb-6" style={{color: '#6B7280'}}>
+                        No hay resultados para los filtros aplicados
+                      </p>
                       <button 
-                        className="card-play" 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onPlay(t.videoUrl);
-                        }} 
-                        aria-label={`Reproducir video de ${t.name}`}
+                        onClick={clearFilters}
+                        style={{
+                          backgroundColor: '#294954',
+                          color: '#FAF9F5',
+                          padding: '12px 24px',
+                          borderRadius: '20px',
+                          border: 'none',
+                          cursor: 'pointer',
+                          fontSize: '16px',
+                          fontWeight: '600'
+                        }}
                       >
-                        ▶
+                        Limpiar filtros
                       </button>
                     </div>
-                    <div className="card-body">
-                      <div className="card-header">
-                        <h3 className="card-name" title={t.name}>{t.name}</h3>
-                        {t.available && <span className="badge-available">Disponible</span>}
-                      </div>
-                      <div className="card-meta">
-                        <span className="chip chip-subject">{t.subject}</span>
-                        <span className="chip chip-level">{t.level}</span>
-                      </div>
-                      <div className="card-actions">
-                        <div className="info-boxes">
-                          <div className="info-box price-box">
-                            <span className="info-value">${t.hourlyRate}</span>
-                            <span className="info-label">MXN/HORA</span>
-                          </div>
-                          <div className="info-box rating-box">
-                            <div className="rating-content">
-                              <span className="star-icon">★</span>
-                              <span className="info-value">{t.rating.toFixed(1)}</span>
-                            </div>
-                            <span className="info-label">CALIFICACIÓN</span>
-                          </div>
-                        </div>
-                        <a 
-                          className="link-profile"
+                  </div>
+                ) : (
+                  items.map((t, idx) => (
+                    <article 
+                      key={t.id} 
+                      className="card card-appear" 
+                      style={{ animationDelay: `${idx * 80}ms` }}
+                      onClick={() => handleCardClick(t.id)}
+                    >
+                      <div className="card-video" style={{ backgroundImage: `url(${t.thumbnailUrl})` }} aria-label={`Video de ${t.name}`}>
+                        <button 
+                          className="card-play" 
                           onClick={(e) => {
-                            e.preventDefault();
-                            handleCardClick(t.id);
-                          }}
-                          href="#"
+                            e.stopPropagation();
+                            onPlay(t.videoUrl);
+                          }} 
+                          aria-label={`Reproducir video de ${t.name}`}
                         >
-                          Ver Perfil
-                          <span className="arrow-icon">→</span>
-                        </a>
+                          ▶
+                        </button>
                       </div>
-                    </div>
-                  </article>
-                ))}
+                      <div className="card-body">
+                        <div className="card-header">
+                          <h3 className="card-name" title={t.name}>{t.name}</h3>
+                          {t.available && <span className="badge-available">Disponible</span>}
+                        </div>
+                        <div className="card-meta">
+                          <span className="chip chip-subject">{t.subject}</span>
+                          <span className="chip chip-level">{t.level}</span>
+                        </div>
+                        <div className="card-actions">
+                          <div className="info-boxes">
+                            <div className="info-box price-box">
+                              <span className="info-value">${t.hourlyRate}</span>
+                              <span className="info-label">MXN/HORA</span>
+                            </div>
+                            <div className="info-box rating-box">
+                              <div className="rating-content">
+                                <span className="star-icon">★</span>
+                                <span className="info-value">{t.rating.toFixed(1)}</span>
+                              </div>
+                              <span className="info-label">CALIFICACIÓN</span>
+                            </div>
+                          </div>
+                          <a 
+                            className="link-profile"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleCardClick(t.id);
+                            }}
+                            href="#"
+                          >
+                            Ver Perfil
+                            <span className="arrow-icon">→</span>
+                          </a>
+                        </div>
+                      </div>
+                    </article>
+                  ))
+                )}
               </div>
 
               <div className="load-more">

@@ -20,7 +20,12 @@ export const TeachersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       const res = await apiGetTeachers(page, pageSize);
       if (res?.success) {
-        setTeachers(res.data);
+        // Si es página 1, reemplazar. Si es página > 1, agregar a los existentes
+        if (page && page > 1) {
+          setTeachers(prev => [...prev, ...res.data]);
+        } else {
+          setTeachers(res.data);
+        }
         setTotal(res.total);
         setPage(res.page);
         setPageSize(res.page_size);
@@ -44,7 +49,12 @@ export const TeachersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       const res = await apiSearchTeachers(params);
       if (res?.success) {
-        setTeachers(res.data);
+        // Si es página 1, reemplazar. Si es página > 1, agregar a los existentes
+        if (params?.page && params.page > 1) {
+          setTeachers(prev => [...prev, ...res.data]);
+        } else {
+          setTeachers(res.data);
+        }
         setTotal(res.total);
         setPage(res.page);
         setPageSize(res.page_size);

@@ -72,7 +72,6 @@ export const useTeachersApi = () => {
       // Intentar cargar del caché cuando falla la API
       const cachedTeachers = getTeachersFromCache();
       if (cachedTeachers && cachedTeachers.length > 0) {
-        console.log('📦 Usando profesores del caché (backend no disponible)');
         return {
           success: true,
           message: 'Datos del caché',
@@ -126,7 +125,6 @@ export const useTeachersApi = () => {
       // Intentar cargar del caché cuando falla la API
       const cachedTeachers = getTeachersFromCache();
       if (cachedTeachers && cachedTeachers.length > 0) {
-        console.log('📦 Usando profesores del caché (backend no disponible)');
         return {
           success: true,
           message: 'Datos del caché',

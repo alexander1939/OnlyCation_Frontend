@@ -7,7 +7,7 @@ interface NotificationProps {
   isVisible: boolean;
   onClose: (id: string) => void;
   autoClose?: number | false;
-  index: number; // Para posicionar múltiples notificaciones
+  index: number;
 }
 
 export default function NetworkNotification({ 
@@ -25,7 +25,6 @@ export default function NetworkNotification({
     if (isVisible) {
       setIsAnimating(true);
       
-      // Auto close si está configurado
       if (autoClose !== false) {
         const timer = setTimeout(() => {
           handleClose();
@@ -38,7 +37,6 @@ export default function NetworkNotification({
 
   const handleClose = () => {
     setIsAnimating(false);
-    // Esperar a que termine la animación antes de eliminar completamente
     setTimeout(() => {
       onClose(id);
     }, 300);
@@ -50,85 +48,138 @@ export default function NetworkNotification({
     switch (type) {
       case 'success':
         return {
-          backgroundColor: '#10B981',
-          borderColor: '#059669',
+          background: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)',
+          borderColor: '#86efac',
+          iconColor: '#16a34a',
+          textColor: '#15803d',
         };
       case 'error':
         return {
-          backgroundColor: '#EF4444',
-          borderColor: '#DC2626',
+          background: 'linear-gradient(135deg, #ffffff 0%, #fef2f2 100%)',
+          borderColor: '#fca5a5',
+          iconColor: '#dc2626',
+          textColor: '#991b1b',
         };
       case 'warning':
         return {
-          backgroundColor: '#F59E0B',
-          borderColor: '#D97706',
+          background: 'linear-gradient(135deg, #ffffff 0%, #fffbeb 100%)',
+          borderColor: '#fcd34d',
+          iconColor: '#f59e0b',
+          textColor: '#92400e',
         };
       default:
         return {
-          backgroundColor: '#6B7280',
-          borderColor: '#4B5563',
+          background: 'linear-gradient(135deg, #ffffff 0%, #f9fafb 100%)',
+          borderColor: '#d1d5db',
+          iconColor: '#6b7280',
+          textColor: '#374151',
         };
     }
   };
 
+  const getIcon = () => {
+    switch (type) {
+      case 'success':
+        return '✓';
+      case 'error':
+        return '!';
+      case 'warning':
+        return '⚠';
+      default:
+        return 'i';
+    }
+  };
+
   const typeStyles = getTypeStyles();
-  
-  // Calcular posición basada en el índice (más reciente arriba)
-  const topPosition = 80 + (index * 90); // 90px de separación entre notificaciones
+  const topPosition = 120 + (index * 80);
 
   return (
     <div
       style={{
         position: 'fixed',
         top: `${topPosition}px`,
-        right: '20px',
-        width: '400px',
-        backgroundColor: typeStyles.backgroundColor,
-        color: 'white',
-        borderRadius: '12px',
-        padding: '20px 24px',
-        minHeight: '70px',
-        boxShadow: '0 6px 20px rgba(0, 0, 0, 0.2)',
-        zIndex: 9999 - index, // Más reciente tiene mayor z-index
+        right: '24px',
+        width: '500px',
+        background: typeStyles.background,
+        borderLeft: `3px solid ${typeStyles.borderColor}`,
+        borderRadius: '8px',
+        padding: '18px 24px',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04)',
+        zIndex: 9999 - index,
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        fontSize: '16px',
-        fontWeight: '500',
-        lineHeight: '1.4',
-        transform: isAnimating ? 'translateX(0)' : 'translateX(100%)',
+        gap: '14px',
+        transform: isAnimating ? 'translateX(0) scale(1)' : 'translateX(120%) scale(0.95)',
         opacity: isAnimating ? 1 : 0,
-        transition: 'all 0.3s ease-in-out',
+        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+        backdropFilter: 'blur(10px)',
+        fontFamily: 'Roboto, sans-serif',
       }}
     >
-      <span>{message}</span>
-      <button
-        onClick={handleClose}
+      {/* Icon */}
+      <div
         style={{
-          background: 'rgba(255, 255, 255, 0.2)',
-          border: 'none',
-          color: 'white',
-          fontSize: '18px',
-          cursor: 'pointer',
-          padding: '8px',
+          width: '36px',
+          height: '36px',
           borderRadius: '50%',
-          width: '32px',
-          height: '32px',
+          background: `${typeStyles.iconColor}15`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          transition: 'background-color 0.2s ease',
-          marginLeft: '12px',
+          fontSize: '18px',
+          fontWeight: '600',
+          color: typeStyles.iconColor,
+          flexShrink: 0,
+        }}
+      >
+        {getIcon()}
+      </div>
+
+      {/* Message */}
+      <span
+        style={{
+          flex: 1,
+          fontSize: '15px',
+          fontWeight: '500',
+          lineHeight: '1.5',
+          color: typeStyles.textColor,
+          letterSpacing: '-0.01em',
+          fontFamily: 'Roboto, sans-serif',
+        }}
+      >
+        {message}
+      </span>
+
+      {/* Close button */}
+      <button
+        onClick={handleClose}
+        style={{
+          background: 'transparent',
+          border: 'none',
+          color: typeStyles.textColor,
+          fontSize: '22px',
+          cursor: 'pointer',
+          padding: '4px',
+          borderRadius: '4px',
+          width: '26px',
+          height: '26px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          transition: 'all 0.2s ease',
+          opacity: 0.5,
           flexShrink: 0,
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+          e.currentTarget.style.opacity = '1';
+          e.currentTarget.style.background = `${typeStyles.iconColor}10`;
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+          e.currentTarget.style.opacity = '0.5';
+          e.currentTarget.style.background = 'transparent';
         }}
       >
-        ✕
+        ×
       </button>
     </div>
   );

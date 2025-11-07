@@ -37,46 +37,38 @@ export const useNetworkStatus = (): NetworkStatus => {
         console.log('🔍 Backend check:', { data, apiConnected, hasShownOffline });
         
         if (data && data.status === 'ok') {
-          // Backend funcionando correctamente
-          console.log('✅ Backend OK - Estado actual:', { apiConnected, hasShownOffline });
           
           if (!apiConnected && hasShownOffline) {
-            console.log('📣 MOSTRANDO NOTIFICACIÓN DE CONEXIÓN RESTAURADA');
             setApiConnected(true);
             setHasShownOffline(false);
-            showSuccess('🌐 Conexión restaurada');
+            showSuccess('Conexión restaurada');
             updatePageTitle(true);
           } else if (!hasShownOffline) {
-            console.log('🟢 Primera conexión - no mostrar notificación');
             setApiConnected(true);
-          } else {
-            console.log('❓ Estado:', { apiConnected, hasShownOffline });
           }
         } else {
           // Backend responde pero sin status ok
           if (apiConnected || !hasShownOffline) {
             setApiConnected(false);
             setHasShownOffline(true);
-            showError('⚠️ Servidor no disponible - Modo offline');
+            showError('Servidor no disponible - Modo offline');
             updatePageTitle(false);
           }
         }
       } else {
-        // Backend responde con error
         if (apiConnected || !hasShownOffline) {
           setApiConnected(false);
           setHasShownOffline(true);
-          showError('⚠️ Servidor no disponible - Modo offline');
+          showError('Servidor no disponible - Modo offline');
           updatePageTitle(false);
         }
       }
     } catch (error) {
       // Backend no disponible
-      console.log('❌ Backend no disponible');
       if (apiConnected || !hasShownOffline) {
         setApiConnected(false);
         setHasShownOffline(true);
-        showError('⚠️ Servidor no disponible - Modo offline');
+        showError('Servidor no disponible - Modo offline');
         updatePageTitle(false);
       }
     }
@@ -91,14 +83,12 @@ export const useNetworkStatus = (): NetworkStatus => {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden && !apiConnected) {
-        console.log('�️ Usuario volvió a la pestaña - verificando backend');
         checkBackend();
       }
     };
 
     const handleFocus = () => {
       if (!apiConnected) {
-        console.log('🎯 Ventana enfocada - verificando backend');
         checkBackend();
       }
     };
@@ -127,7 +117,7 @@ export const useNetworkStatus = (): NetworkStatus => {
         setWasOffline(true);
         setApiConnected(false);
         setHasShownOffline(true);
-        showError('⚠️ Servidor no disponible - Modo offline');
+        showError('Servidor no disponible - Modo offline');
         updatePageTitle(false);
       }
     };

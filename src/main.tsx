@@ -7,7 +7,8 @@ import { createApiInterceptor } from './utils/apiErrorHandler.ts'
 // Inicializar interceptor de API para detectar errores de conexión
 createApiInterceptor();
 
-// Registra el service worker
+// Registra el service worker (desactivado temporalmente en desarrollo)
+/*
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').then(
@@ -20,6 +21,7 @@ if ('serviceWorker' in navigator) {
     );
   });
 }
+*/
 
 createRoot(document.getElementById('root')!).render(
   <>

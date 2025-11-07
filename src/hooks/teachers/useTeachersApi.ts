@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import axios, { AxiosError } from 'axios';
+import { saveTeachersToCache, getTeachersFromCache } from '../../utils/teachersCache';
 
 const API_URL = import.meta.env.VITE_API_URL as string;
 
@@ -57,10 +58,32 @@ export const useTeachersApi = () => {
     try {
       const url = `/public/teachers/?page=${page}&page_size=${pageSize}`;
       const res = await client.get<SearchTeachersResponse>(url);
+      
+      // Guardar en caché cuando la API responde correctamente
+      if (res.data.data && res.data.data.length > 0) {
+        saveTeachersToCache(res.data.data);
+      }
+      
       return res.data;
     } catch (err) {
       const axErr = err as AxiosError<{ detail?: string; message?: string }>;
       const message = axErr.response?.data?.detail || axErr.response?.data?.message || axErr.message || 'Error al obtener profesores';
+      
+      // Intentar cargar del caché cuando falla la API
+      const cachedTeachers = getTeachersFromCache();
+      if (cachedTeachers && cachedTeachers.length > 0) {
+        console.log('📦 Usando profesores del caché (backend no disponible)');
+        return {
+          success: true,
+          message: 'Datos del caché',
+          data: cachedTeachers,
+          total: cachedTeachers.length,
+          page: 1,
+          page_size: cachedTeachers.length,
+          total_pages: 1
+        };
+      }
+      
       return {
         success: false,
         message,
@@ -90,10 +113,31 @@ export const useTeachersApi = () => {
 
       const res = await client.get<SearchTeachersResponse>(url);
       
+      // Guardar en caché cuando la API responde correctamente
+      if (res.data.data && res.data.data.length > 0) {
+        saveTeachersToCache(res.data.data);
+      }
+      
       return res.data;
     } catch (err) {
       const axErr = err as AxiosError<{ detail?: string; message?: string }>;
       const message = axErr.response?.data?.detail || axErr.response?.data?.message || axErr.message || 'Error al buscar profesores';
+      
+      // Intentar cargar del caché cuando falla la API
+      const cachedTeachers = getTeachersFromCache();
+      if (cachedTeachers && cachedTeachers.length > 0) {
+        console.log('📦 Usando profesores del caché (backend no disponible)');
+        return {
+          success: true,
+          message: 'Datos del caché',
+          data: cachedTeachers,
+          total: cachedTeachers.length,
+          page: 1,
+          page_size: cachedTeachers.length,
+          total_pages: 1
+        };
+      }
+      
       return {
         success: false,
         message,

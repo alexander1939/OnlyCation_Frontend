@@ -3,6 +3,7 @@ import type { Teacher, SearchTeachersParams } from '../../hooks/teachers/useTeac
 export interface TeachersContextType {
   teachers: Teacher[];
   loading: boolean;
+  loadingMore: boolean;
   error: string | null;
   total: number;
   page: number;

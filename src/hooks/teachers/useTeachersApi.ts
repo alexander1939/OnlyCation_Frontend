@@ -71,24 +71,29 @@ export const useTeachersApi = () => {
       
       // Intentar cargar del caché cuando falla la API
       const cachedTeachers = getTeachersFromCache();
-      if (cachedTeachers && cachedTeachers.length > 0) {
+      if (cachedTeachers && cachedTeachers.length > 0 && page === 1) {
+        // Solo devolver caché en página 1
+        // Limitar al pageSize solicitado (ej: 3 para Home, 12 para Catálogo)
+        const limitedTeachers = cachedTeachers.slice(0, pageSize);
+        
         return {
           success: true,
           message: 'Datos del caché',
-          data: cachedTeachers,
-          total: cachedTeachers.length,
+          data: limitedTeachers,
+          total: limitedTeachers.length,
           page: 1,
-          page_size: cachedTeachers.length,
+          page_size: limitedTeachers.length,
           total_pages: 1
         };
       }
       
+      // Si es página > 1 o no hay caché, devolver vacío
       return {
         success: false,
         message,
         data: [],
         total: 0,
-        page: 1,
+        page: page || 1,
         page_size: pageSize,
         total_pages: 0
       };

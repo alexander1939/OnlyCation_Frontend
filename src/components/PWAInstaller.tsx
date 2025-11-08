@@ -4,9 +4,18 @@ import { toast } from 'react-toastify';
 export default function PWAInstaller() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [debugMode, setDebugMode] = useState(false);
 
   useEffect(() => {
+    // Debug: Mostrar siempre en desarrollo
+    if (import.meta.env.DEV) {
+      console.log('PWA Installer: Modo desarrollo detectado');
+      setDebugMode(true);
+      setIsVisible(true);
+    }
+
     const handleBeforeInstallPrompt = (e: Event) => {
+      console.log('PWA Installer: beforeinstallprompt event fired');
       // Previene que el navegador muestre el mensaje de instalación automática
       e.preventDefault();
       // Guarda el evento para usarlo más tarde
@@ -15,11 +24,21 @@ export default function PWAInstaller() {
       setIsVisible(true);
     };
 
+    // Verificar si ya está instalado
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    const isInWebAppiOS = (window.navigator as any).standalone === true;
+    
+    if (isStandalone || isInWebAppiOS) {
+      console.log('PWA Installer: App ya está instalada');
+      setIsVisible(false);
+      return;
+    }
+
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
     // Comprueba si la aplicación ya está instalada
     window.addEventListener('appinstalled', () => {
-      console.log('¡Aplicación instalada con éxito!');
+      console.log('PWA Installer: ¡Aplicación instalada con éxito!');
       setIsVisible(false);
     });
 
@@ -29,6 +48,11 @@ export default function PWAInstaller() {
   }, []);
 
   const handleInstallClick = async () => {
+    if (debugMode && !deferredPrompt) {
+      toast.info('Modo debug: En producción esto activaría la instalación PWA');
+      return;
+    }
+
     if (!deferredPrompt) return;
 
     // Muestra el mensaje de instalación
@@ -61,7 +85,7 @@ export default function PWAInstaller() {
       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
         <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
       </svg>
-      Instalar aplicación
+      {debugMode ? 'Instalar PWA (Debug)' : 'Instalar aplicación'}
     </button>
   );
 }

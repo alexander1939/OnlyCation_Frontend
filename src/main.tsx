@@ -1,12 +1,14 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
 import './index.css'
 import App from './App.tsx'
 import PWAInstaller from './components/PWAInstaller'
+import { createApiInterceptor } from './utils/apiErrorHandler.ts'
 
-// Registra el service worker
+// Inicializar interceptor de API para detectar errores de conexión
+createApiInterceptor();
+
+// Registra el service worker (desactivado temporalmente en desarrollo)
+/*
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').then(
@@ -19,22 +21,11 @@ if ('serviceWorker' in navigator) {
     );
   });
 }
+*/
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+  <>
     <App />
     <PWAInstaller />
-    <ToastContainer
-      position="top-right"
-      autoClose={5000}
-      hideProgressBar={false}
-      newestOnTop={false}
-      closeOnClick
-      rtl={false}
-      pauseOnFocusLoss
-      draggable
-      pauseOnHover
-      theme="light"
-    />
-  </StrictMode>,
+  </>
 )

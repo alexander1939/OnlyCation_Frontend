@@ -34,7 +34,7 @@ function extractYouTubeId(url: string): string | null {
 }
 
 export default function TeacherCatalog() {
-  const { teachers, loading, total, getTeachers, searchTeachers } = useTeachersContext();
+  const { teachers, loading, loadingMore, total, getTeachers, searchTeachers } = useTeachersContext();
   const [name, setName] = useState('');
   const [subject, setSubject] = useState('');
   const [levels, setLevels] = useState<string[]>([]);
@@ -383,8 +383,7 @@ export default function TeacherCatalog() {
                   items.map((t, idx) => (
                     <article 
                       key={t.id} 
-                      className="card card-appear" 
-                      style={{ animationDelay: `${idx * 80}ms` }}
+                      className="card card-appear"
                       onClick={() => handleCardClick(t.id)}
                     >
                       <div className="card-video" style={{ backgroundImage: `url(${t.thumbnailUrl})` }} aria-label={`Video de ${t.name}`}>
@@ -441,8 +440,8 @@ export default function TeacherCatalog() {
               </div>
 
               <div className="load-more">
-                <button className="btn-primary" onClick={loadMore}>
-                  Cargar más resultados
+                <button className="btn-primary" onClick={loadMore} disabled={loadingMore}>
+                  {loadingMore ? 'Cargando...' : 'Cargar más resultados'}
                 </button>
               </div>
             </div>

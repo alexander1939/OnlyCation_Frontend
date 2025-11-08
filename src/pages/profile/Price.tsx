@@ -28,7 +28,7 @@ const CreatePriceForm: React.FC = () => {
     if (availability?.preference_id) {
       setPreferenceId(String(availability.preference_id));
     } else {
-      const stored = localStorage.getItem('preference_id');
+      const stored = localStorage.getItem('user_preference_id');
       if (stored) setPreferenceId(stored);
     }
   }, [availability?.preference_id]);

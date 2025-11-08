@@ -46,10 +46,7 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityA
       return;
     }
     
-    // Agregar al estado local
-    addHours(modalDay, hours);
-    
-    // Guardar automáticamente en el backend
+    // Guardar en el backend primero
     try {
       const pref = localStorage.getItem('user_preference_id');
       if (!pref) {
@@ -68,20 +65,41 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityA
         preference_id,
         day_of_week: dayMap[modalDay],
         start_time: `${String(h).padStart(2, '0')}:00`,
-        end_time: `${String(h + 1).padStart(2, '0')}:00`,
+        end_time: `${String((h + 1) % 24).padStart(2, '0')}:00`,
       }));
       
+      // Enviar secuencialmente en lugar de paralelo para evitar conflictos
+      const successfulHours: number[] = [];
+      let errorCount = 0;
       
-      const results = await Promise.all(payloads.map(payload => createAvailability(payload)));
+      for (let i = 0; i < payloads.length; i++) {
+        const payload = payloads[i];
+        const hour = hours[i];
+        const result = await createAvailability(payload);
+        
+        if (result.success) {
+          successfulHours.push(hour);
+          const startTime = `${String(hour).padStart(2, '0')}:00`;
+          const endTime = `${String((hour + 1) % 24).padStart(2, '0')}:00`;
+          showSuccess(`Disponibilidad agregada: ${startTime} - ${endTime}`);
+        } else {
+          errorCount++;
+          const startTime = `${String(hour).padStart(2, '0')}:00`;
+          showError(`Error al guardar horario ${startTime}: ${result.message}`);
+        }
+      }
       
-      const failed = results.filter(r => !r.success);
-      if (failed.length > 0) {
-        showError(`⚠️ Algunos horarios no se pudieron guardar: ${failed[0].message}`);
-      } else {
-        showSuccess(`${results.length} horario(s) guardado(s) exitosamente`);
+      // Agregar solo las horas exitosas al estado local
+      if (successfulHours.length > 0) {
+        addHours(modalDay, successfulHours);
+      }
+      
+      if (errorCount > 0 && successfulHours.length > 0) {
+        showWarning(`${successfulHours.length} horario(s) guardado(s), ${errorCount} fallaron`);
       }
     } catch (e: any) {
       showError(`Error al guardar: ${e?.message || 'Error desconocido'}`);
+      // No agregar al estado local si hubo error
     }
     
     setIsModalOpen(false);

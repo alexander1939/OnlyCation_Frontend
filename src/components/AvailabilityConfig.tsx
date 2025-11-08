@@ -4,6 +4,7 @@ import '../styles/docente-agenda.css';
 import { useSchedule } from '../context/availability/ScheduleContext';
 import type { DayKey } from '../context/availability/ScheduleContext';
 import { useAgendaApi } from '../hooks/availability/useavailabilityApi';
+import { useNotificationContext } from '../components/NotificationProvider';
 
 interface AvailabilityConfigProps {
   onAvailabilityAdded?: () => void;
@@ -13,6 +14,7 @@ interface AvailabilityConfigProps {
 const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityAdded, onAvailabilityDeleted }) => {
   const { dayLabels, enabledDays, slots, availableSlots, addHours, removeSlot, toggleDay, dayKeyToIndex, toHH } = useSchedule();
   const { deleteAvailability, createAvailability } = useAgendaApi();
+  const { showSuccess, showError, showWarning } = useNotificationContext();
   const weekKeys = useMemo<DayKey[]>(() => ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'], []);
 
   // Modal local state
@@ -51,7 +53,7 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityA
     try {
       const pref = localStorage.getItem('user_preference_id');
       if (!pref) {
-        alert('❌ No se detectó preference_id. Inicia sesión nuevamente.');
+        showError('No se detectó preference_id. Inicia sesión nuevamente.');
         setIsModalOpen(false);
         return;
       }
@@ -69,19 +71,17 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityA
         end_time: `${String(h + 1).padStart(2, '0')}:00`,
       }));
       
-      console.log('💾 Guardando horarios automáticamente:', payloads);
       
       const results = await Promise.all(payloads.map(payload => createAvailability(payload)));
       
       const failed = results.filter(r => !r.success);
       if (failed.length > 0) {
-        alert(`⚠️ Algunos horarios no se pudieron guardar: ${failed[0].message}`);
+        showError(`⚠️ Algunos horarios no se pudieron guardar: ${failed[0].message}`);
       } else {
-        console.log(`✅ ${results.length} horario(s) guardado(s)`);
+        showSuccess(`${results.length} horario(s) guardado(s) exitosamente`);
       }
     } catch (e: any) {
-      console.error('Error al guardar:', e);
-      alert(`❌ Error al guardar: ${e?.message || 'Error desconocido'}`);
+      showError(`Error al guardar: ${e?.message || 'Error desconocido'}`);
     }
     
     setIsModalOpen(false);
@@ -94,14 +94,14 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityA
   const canToggleDay = (day: DayKey): boolean => {
     const currentlyEnabled = Object.values(enabledDays).filter(Boolean).length;
     if (enabledDays[day] && currentlyEnabled === 1) {
-      alert('⚠️ Debes tener al menos un día activo en tu agenda.');
+      showWarning('Debes tener al menos un día activo en tu agenda.');
       return false;
     }
     if (enabledDays[day]) {
       const dayIndex = dayKeyToIndex[day];
       const hasBookedClasses = availableSlots.some(slot => slot.isBooked && slot.start.getDay() === dayIndex);
       if (hasBookedClasses) {
-        alert('⚠️ No puedes deshabilitar este día porque tienes clases reservadas. Primero debes reagendar con tus estudiantes.');
+        showWarning('No puedes deshabilitar este día porque tienes clases reservadas. Primero debes reagendar con tus estudiantes.');
         return false;
       }
     }
@@ -119,7 +119,7 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityA
     const targetDay = dayKeyToIndex[day];
     const hasBooked = availableSlots.some(s => s.isBooked && format(s.start, 'HH:mm') === slotToRemove.hour && s.start.getDay() === targetDay);
     if (hasBooked) {
-      alert('⚠️ No puedes eliminar esta hora porque tienes clases reservadas. Primero debes reagendar con tus estudiantes.');
+      showWarning('⚠️ No puedes eliminar esta hora porque tienes clases reservadas. Primero debes reagendar con tus estudiantes.');
       return;
     }
     
@@ -131,10 +131,9 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityA
       setDeleting(null);
       
       if (!result.success) {
-        alert(`❌ Error al eliminar: ${result.message}`);
+        showError(`Error al eliminar: ${result.message}`);
         return;
       }
-      console.log(`✅ Horario ${id} eliminado del servidor`);
       if (onAvailabilityDeleted) onAvailabilityDeleted();
     }
     

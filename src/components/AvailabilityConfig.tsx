@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import { format } from 'date-fns';
 import '../styles/docente-agenda.css';
 import { useSchedule } from '../context/availability/ScheduleContext';
 import type { DayKey } from '../context/availability/ScheduleContext';

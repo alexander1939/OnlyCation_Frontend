@@ -11,9 +11,9 @@ interface AvailabilityConfigProps {
   onAvailabilityDeleted?: () => void;
 }
 
-const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityAdded, onAvailabilityDeleted }) => {
-  const { dayLabels, enabledDays, slots, availableSlots, addHours, removeSlot, toggleDay, dayKeyToIndex, toHH } = useSchedule();
-  const { deleteAvailability, createAvailability } = useAgendaApi();
+const AvailabilityConfig: React.FC<AvailabilityConfigProps> = () => {
+  const { dayLabels, enabledDays, slots, availableSlots, removeSlot, toggleDay, dayKeyToIndex, toHH, loadFromAgenda } = useSchedule();
+  const { deleteAvailability, createAvailability, fetchWeeklyAgenda } = useAgendaApi();
   const { showSuccess, showError, showWarning } = useNotificationContext();
   const weekKeys = useMemo<DayKey[]>(() => ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'], []);
 
@@ -21,7 +21,7 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityA
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalDay, setModalDay] = useState<DayKey | null>(null);
   const [selectedHours, setSelectedHours] = useState<Set<number>>(new Set());
-  const [deleting, setDeleting] = useState<string | null>(null);
+  const [, setDeleting] = useState<string | null>(null);
 
   const openAddModal = (day: DayKey) => {
     if (!enabledDays[day]) return;
@@ -89,9 +89,35 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityA
         }
       }
       
-      // Agregar solo las horas exitosas al estado local
+      // Recargar TODA la agenda desde el backend con datos reales
       if (successfulHours.length > 0) {
-        addHours(modalDay, successfulHours);
+        // Calcular rango de fechas para la semana actual
+        const today = new Date();
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - today.getDay()); // Domingo
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6); // Sábado
+        
+        const formatDate = (date: Date) => {
+          const yyyy = date.getFullYear();
+          const mm = String(date.getMonth() + 1).padStart(2, '0');
+          const dd = String(date.getDate()).padStart(2, '0');
+          return `${yyyy}-${mm}-${dd}`;
+        };
+        
+        const startDate = formatDate(startOfWeek);
+        const endDate = formatDate(endOfWeek);
+        
+        console.log('🔄 Recargando agenda desde backend:', startDate, 'a', endDate);
+        
+        // Fetch agenda from backend with REAL data
+        const agendaResponse = await fetchWeeklyAgenda(startDate, endDate);
+        if (agendaResponse.success && agendaResponse.data) {
+          console.log('✅ Agenda recibida del backend:', agendaResponse.data);
+          loadFromAgenda?.(agendaResponse.data);
+        } else {
+          showError('Error al recargar la agenda');
+        }
       }
       
       if (errorCount > 0 && successfulHours.length > 0) {
@@ -105,7 +131,6 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityA
     setIsModalOpen(false);
     setModalDay(null);
     setSelectedHours(new Set());
-    if (onAvailabilityAdded) onAvailabilityAdded();
   };
 
   // Validaciones
@@ -117,7 +142,7 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityA
     }
     if (enabledDays[day]) {
       const dayIndex = dayKeyToIndex[day];
-      const hasBookedClasses = availableSlots.some(slot => slot.isBooked && slot.start.getDay() === dayIndex);
+      const hasBookedClasses = availableSlots.some(s => s.isBooked && s.start.getDay() === dayIndex);
       if (hasBookedClasses) {
         showWarning('No puedes deshabilitar este día porque tienes clases reservadas. Primero debes reagendar con tus estudiantes.');
         return false;
@@ -135,9 +160,9 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityA
     const slotToRemove = slots[day].find(s => s.id === id);
     if (!slotToRemove) return;
     const targetDay = dayKeyToIndex[day];
-    const hasBooked = availableSlots.some(s => s.isBooked && format(s.start, 'HH:mm') === slotToRemove.hour && s.start.getDay() === targetDay);
+    const hasBooked = availableSlots.some(s => s.isBooked && s.start.getDay() === targetDay);
     if (hasBooked) {
-      showWarning('⚠️ No puedes eliminar esta hora porque tienes clases reservadas. Primero debes reagendar con tus estudiantes.');
+      showWarning('No puedes eliminar esta hora porque tienes clases reservadas. Primero debes reagendar con tus estudiantes.');
       return;
     }
     
@@ -149,10 +174,15 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityA
       setDeleting(null);
       
       if (!result.success) {
-        showError(`Error al eliminar: ${result.message}`);
+        showError(`Error al eliminar horario ${slotToRemove.hour}: ${result.message}`);
         return;
       }
-      if (onAvailabilityDeleted) onAvailabilityDeleted();
+      
+      // Calcular hora de fin para mostrar el rango completo
+      const [hourStr] = slotToRemove.hour.split(':');
+      const hourNum = parseInt(hourStr);
+      const endTime = `${String((hourNum + 1) % 24).padStart(2, '0')}:00`;
+      showSuccess(`Disponibilidad eliminada: ${slotToRemove.hour} - ${endTime}`);
     }
     
     removeSlot(day, id);
@@ -183,7 +213,7 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityA
                   <div className="agenda-slots">
                     {slots[key].map((slot) => {
                       const dayIndex = dayKeyToIndex[key];
-                      const hasBooking = availableSlots.some(s => s.isBooked && format(s.start, 'HH:mm') === slot.hour && s.start.getDay() === dayIndex);
+                      const hasBooking = availableSlots.some(s => s.isBooked && s.start.getDay() === dayIndex);
                       return (
                         <div key={slot.id} className={`agenda-chip ${hasBooking ? 'has-booking' : ''}`}>
                           <span>{slot.hour} {hasBooking ? '🔒' : ''}</span>

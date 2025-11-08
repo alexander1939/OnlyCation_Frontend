@@ -49,7 +49,7 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityA
     
     // Guardar automáticamente en el backend
     try {
-      const pref = localStorage.getItem('preference_id');
+      const pref = localStorage.getItem('user_preference_id');
       if (!pref) {
         alert('❌ No se detectó preference_id. Inicia sesión nuevamente.');
         setIsModalOpen(false);

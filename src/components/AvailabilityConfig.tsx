@@ -177,15 +177,16 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = () => {
         showError(`Error al eliminar horario ${slotToRemove.hour}: ${result.message}`);
         return;
       }
-      
-      // Calcular hora de fin para mostrar el rango completo
-      const [hourStr] = slotToRemove.hour.split(':');
-      const hourNum = parseInt(hourStr);
-      const endTime = `${String((hourNum + 1) % 24).padStart(2, '0')}:00`;
-      showSuccess(`Disponibilidad eliminada: ${slotToRemove.hour} - ${endTime}`);
     }
     
+    // Eliminar del estado local
     removeSlot(day, id);
+    
+    // Mostrar notificación de éxito siempre
+    const [hourStr] = slotToRemove.hour.split(':');
+    const hourNum = parseInt(hourStr);
+    const endTime = `${String((hourNum + 1) % 24).padStart(2, '0')}:00`;
+    showSuccess(`Disponibilidad eliminada: ${slotToRemove.hour} - ${endTime}`);
   };
 
   return (

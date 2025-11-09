@@ -26,6 +26,8 @@ type AllBookingsViewProps = {
   hasMore: boolean;
   onLoadMore: () => void;
   onSearch: (params: { status?: string; date_from?: string; min_price?: number }) => void;
+  pageTitle?: string;
+  showViewAllButton?: boolean;
 };
 
 export default function AllBookingsView({ 
@@ -41,7 +43,9 @@ export default function AllBookingsView({
   detailError,
   hasMore,
   onLoadMore,
-  onSearch
+  onSearch,
+  pageTitle,
+  showViewAllButton
 }: AllBookingsViewProps) {
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [dateFilter, setDateFilter] = useState<string>('');
@@ -122,7 +126,7 @@ export default function AllBookingsView({
         <section className="docente-container">
           <div className="clases-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <h2 className="clases-title">Mis Reservas</h2>
+              <h2 className="clases-title">{pageTitle || 'Mis Reservas'}</h2>
               {classes.length > 0 && (
                 <span className="text-sm text-gray-600">({classes.length})</span>
               )}

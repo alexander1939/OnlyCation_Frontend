@@ -66,13 +66,24 @@ const DispAgenda: React.FC = () => {
 
   // Calcular estadísticas
   const stats = useMemo(() => {
-    if (!agendaData?.summary) return { total: 0, occupied: 0, available: 0 };
+    if (!agendaData?.days) return { total: 0, occupied: 0, available: 0 };
     
-    return {
-      total: agendaData.summary.total_slots || 0,
-      occupied: agendaData.summary.occupied_slots || 0,
-      available: agendaData.summary.available_slots || 0,
-    };
+    let total = 0;
+    let occupied = 0;
+    let available = 0;
+    
+    agendaData.days.forEach(day => {
+      day.slots?.forEach(slot => {
+        total++;
+        if (slot.status === 'occupied') {
+          occupied++;
+        } else if (slot.status === 'available') {
+          available++;
+        }
+      });
+    });
+    
+    return { total, occupied, available };
   }, [agendaData]);
 
   if (loading) {

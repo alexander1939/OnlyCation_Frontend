@@ -4,7 +4,7 @@ const Terms: React.FC = () => {
   return (
     <div className="w-full" style={{margin: 0, padding: 0}}>
       <main style={{paddingTop: '120px', paddingBottom: '64px'}}>
-        <div className="max-w-4xl mx-auto px-8 md:px-12 lg:px-16" style={{padding:50}}>
+        <div className="max-w-4xl mx-auto px-8 md:px-12 lg:px-16" style={{padding:502}}>
           <div className="text-center mb-12">
             <h1 className="text-5xl font-bold mb-6" style={{color: '#294954'}}>
               Términos y Condiciones

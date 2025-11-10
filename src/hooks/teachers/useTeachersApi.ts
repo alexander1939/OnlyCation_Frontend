@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import axios, { AxiosError } from 'axios';
+import { saveTeachersToCache, getTeachersFromCache } from '../../utils/teachersCache';
 
 const API_URL = import.meta.env.VITE_API_URL as string;
 
@@ -57,16 +58,42 @@ export const useTeachersApi = () => {
     try {
       const url = `/public/teachers/?page=${page}&page_size=${pageSize}`;
       const res = await client.get<SearchTeachersResponse>(url);
+      
+      // Guardar en caché cuando la API responde correctamente
+      if (res.data.data && res.data.data.length > 0) {
+        saveTeachersToCache(res.data.data);
+      }
+      
       return res.data;
     } catch (err) {
       const axErr = err as AxiosError<{ detail?: string; message?: string }>;
       const message = axErr.response?.data?.detail || axErr.response?.data?.message || axErr.message || 'Error al obtener profesores';
+      
+      // Intentar cargar del caché cuando falla la API
+      const cachedTeachers = getTeachersFromCache();
+      if (cachedTeachers && cachedTeachers.length > 0 && page === 1) {
+        // Solo devolver caché en página 1
+        // Limitar al pageSize solicitado (ej: 3 para Home, 12 para Catálogo)
+        const limitedTeachers = cachedTeachers.slice(0, pageSize);
+        
+        return {
+          success: true,
+          message: 'Datos del caché',
+          data: limitedTeachers,
+          total: limitedTeachers.length,
+          page: 1,
+          page_size: limitedTeachers.length,
+          total_pages: 1
+        };
+      }
+      
+      // Si es página > 1 o no hay caché, devolver vacío
       return {
         success: false,
         message,
         data: [],
         total: 0,
-        page: 1,
+        page: page || 1,
         page_size: pageSize,
         total_pages: 0
       };
@@ -90,10 +117,30 @@ export const useTeachersApi = () => {
 
       const res = await client.get<SearchTeachersResponse>(url);
       
+      // Guardar en caché cuando la API responde correctamente
+      if (res.data.data && res.data.data.length > 0) {
+        saveTeachersToCache(res.data.data);
+      }
+      
       return res.data;
     } catch (err) {
       const axErr = err as AxiosError<{ detail?: string; message?: string }>;
       const message = axErr.response?.data?.detail || axErr.response?.data?.message || axErr.message || 'Error al buscar profesores';
+      
+      // Intentar cargar del caché cuando falla la API
+      const cachedTeachers = getTeachersFromCache();
+      if (cachedTeachers && cachedTeachers.length > 0) {
+        return {
+          success: true,
+          message: 'Datos del caché',
+          data: cachedTeachers,
+          total: cachedTeachers.length,
+          page: 1,
+          page_size: cachedTeachers.length,
+          total_pages: 1
+        };
+      }
+      
       return {
         success: false,
         message,

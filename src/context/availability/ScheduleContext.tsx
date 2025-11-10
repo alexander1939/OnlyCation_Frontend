@@ -40,15 +40,17 @@ interface ScheduleContextValue {
   availableSlots: TimeSlot[];
   enabledDays: Record<DayKey, boolean>;
   slots: Record<DayKey, Slot[]>;
+  setSlots: React.Dispatch<React.SetStateAction<Record<DayKey, Slot[]>>>;
   // Labels/utils
   dayLabels: Record<DayKey, string>;
   dayKeyToIndex: Record<DayKey, number>;
   toHH: (n: number) => string;
   // Actions
   setSelectedDate: (d: Date) => void;
-  addHours: (day: DayKey, hours: number[]) => void;
+  addHours: (day: DayKey, hours: number[], idsMap?: Map<number, string>) => void;
   removeSlot: (day: DayKey, id: string) => void;
   toggleDay: (day: DayKey) => void;
+  updateSlotId: (day: DayKey, hour: string, newId: string) => void;
   onSlotClick?: (slot: TimeSlot) => void;
   loadFromAgenda?: (agendaData: any) => void;
 }
@@ -164,10 +166,17 @@ export const ScheduleProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setAvailableSlots(generated);
   }, [selectedDate, slots, enabledDays]);
 
-  const addHours = (day: DayKey, hours: number[]) => {
+  const addHours = (day: DayKey, hours: number[], idsMap?: Map<number, string>) => {
     setSlots(prev => {
       const existing = new Set(prev[day].map(s => s.hour));
-      const toAdd = hours.map(toHH).filter(hh => !existing.has(hh)).map(hh => ({ id: crypto.randomUUID(), hour: hh }));
+      const toAdd = hours
+        .filter(hour => !existing.has(toHH(hour)))
+        .map(hour => {
+          const id = idsMap?.get(hour) ?? crypto.randomUUID();
+          const hh = toHH(hour);
+          return { id, hour: hh };
+        })
+        .sort((a, b) => a.hour.localeCompare(b.hour));
       return { ...prev, [day]: [...prev[day], ...toAdd].sort((a, b) => a.hour.localeCompare(b.hour)) };
     });
   };
@@ -187,11 +196,21 @@ export const ScheduleProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     });
   };
 
+  const updateSlotId = (day: DayKey, hour: string, newId: string) => {
+    setSlots(prev => {
+      const updatedDaySlots = prev[day].map(slot => 
+        slot.hour === hour ? { ...slot, id: newId } : slot
+      );
+      return { ...prev, [day]: updatedDaySlots };
+    });
+  };
+
   const value: ScheduleContextValue = useMemo(() => ({
     selectedDate,
     availableSlots,
     enabledDays,
     slots,
+    setSlots,
     dayLabels,
     dayKeyToIndex,
     toHH,
@@ -199,6 +218,7 @@ export const ScheduleProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     addHours,
     removeSlot,
     toggleDay,
+    updateSlotId,
     loadFromAgenda,
     onSlotClick: (slot) => {
       if (!slot.isBooked) {

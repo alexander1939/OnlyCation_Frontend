@@ -1,25 +1,26 @@
 import React, { useMemo, useState } from 'react';
-import { format } from 'date-fns';
 import '../styles/docente-agenda.css';
 import { useSchedule } from '../context/availability/ScheduleContext';
 import type { DayKey } from '../context/availability/ScheduleContext';
 import { useAgendaApi } from '../hooks/availability/useavailabilityApi';
+import { useNotificationContext } from '../components/NotificationProvider';
 
 interface AvailabilityConfigProps {
   onAvailabilityAdded?: () => void;
   onAvailabilityDeleted?: () => void;
 }
 
-const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityAdded, onAvailabilityDeleted }) => {
-  const { dayLabels, enabledDays, slots, availableSlots, addHours, removeSlot, toggleDay, dayKeyToIndex, toHH } = useSchedule();
-  const { deleteAvailability, createAvailability } = useAgendaApi();
+const AvailabilityConfig: React.FC<AvailabilityConfigProps> = () => {
+  const { dayLabels, enabledDays, slots, availableSlots, removeSlot, toggleDay, dayKeyToIndex, toHH, loadFromAgenda } = useSchedule();
+  const { deleteAvailability, createAvailability, fetchWeeklyAgenda } = useAgendaApi();
+  const { showSuccess, showError, showWarning } = useNotificationContext();
   const weekKeys = useMemo<DayKey[]>(() => ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'], []);
 
   // Modal local state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalDay, setModalDay] = useState<DayKey | null>(null);
   const [selectedHours, setSelectedHours] = useState<Set<number>>(new Set());
-  const [deleting, setDeleting] = useState<string | null>(null);
+  const [, setDeleting] = useState<string | null>(null);
 
   const openAddModal = (day: DayKey) => {
     if (!enabledDays[day]) return;
@@ -44,14 +45,11 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityA
       return;
     }
     
-    // Agregar al estado local
-    addHours(modalDay, hours);
-    
-    // Guardar automáticamente en el backend
+    // Guardar en el backend primero
     try {
-      const pref = localStorage.getItem('preference_id');
+      const pref = localStorage.getItem('user_preference_id');
       if (!pref) {
-        alert('❌ No se detectó preference_id. Inicia sesión nuevamente.');
+        showError('No se detectó preference_id. Inicia sesión nuevamente.');
         setIsModalOpen(false);
         return;
       }
@@ -66,42 +64,86 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityA
         preference_id,
         day_of_week: dayMap[modalDay],
         start_time: `${String(h).padStart(2, '0')}:00`,
-        end_time: `${String(h + 1).padStart(2, '0')}:00`,
+        end_time: `${String((h + 1) % 24).padStart(2, '0')}:00`,
       }));
       
-      console.log('💾 Guardando horarios automáticamente:', payloads);
+      // Enviar secuencialmente en lugar de paralelo para evitar conflictos
+      const successfulHours: number[] = [];
+      let errorCount = 0;
       
-      const results = await Promise.all(payloads.map(payload => createAvailability(payload)));
+      for (let i = 0; i < payloads.length; i++) {
+        const payload = payloads[i];
+        const hour = hours[i];
+        const result = await createAvailability(payload);
+        
+        if (result.success) {
+          successfulHours.push(hour);
+          const startTime = `${String(hour).padStart(2, '0')}:00`;
+          const endTime = `${String((hour + 1) % 24).padStart(2, '0')}:00`;
+          showSuccess(`Disponibilidad agregada: ${startTime} - ${endTime}`);
+        } else {
+          errorCount++;
+          const startTime = `${String(hour).padStart(2, '0')}:00`;
+          showError(`Error al guardar horario ${startTime}: ${result.message}`);
+        }
+      }
       
-      const failed = results.filter(r => !r.success);
-      if (failed.length > 0) {
-        alert(`⚠️ Algunos horarios no se pudieron guardar: ${failed[0].message}`);
-      } else {
-        console.log(`✅ ${results.length} horario(s) guardado(s)`);
+      // Recargar TODA la agenda desde el backend con datos reales
+      if (successfulHours.length > 0) {
+        // Calcular rango de fechas para la semana actual
+        const today = new Date();
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - today.getDay()); // Domingo
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6); // Sábado
+        
+        const formatDate = (date: Date) => {
+          const yyyy = date.getFullYear();
+          const mm = String(date.getMonth() + 1).padStart(2, '0');
+          const dd = String(date.getDate()).padStart(2, '0');
+          return `${yyyy}-${mm}-${dd}`;
+        };
+        
+        const startDate = formatDate(startOfWeek);
+        const endDate = formatDate(endOfWeek);
+        
+        console.log('🔄 Recargando agenda desde backend:', startDate, 'a', endDate);
+        
+        // Fetch agenda from backend with REAL data
+        const agendaResponse = await fetchWeeklyAgenda(startDate, endDate);
+        if (agendaResponse.success && agendaResponse.data) {
+          console.log('✅ Agenda recibida del backend:', agendaResponse.data);
+          loadFromAgenda?.(agendaResponse.data);
+        } else {
+          showError('Error al recargar la agenda');
+        }
+      }
+      
+      if (errorCount > 0 && successfulHours.length > 0) {
+        showWarning(`${successfulHours.length} horario(s) guardado(s), ${errorCount} fallaron`);
       }
     } catch (e: any) {
-      console.error('Error al guardar:', e);
-      alert(`❌ Error al guardar: ${e?.message || 'Error desconocido'}`);
+      showError(`Error al guardar: ${e?.message || 'Error desconocido'}`);
+      // No agregar al estado local si hubo error
     }
     
     setIsModalOpen(false);
     setModalDay(null);
     setSelectedHours(new Set());
-    if (onAvailabilityAdded) onAvailabilityAdded();
   };
 
   // Validaciones
   const canToggleDay = (day: DayKey): boolean => {
     const currentlyEnabled = Object.values(enabledDays).filter(Boolean).length;
     if (enabledDays[day] && currentlyEnabled === 1) {
-      alert('⚠️ Debes tener al menos un día activo en tu agenda.');
+      showWarning('Debes tener al menos un día activo en tu agenda.');
       return false;
     }
     if (enabledDays[day]) {
       const dayIndex = dayKeyToIndex[day];
-      const hasBookedClasses = availableSlots.some(slot => slot.isBooked && slot.start.getDay() === dayIndex);
+      const hasBookedClasses = availableSlots.some(s => s.isBooked && s.start.getDay() === dayIndex);
       if (hasBookedClasses) {
-        alert('⚠️ No puedes deshabilitar este día porque tienes clases reservadas. Primero debes reagendar con tus estudiantes.');
+        showWarning('No puedes deshabilitar este día porque tienes clases reservadas. Primero debes reagendar con tus estudiantes.');
         return false;
       }
     }
@@ -117,9 +159,9 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityA
     const slotToRemove = slots[day].find(s => s.id === id);
     if (!slotToRemove) return;
     const targetDay = dayKeyToIndex[day];
-    const hasBooked = availableSlots.some(s => s.isBooked && format(s.start, 'HH:mm') === slotToRemove.hour && s.start.getDay() === targetDay);
+    const hasBooked = availableSlots.some(s => s.isBooked && s.start.getDay() === targetDay);
     if (hasBooked) {
-      alert('⚠️ No puedes eliminar esta hora porque tienes clases reservadas. Primero debes reagendar con tus estudiantes.');
+      showWarning('No puedes eliminar esta hora porque tienes clases reservadas. Primero debes reagendar con tus estudiantes.');
       return;
     }
     
@@ -131,14 +173,19 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityA
       setDeleting(null);
       
       if (!result.success) {
-        alert(`❌ Error al eliminar: ${result.message}`);
+        showError(`Error al eliminar horario ${slotToRemove.hour}: ${result.message}`);
         return;
       }
-      console.log(`✅ Horario ${id} eliminado del servidor`);
-      if (onAvailabilityDeleted) onAvailabilityDeleted();
     }
     
+    // Eliminar del estado local
     removeSlot(day, id);
+    
+    // Mostrar notificación de éxito siempre
+    const [hourStr] = slotToRemove.hour.split(':');
+    const hourNum = parseInt(hourStr);
+    const endTime = `${String((hourNum + 1) % 24).padStart(2, '0')}:00`;
+    showSuccess(`Disponibilidad eliminada: ${slotToRemove.hour} - ${endTime}`);
   };
 
   return (
@@ -166,7 +213,7 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityA
                   <div className="agenda-slots">
                     {slots[key].map((slot) => {
                       const dayIndex = dayKeyToIndex[key];
-                      const hasBooking = availableSlots.some(s => s.isBooked && format(s.start, 'HH:mm') === slot.hour && s.start.getDay() === dayIndex);
+                      const hasBooking = availableSlots.some(s => s.isBooked && s.start.getDay() === dayIndex);
                       return (
                         <div key={slot.id} className={`agenda-chip ${hasBooking ? 'has-booking' : ''}`}>
                           <span>{slot.hour} {hasBooking ? '🔒' : ''}</span>

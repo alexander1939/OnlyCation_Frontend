@@ -52,7 +52,7 @@ const SaveAvailabilityBar: React.FC = () => {
     setError(null);
     setSuccess(null);
     try {
-      const pref = localStorage.getItem('preference_id');
+      const pref = localStorage.getItem('user_preference_id');
       if (!pref) throw new Error('No se detectó preference_id. Inicia sesión nuevamente.');
       const preference_id = Number(pref);
       const today = new Date();

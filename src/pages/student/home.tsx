@@ -119,7 +119,7 @@ const StudentHome: React.FC = () => {
               iconBg="#E6FFFA"
             />
             <SubjectList 
-            title="Explorar Niveles Educativos" options={levels} mode="student"
+            role="student"
             />
           </div>
         </div>

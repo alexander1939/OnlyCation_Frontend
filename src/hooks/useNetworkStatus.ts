@@ -29,8 +29,11 @@ export const useNetworkStatus = (): NetworkStatus => {
 
   const checkBackend = useCallback(async () => {
     try {
-      const baseUrl = API_URL.replace('/api', '');
-      const response = await fetch(`${baseUrl}/`, {
+      // Construir la URL correctamente usando URL object
+      const url = new URL(API_URL);
+      const healthCheckUrl = `${url.protocol}//${url.host}/`;
+      
+      const response = await fetch(healthCheckUrl, {
         method: 'GET',
       });
       

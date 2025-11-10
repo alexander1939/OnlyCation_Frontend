@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNotificationContext } from '../components/NotificationProvider';
 
+const API_URL = import.meta.env.VITE_API_URL as string;
+
 interface NetworkStatus {
   isOnline: boolean;
   wasOffline: boolean;
@@ -27,7 +29,8 @@ export const useNetworkStatus = (): NetworkStatus => {
 
   const checkBackend = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:8000/', {
+      const baseUrl = API_URL.replace('/api', '');
+      const response = await fetch(`${baseUrl}/`, {
         method: 'GET',
       });
       

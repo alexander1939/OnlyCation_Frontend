@@ -7,6 +7,20 @@ export interface NextClass {
   modality: string;
   participant_role: 'teacher' | 'student';
   status: string;
+  created_at?: string;
+  teacher?: {
+    id: number;
+    first_name: string;
+    last_name: string;
+  };
+  student?: {
+    id: number;
+    first_name: string;
+    last_name: string;
+  };
+  class_link?: string;
+  confirmation_teacher?: boolean;
+  confirmation_student?: boolean;
 }
 
 export interface MyNextClassesResponse {

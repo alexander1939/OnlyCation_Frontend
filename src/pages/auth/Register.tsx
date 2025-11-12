@@ -273,7 +273,7 @@ function Register() {
                       transition: 'font-size 0.4s ease',
                       willChange: 'font-size'
                     }}>
-                      👨‍🏫
+                      🧑‍🏫
                     </div>
                     <h2 style={{
                       fontSize: userType === 'student' ? '18px' : '32px',
@@ -307,12 +307,7 @@ function Register() {
                 
                 {/* Formulario aparece aquí para docente */}
                 {userType === 'teacher' && showForm && !isContracting && !isTransitioning && (
-                  <div className="form-container" style={{
-                    width: '100%',
-                    maxWidth: '580px',
-                    padding: '0 30px 20px 30px',
-                    margin: '0 auto'
-                  }}>
+                  <div className="form-container teacher-form-container">
                     <button
                       type="button"
                       aria-label="Cerrar formulario"
@@ -332,19 +327,7 @@ function Register() {
                 
                 {/* Formulario saliendo durante transición */}
                 {userType === 'teacher' && !showForm && isTransitioning && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '0',
-                    left: '0',
-                    width: '100%',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '0 30px 20px 30px',
-                    margin: '0 auto'
-                  }}>
+                  <div className="form-container-exit teacher-form-container">
                     <RegisterForm 
                       userType="teacher"
                       onSubmit={handleSubmit}

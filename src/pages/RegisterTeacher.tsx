@@ -4,7 +4,7 @@ import Header from '../components/ui/Header';
 import Footer from '../components/ui/Footer';
 import RegisterForm from '../components/registerComp/RegisterForm';
 
-interface RegisterFormData {
+interface RegisterFormData { 
   first_name: string;
   last_name: string;
   email: string;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Ribbon from '../ui/Ribbon';
 import { Link } from 'react-router-dom';
+import '../../styles/RegisterForm.css';
 
 interface RegisterFormData {
   first_name: string;
@@ -293,14 +294,23 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ userType, onSubmit, isLoadi
     backgroundColor: '#FFFFFF',
   };
 
+  const passwordInputStyle: React.CSSProperties = {
+    ...inputStyle,
+    paddingRight: '56px', // Espacio para el icono del ojo
+  };
 
   const errorInputStyle: React.CSSProperties = {
     ...inputStyle,
     borderColor: '#EF4444',
   };
 
+  const errorPasswordInputStyle: React.CSSProperties = {
+    ...passwordInputStyle,
+    borderColor: '#EF4444',
+  };
+
   return (
-    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '40px 20px' }}>
+    <div className="register-form-container" style={{ maxWidth: '600px', margin: '0 auto', padding: '40px 20px' }}>
       <div style={{ textAlign: 'center', marginBottom: '40px' }}>
         <Ribbon 
           text={userType === 'student' ? 'Registro de Estudiante' : 'Registro de Docente'} 
@@ -331,7 +341,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ userType, onSubmit, isLoadi
 
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         {/* Nombres */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+        <div className="register-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
           <div>
             <label style={{
               display: 'block',
@@ -422,15 +432,18 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ userType, onSubmit, isLoadi
         </div>
 
         {/* Contraseñas */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+        <div className="register-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
           <div>
             <label style={{
-              display: 'block',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               fontSize: '14px',
               fontWeight: '600',
               color: '#294954',
               marginBottom: '8px',
-              fontFamily: 'Inter, sans-serif'
+              fontFamily: 'Inter, sans-serif',
+              minHeight: '40px'
             }}>
               Contraseña *
             </label>
@@ -439,22 +452,28 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ userType, onSubmit, isLoadi
                 type={showPassword ? 'text' : 'password'}
                 value={formData.password}
                 onChange={(e) => handleInputChange('password', e.target.value)}
-                style={errors.password ? errorInputStyle : inputStyle}
-                placeholder="Contraseña segura"
+                style={errors.password ? errorPasswordInputStyle : passwordInputStyle}
+                placeholder="Contraseña"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 style={{
                   position: 'absolute',
-                  right: '16px',
+                  right: '12px',
                   top: '50%',
                   transform: 'translateY(-50%)',
                   background: 'none',
                   border: 'none',
                   color: '#6B7280',
                   cursor: 'pointer',
-                  fontSize: '14px'
+                  fontSize: '20px',
+                  padding: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  minWidth: '36px',
+                  minHeight: '36px'
                 }}
               >
                 {showPassword ? '👁️' : '👁️‍🗨️'}
@@ -469,12 +488,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ userType, onSubmit, isLoadi
 
           <div>
             <label style={{
-              display: 'block',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               fontSize: '14px',
               fontWeight: '600',
               color: '#294954',
               marginBottom: '8px',
-              fontFamily: 'Inter, sans-serif'
+              fontFamily: 'Inter, sans-serif',
+              minHeight: '40px'
             }}>
               Confirmar Contraseña *
             </label>
@@ -483,22 +505,28 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ userType, onSubmit, isLoadi
                 type={showConfirmPassword ? 'text' : 'password'}
                 value={formData.confirmPassword}
                 onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                style={errors.confirmPassword ? errorInputStyle : inputStyle}
-                placeholder="Repite tu contraseña"
+                style={errors.confirmPassword ? errorPasswordInputStyle : passwordInputStyle}
+                placeholder="Confirmar"
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 style={{
                   position: 'absolute',
-                  right: '16px',
+                  right: '12px',
                   top: '50%',
                   transform: 'translateY(-50%)',
                   background: 'none',
                   border: 'none',
                   color: '#6B7280',
                   cursor: 'pointer',
-                  fontSize: '14px'
+                  fontSize: '20px',
+                  padding: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  minWidth: '36px',
+                  minHeight: '36px'
                 }}
               >
                 {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
@@ -522,7 +550,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ userType, onSubmit, isLoadi
             marginTop: '16px'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <span style={{ fontSize: '24px' }}>👨‍🏫</span>
+              <span style={{ fontSize: '24px' }}>🧑‍🏫</span>
               <h3 style={{
                 fontSize: '18px',
                 fontWeight: '600',

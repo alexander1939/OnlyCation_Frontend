@@ -30,7 +30,20 @@ export const MyNextClassesProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const res = await getMyNextClasses(LIMIT, 0);
       if (res.success && res.data) {
-        setClasses(res.data.data);
+        // Ordenar clases: primero por fecha de inicio, luego por fecha de creación
+        const sortedClasses = [...res.data.data].sort((a, b) => {
+          const dateA = new Date(a.start_time).getTime();
+          const dateB = new Date(b.start_time).getTime();
+          
+          // Si las fechas de inicio son iguales, ordenar por fecha de creación
+          if (dateA === dateB && a.created_at && b.created_at) {
+            return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+          }
+          
+          return dateA - dateB;
+        });
+        
+        setClasses(sortedClasses);
         setHasMore(res.data.has_more ?? false);
         setOffset(LIMIT);
       } else {

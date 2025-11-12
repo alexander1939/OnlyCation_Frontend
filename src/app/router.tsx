@@ -44,6 +44,7 @@ import AllBookings from '../pages/booking/all_bookings';
 import { TeachersProvider } from '../context/teachers/TeachersContext';
 import Terms from '../pages/legal/Terms';
 import Privacy from '../pages/legal/Privacy';
+import ActivateAccountCard from '../components/comptHome/activate-account';
 
 const router = createBrowserRouter([
   {
@@ -297,6 +298,10 @@ const router = createBrowserRouter([
     ),
   },
   // Rutas existentes
+  {
+    path: '/teacher/activate-account',
+    element: <ActivateAccountCard />,
+  },
   {
     path: '/teachers',
     element: <AllTeachers />,

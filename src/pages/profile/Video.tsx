@@ -13,6 +13,7 @@ const VideoInner: React.FC = () => {
   const [form, setForm] = useState<VideoSaveRequest>(initialForm);
   const [saved, setSaved] = useState<VideoData | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
+  const [videoError, setVideoError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { check } = useActivation();
 
@@ -41,6 +42,7 @@ const VideoInner: React.FC = () => {
     // Actualiza vista previa
     const id = extractYouTubeId(value);
     setPreviewUrl(id ? `https://www.youtube.com/embed/${id}` : '');
+    setVideoError(id ? null : (value.trim() ? 'Ingresa una URL o ID válido de YouTube.' : null));
   };
 
   const handleCancel = () => {
@@ -52,7 +54,9 @@ const VideoInner: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await saveMyVideo(form);
+    const id = extractYouTubeId(form.url_or_id);
+    if (!id) { setVideoError('Ingresa una URL o ID válido de YouTube.'); return; }
+    const res = await saveMyVideo({ url_or_id: id });
     if (res.success && res.data?.data) setSaved(res.data.data);
   };
 
@@ -116,11 +120,12 @@ const VideoInner: React.FC = () => {
               <button type="button" onClick={handleCancel} className="video-btn--secondary">
                 Cancelar
               </button>
-              <button type="submit" disabled={saving || !form.url_or_id.trim()} className={`video-btn--primary ${saving ? 'cursor-not-allowed' : ''}`}>
+              <button type="submit" disabled={saving || !extractYouTubeId(form.url_or_id)} className={`video-btn--primary ${saving ? 'cursor-not-allowed' : ''}`}>
                 {saving ? 'Guardando...' : 'Guardar Video'}
               </button>
             </div>
 
+            {videoError && <p className="video-alert video-alert--error">{videoError}</p>}
             {error && <p className="video-alert video-alert--error">{error}</p>}
             {success && <p className="video-alert video-alert--success">¡Video guardado correctamente!</p>}
           </form>

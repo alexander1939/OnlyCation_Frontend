@@ -4,25 +4,91 @@ import { useDocumentsContext } from '../../context';
 import '../../styles/documents.css';
 import OnboardingSteps from '../../components/OnboardingSteps';
 import { useActivation } from '../../context/activation/useActivation';
+import { useAuthContext } from '../../context/auth';
 
 const CreateDocument: React.FC = () => {
   const navigate = useNavigate();
   const { createDocument, creating, error, lastCreated, resetStatus } = useDocumentsContext();
   const { check } = useActivation();
+  const { user } = useAuthContext();
 
   const [rfc, setRfc] = useState('');
   const [expertise, setExpertise] = useState('');
   const [description, setDescription] = useState('');
   const [certificate, setCertificate] = useState<File | null>(null);
   const [curriculum, setCurriculum] = useState<File | null>(null);
+  const [certError, setCertError] = useState<string | null>(null);
+  const [cvError, setCvError] = useState<string | null>(null);
+  const [rfcError, setRfcError] = useState<string | null>(null);
+  const [expertiseError, setExpertiseError] = useState<string | null>(null);
+  const [descriptionError, setDescriptionError] = useState<string | null>(null);
+  const certInputRef = React.useRef<HTMLInputElement | null>(null);
+  const cvInputRef = React.useRef<HTMLInputElement | null>(null);
+
+  const fullName = `${user?.first_name ?? ''} ${user?.last_name ?? ''}`.trim();
+  const norm = (s: string) => s
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+  const includesByTokens = (f: File | null, kind: 'cert' | 'cv') => {
+    if (!f) return false;
+    const hasPdf = /\.pdf$/i.test(f.name) && (f.type === 'application/pdf' || f.type === '');
+    const nFile = norm(f.name.replace(/\.pdf$/i, ''));
+    const tokens = norm(fullName).split(' ').filter(Boolean);
+    const hasAllNameTokens = tokens.every(t => nFile.includes(t));
+    const kindToken = kind === 'cert' ? 'certificado' : 'curriculum';
+    const hasKind = nFile.includes(kindToken);
+    return hasPdf && hasAllNameTokens && hasKind;
+  };
+
+  const validateFiles = () => {
+    const certOk = includesByTokens(certificate, 'cert');
+    const cvOk = includesByTokens(curriculum, 'cv');
+    const msgCert = `El PDF debe ser .pdf y su nombre debe contener todas las palabras de tu nombre ("${fullName}") y la palabra "Certificado".`;
+    const msgCv = `El PDF debe ser .pdf y su nombre debe contener todas las palabras de tu nombre ("${fullName}") y la palabra "Curriculum".`;
+    setCertError(certOk ? null : msgCert);
+    setCvError(cvOk ? null : msgCv);
+    return certOk && cvOk;
+  };
+
+  // RFC validation (SAT): 12 (moral) o 13 (física) con estructura.
+  const rfcRegex = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{2}[A0-9]$/;
+  const rfcSanitize = (s: string) => s.toUpperCase().replace(/[^A-ZÑ&0-9]/g, '').slice(0, 13);
+  const validateRfc = (val: string) => {
+    if (!val) return 'Ingresa tu RFC.';
+    if (val.length < 12) return 'El RFC debe tener 12 o 13 caracteres.';
+    if (!(val.length === 12 || val.length === 13)) return 'El RFC debe tener 12 o 13 caracteres.';
+    if (!rfcRegex.test(val)) return 'Formato de RFC inválido.';
+    return null;
+  };
 
   const isValid = useMemo(() => {
-    return rfc.trim() && expertise.trim() && description.trim() && certificate && curriculum;
+    const rfcOk = !validateRfc(rfcSanitize(rfc));
+    const validateFreeText = (v: string) => {
+      const s = String(v).trim();
+      const onlyLetters = s.replace(/[^A-Za-zÀ-ÿ]/g, '');
+      const hasLetters = /[A-Za-zÀ-ÿ]/.test(s);
+      const hasMinLetters = onlyLetters.length >= 3;
+      const repeatedChar = /(.)\1{3,}/i.test(s);
+      const laughter = /(ja|je|ji|jo|ju|ha|he|hi|ho|hu){3,}/i.test(s);
+      const hasVowel = /[AEIOUÁÉÍÓÚaeiouáéíóú]/.test(s);
+      return hasLetters && hasMinLetters && hasVowel && !repeatedChar && !laughter;
+    };
+    const expOk = validateFreeText(expertise);
+    const descOk = validateFreeText(description);
+    const base = rfcOk && expOk && descOk && certificate && curriculum;
+    if (!base) return false;
+    return includesByTokens(certificate, 'cert') && includesByTokens(curriculum, 'cv');
   }, [rfc, expertise, description, certificate, curriculum]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isValid || !certificate || !curriculum) return;
+    if (!isValid || !certificate || !curriculum) {
+      validateFiles();
+      return;
+    }
     await createDocument({
       rfc: rfc.trim(),
       expertise_area: expertise.trim(),
@@ -59,17 +125,28 @@ const CreateDocument: React.FC = () => {
           <form onSubmit={onSubmit} className="doc-form" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {/* RFC */}
             <div>
-              <label className="doc-label">RFC Cifrado</label>
+              <label className="doc-label">RFC</label>
               <div className="doc-field">
                 <input
                   type="text"
                   className="doc-input"
-                  placeholder="Ingresar RFC Cifrado"
+                  placeholder="Ej: GOCJ800101AB1"
                   value={rfc}
-                  onChange={(e) => setRfc(e.target.value)}
+                  onChange={(e) => {
+                    const next = rfcSanitize(e.target.value);
+                    setRfc(next);
+                    setRfcError(validateRfc(next));
+                    // Revalidar PDFs al cambiar RFC
+                    const msgCert = `El PDF debe ser .pdf y su nombre debe contener todas las palabras de tu nombre ("${fullName}") y la palabra "Certificado".`;
+                    const msgCv = `El PDF debe ser .pdf y su nombre debe contener todas las palabras de tu nombre ("${fullName}") y la palabra "Curriculum".`;
+                    if (certificate) setCertError(includesByTokens(certificate, 'cert') ? null : msgCert);
+                    if (curriculum) setCvError(includesByTokens(curriculum, 'cv') ? null : msgCv);
+                  }}
+                  maxLength={13} 
                 />
                 <span className="doc-trailing" aria-hidden>🔒</span>
               </div>
+              {rfcError && <div className="doc-alert doc-alert--error" style={{ marginTop: '0.25rem' }}>{rfcError}</div>}
             </div>
 
             {/* Files */}
@@ -77,23 +154,49 @@ const CreateDocument: React.FC = () => {
               <div>
                 <label className="doc-label">Certificado (.pdf)</label>
                 <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <button type="button" className="doc-btn--secondary" onClick={() => certInputRef.current?.click()}>
+                      📄 Elegir PDF
+                    </button>
+                    <span className="doc-file-name">{certificate?.name || 'Ningún archivo seleccionado'}</span>
+                  </div>
                   <input
+                    ref={certInputRef}
                     type="file"
                     accept=".pdf"
-                    onChange={(e) => setCertificate(e.target.files?.[0] || null)}
-                    className="doc-file"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0] || null;
+                      setCertificate(f);
+                      const msgCert = `El PDF debe ser .pdf y su nombre debe contener todas las palabras de tu nombre ("${fullName}") y la palabra "Certificado".`;
+                      setCertError(f && includesByTokens(f, 'cert') ? null : msgCert);
+                    }}
+                    style={{ display: 'none' }}
                   />
+                  {certError && <div className="doc-alert doc-alert--error" style={{ marginTop: '0.25rem' }}>{certError}</div>}
                 </div>
               </div>
               <div>
                 <label className="doc-label">Curriculum (.pdf)</label>
                 <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <button type="button" className="doc-btn--secondary" onClick={() => cvInputRef.current?.click()}>
+                      📄 Elegir PDF
+                    </button>
+                    <span className="doc-file-name">{curriculum?.name || 'Ningún archivo seleccionado'}</span>
+                  </div>
                   <input
+                    ref={cvInputRef}
                     type="file"
                     accept=".pdf"
-                    onChange={(e) => setCurriculum(e.target.files?.[0] || null)}
-                    className="doc-file"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0] || null;
+                      setCurriculum(f);
+                      const msgCv = `El PDF debe ser .pdf y su nombre debe contener todas las palabras de tu nombre ("${fullName}") y la palabra "Curriculum".`;
+                      setCvError(f && includesByTokens(f, 'cv') ? null : msgCv);
+                    }}
+                    style={{ display: 'none' }}
                   />
+                  {cvError && <div className="doc-alert doc-alert--error" style={{ marginTop: '0.25rem' }}>{cvError}</div>}
                 </div>
               </div>
             </div>
@@ -106,8 +209,22 @@ const CreateDocument: React.FC = () => {
                 className="doc-input"
                 placeholder="Ej. Desarrollo Frontend"
                 value={expertise}
-                onChange={(e) => setExpertise(e.target.value)}
+                onChange={(e) => {
+                  const sanitize = (s: string) => s.replace(/[^A-Za-zÀ-ÿ0-9 ,\.]+/g, ' ').replace(/\s{2,}/g, ' ').trimStart();
+                  const v = sanitize(e.target.value);
+                  setExpertise(v);
+                  const s = v.trim();
+                  const onlyLetters = s.replace(/[^A-Za-zÀ-ÿ]/g, '');
+                  const hasLetters = /[A-Za-zÀ-ÿ]/.test(s);
+                  const hasMinLetters = onlyLetters.length >= 3;
+                  const repeatedChar = /(.)\1{3,}/i.test(s);
+                  const laughter = /(ja|je|ji|jo|ju|ha|he|hi|ho|hu){3,}/i.test(s);
+                  const hasVowel = /[AEIOUÁÉÍÓÚaeiouáéíóú]/.test(s);
+                  const valid = hasLetters && hasMinLetters && hasVowel && !repeatedChar && !laughter;
+                  setExpertiseError(valid ? null : 'Ingresa un área de experiencia válida.');
+                }}
               />
+              {expertiseError && <div className="doc-alert doc-alert--error" style={{ marginTop: '0.25rem' }}>{expertiseError}</div>}
             </div>
 
             {/* Description */}
@@ -117,8 +234,23 @@ const CreateDocument: React.FC = () => {
                 className="doc-textarea"
                 placeholder="Breve descripción de sus habilidades y experiencia."
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) => {
+                  const sanitize = (s: string) => s.replace(/[^A-Za-zÀ-ÿ0-9 ,\.]+/g, ' ').replace(/\s{2,}/g, ' ').trimStart();
+                  const v = sanitize(e.target.value);
+                  setDescription(v);
+                  const s = v.trim();
+                  const onlyLetters = s.replace(/[^A-Za-zÀ-ÿ]/g, '');
+                  const hasLetters = /[A-Za-zÀ-ÿ]/.test(s);
+                  const hasMinLetters = onlyLetters.length >= 3;
+                  const repeatedChar = /(.)\1{3,}/i.test(s);
+                  const laughter = /(ja|je|ji|jo|ju|ha|he|hi|ho|hu){3,}/i.test(s);
+                  const hasVowel = /[AEIOUÁÉÍÓÚaeiouáéíóú]/.test(s);
+                  const valid = hasLetters && hasMinLetters && hasVowel && !repeatedChar && !laughter;
+                  setDescriptionError(valid ? null : 'Ingresa una descripción válida.');
+                }}
+                maxLength={500}
               />
+              {descriptionError && <div className="doc-alert doc-alert--error" style={{ marginTop: '0.25rem' }}>{descriptionError}</div>}
             </div>
 
             {/* Footer */}

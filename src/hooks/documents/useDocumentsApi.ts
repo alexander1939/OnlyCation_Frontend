@@ -40,8 +40,8 @@ export const useDocumentsApi = () => {
       form.append('rfc', payload.rfc);
       form.append('expertise_area', payload.expertise_area);
       form.append('description', payload.description);
-      form.append('certificate', payload.certificate);
-      form.append('curriculum', payload.curriculum);
+      form.append('certificate', payload.certificate, payload.certificate.name);
+      form.append('curriculum', payload.curriculum, payload.curriculum.name);
 
       const res = await client.post<ApiResponse<DocumentCreateResponseData>>(
         '/documents/create/',
@@ -54,8 +54,30 @@ export const useDocumentsApi = () => {
       );
       return res.data;
     } catch (err) {
-      const axErr = err as AxiosError<{ detail?: string; message?: string }>;
-      const message = axErr.response?.data?.detail || axErr.response?.data?.message || axErr.message || 'Error al crear el documento';
+      const axErr = err as AxiosError<any>;
+      const data = axErr.response?.data as any;
+      let message: string = 'Error al crear el documento';
+      if (data?.detail) {
+        if (typeof data.detail === 'string') {
+          message = data.detail;
+        } else if (Array.isArray(data.detail)) {
+          message = data.detail
+            .map((d: any) => {
+              const loc = Array.isArray(d?.loc) ? d.loc.join('.') : d?.loc;
+              const msg = d?.msg || d?.message || 'Error de validación';
+              return loc ? `${loc}: ${msg}` : msg;
+            })
+            .join('; ');
+        } else if (typeof data.detail === 'object') {
+          const loc = Array.isArray((data.detail as any).loc) ? (data.detail as any).loc.join('.') : (data.detail as any).loc;
+          const msg = (data.detail as any).msg || (data.detail as any).message || 'Error de validación';
+          message = loc ? `${loc}: ${msg}` : msg;
+        }
+      } else if (typeof data?.message === 'string') {
+        message = data.message;
+      } else if (axErr.message) {
+        message = axErr.message;
+      }
       return { success: false, message } as ApiResponse<DocumentCreateResponseData>;
     }
   }, [client, getAccessToken]);

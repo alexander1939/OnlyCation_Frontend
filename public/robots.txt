@@ -1,0 +1,16 @@
+# robots.txt para OnlyCation
+User-agent: *
+Allow: /
+
+# Bloquear páginas privadas/administrativas
+Disallow: /dashboard/
+Disallow: /perfil/
+Disallow: /reservas/
+Disallow: /historial/
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://onlycation.com/sitemap.xml
+
+# Crawl-delay para no sobrecargar el servidor
+Crawl-delay: 1

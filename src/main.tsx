@@ -3,8 +3,8 @@ import './index.css'
 import App from './App.tsx'
 import PWAInstaller from './components/PWAInstaller'
 import { createApiInterceptor } from './utils/apiErrorHandler.ts'
-
-// Inicializar interceptor de API para detectar errores de conexión
+ 
+// Inicializar  interceptor de API para detectar errores de conexión
 createApiInterceptor();
 
 // Registra el service worker (desactivado temporalmente en desarrollo)

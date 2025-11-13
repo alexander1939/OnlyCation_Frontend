@@ -158,7 +158,7 @@ const router = createBrowserRouter([
   {
     path: "/teacher-home",
     element: (
-      <PrivateRoute roles={["teacher"]}>
+      <PrivateRoute roles={["teacher"]} requireTeacherStatus="active">
         <TeacherHome />
       </PrivateRoute>
     ),
@@ -300,7 +300,11 @@ const router = createBrowserRouter([
   // Rutas existentes
   {
     path: '/teacher/activate-account',
-    element: <ActivateAccountCard />,
+    element: (
+      <PrivateRoute roles={["teacher"]} requireTeacherStatus="pending">
+        <ActivateAccountCard />
+      </PrivateRoute>
+    ),
   },
   {
     path: '/teachers',

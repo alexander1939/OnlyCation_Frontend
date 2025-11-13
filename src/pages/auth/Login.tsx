@@ -31,11 +31,16 @@ const Login: React.FC = () => {
       } catch {}
 
       const role = response.data.role.toLowerCase();
+      const status = (response.data.status || "").toLowerCase();
       if (from) {
         navigate(from, { replace: true });
         return;
       }
-      if (role === "teacher") navigate("/teacher-home");
+      if (role === "teacher") {
+        if (status === "active") navigate("/teacher-home");
+        else if (status === "pending") navigate("/teacher/activate-account");
+        else navigate("/");
+      }
       else if (role === "student") navigate("/student-home");
       else navigate("/");
     } catch (err: any) {
@@ -47,11 +52,14 @@ const Login: React.FC = () => {
   useEffect(() => {
   if (!user || loadingUser) return;
 
-  // Siempre redirigir al home principal según el rol
   switch (user.role.toLowerCase()) {
-    case "teacher":
-      navigate("/teacher-home");
+    case "teacher": {
+      const status = (user.status || "").toLowerCase();
+      if (status === "active") navigate("/teacher-home");
+      else if (status === "pending") navigate("/teacher/activate-account");
+      else navigate("/");
       break;
+    }
     case "student":
       navigate("/student-home");
       break;

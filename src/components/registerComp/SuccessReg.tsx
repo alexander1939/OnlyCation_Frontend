@@ -70,7 +70,7 @@ function SuccessReg({
                 </p>
 
                 <div className="info-box">
-                  <h3 className="info-title">👨‍🏫 Estado de tu Cuenta</h3>
+                  <h3 className="info-title">🧑‍🏫 Estado de tu Cuenta</h3>
                   <div className="info-steps">
                     <div className="info-step">
                       <div className="info-badge info-badge--ok">✓</div>

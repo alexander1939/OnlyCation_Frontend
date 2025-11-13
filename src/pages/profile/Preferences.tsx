@@ -22,21 +22,65 @@ const PreferencesPage: React.FC = () => {
   const { educationalLevels, modalities, loading: loadingCatalogs, error: catalogsError } = useCatalogsContext();
   const { check, getNextRoute } = useActivation();
   const [form, setForm] = useState<PreferenceCreateRequest>(initialForm);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [locationDescError, setLocationDescError] = useState<string | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
+    const sanitize = (s: string) => s.replace(/[^A-Za-zÀ-ÿ0-9 ,\.]+/g, ' ').replace(/\s{2,}/g, ' ').trimStart();
     setForm(prev => ({
       ...prev,
-      [name]: name.endsWith('_id') ? Number(value) : value,
+      [name]: name.endsWith('_id') ? Number(value) : sanitize(value),
     }));
+    if (name === 'location') {
+      const v = sanitize(value).trim();
+      const onlyLetters = v.replace(/[^A-Za-zÀ-ÿ]/g, '');
+      const hasLetters = /[A-Za-zÀ-ÿ]/.test(v);
+      const hasMinLetters = onlyLetters.length >= 3;
+      const repeatedChar = /(.)\1{3,}/i.test(v);
+      const laughter = /(ja|je|ji|jo|ju|ha|he|hi|ho|hu){3,}/i.test(v);
+      const hasVowel = /[AEIOUÁÉÍÓÚaeiouáéíóú]/.test(v);
+      const valid = hasLetters && hasMinLetters && hasVowel && !repeatedChar && !laughter;
+      setLocationError(valid ? null : 'Ingresa una ubicación válida.');
+    }
+    if (name === 'location_description') {
+      const v = sanitize(value).trim();
+      const onlyLetters = v.replace(/[^A-Za-zÀ-ÿ]/g, '');
+      const hasLetters = /[A-Za-zÀ-ÿ]/.test(v);
+      const hasMinLetters = onlyLetters.length >= 3;
+      const repeatedChar = /(.)\1{3,}/i.test(v);
+      const laughter = /(ja|je|ji|jo|ju|ha|he|hi|ho|hu){3,}/i.test(v);
+      const hasVowel = /[AEIOUÁÉÍÓÚaeiouáéíóú]/.test(v);
+      const valid = hasLetters && hasMinLetters && hasVowel && !repeatedChar && !laughter;
+      setLocationDescError(valid ? null : 'Ingresa una descripción de ubicación válida.');
+    }
   };
 
   const handleCancel = () => setForm(initialForm);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const loc = String(form.location).trim();
+    const onlyLetters = loc.replace(/[^A-Za-zÀ-ÿ]/g, '');
+    const hasLetters = /[A-Za-zÀ-ÿ]/.test(loc);
+    const hasMinLetters = onlyLetters.length >= 3;
+    const repeatedChar = /(.)\1{3,}/i.test(loc);
+    const laughter = /(ja|je|ji|jo|ju|ha|he|hi|ho|hu){3,}/i.test(loc);
+    const hasVowel = /[AEIOUÁÉÍÓÚaeiouáéíóú]/.test(loc);
+    const validLoc = hasLetters && hasMinLetters && hasVowel && !repeatedChar && !laughter;
+    if (!validLoc) { setLocationError('Ingresa una ubicación válida.'); return; }
+    const locDesc = String(form.location_description).trim();
+    const onlyLettersD = locDesc.replace(/[^A-Za-zÀ-ÿ]/g, '');
+    const hasLettersD = /[A-Za-zÀ-ÿ]/.test(locDesc);
+    const hasMinLettersD = onlyLettersD.length >= 3;
+    const repeatedCharD = /(.)\1{3,}/i.test(locDesc);
+    const laughterD = /(ja|je|ji|jo|ju|ha|he|hi|ho|hu){3,}/i.test(locDesc);
+    const hasVowelD = /[AEIOUÁÉÍÓÚaeiouáéíóú]/.test(locDesc);
+    const validLocDesc = hasLettersD && hasMinLettersD && hasVowelD && !repeatedCharD && !laughterD;
+    if (!validLocDesc) { setLocationDescError('Ingresa una descripción de ubicación válida.'); return; }
+    if (!loc || !locDesc) return;
     await createPreferences(form);
   };
 
@@ -167,6 +211,9 @@ const PreferencesPage: React.FC = () => {
                     className="pref-input with-icon pr-3"
                   />
                 </div>
+                {locationError && (
+                  <p className="pref-alert pref-alert--error" style={{ marginTop: '0.25rem' }}>{locationError}</p>
+                )}
               </div>
 
               {/* Descripción de la ubicación */}
@@ -190,6 +237,9 @@ const PreferencesPage: React.FC = () => {
                     className="pref-textarea with-icon pr-3 resize-y"
                   />
                 </div>
+                {locationDescError && (
+                  <p className="pref-alert pref-alert--error" style={{ marginTop: '0.25rem' }}>{locationDescError}</p>
+                )}
               </div>
             </div>
 

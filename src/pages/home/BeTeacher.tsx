@@ -3,14 +3,15 @@ import Header from '../../components/ui/Header';
 import Footer from '../../components/ui/Footer';
 import TeacherHero from './TeacherHero';
 import TeacherContent from './TeacherContent';
+import '../../styles/be-teacher.css';
 
 const BeTeacher: React.FC = () => {
   return (
-    <div className="min-h-screen w-full" style={{ backgroundColor: '#FAF9F5', margin: 0, padding: 0 }}>
+    <div className="be-teacher-page min-h-screen w-full">
       <Header />
       
       {/* Usar el mismo espaciado superior que AboutUs para no tapar el título con el Header fijo */}
-      <main style={{ paddingTop: '120px', paddingBottom: '64px' }}>
+      <main className="be-teacher-main">
         <div className="max-w-5xl mx-auto px-6">
           <TeacherHero />
           <TeacherContent />

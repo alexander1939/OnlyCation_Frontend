@@ -1,0 +1,290 @@
+/* Base page styles */
+.be-teacher-page {
+  background-color: #FAF9F5;
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+}
+
+.be-teacher-main {
+  padding-top: 120px;
+  padding-bottom: 64px;
+}
+
+/* Teacher Hero */
+.teacher-hero {
+  background-color: #FAF9F5;
+  padding-top: 3rem; /* py-12 */
+  padding-bottom: 3rem;
+  padding-left: 1.5rem; /* px-6 */
+  padding-right: 1.5rem;
+}
+
+.teacher-hero-title {
+  color: #294954; /* petroleum-blue */
+  font-size: 3rem;
+  line-height: 1.1;
+}
+
+.teacher-hero-description {
+  color: #6B7280; /* gray-500 */
+  font-size: 1.1rem;
+  max-width: 760px;
+  line-height: 1.6;
+}
+
+.teacher-hero-divider {
+  background-color: #68B2C9; /* sky-blue */
+}
+
+/* Section 1: Mission Section (moved from inline <style>) */
+.teacher-mission-section {
+  padding: 80px 0;
+  background-color: #FFFFFF;
+}
+
+.teacher-mission-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.teacher-mission-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.teacher-mission-title {
+  font-size: 42px;
+  font-weight: bold;
+  color: #294954;
+  margin: 18px 0;
+  line-height: 1.2;
+}
+
+.teacher-mission-description {
+  font-size: 18px;
+  line-height: 1.8;
+  color: #6B7280;
+  margin-bottom: 16px;
+}
+
+.teacher-mission-subtitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #294954;
+  margin-top: 20px;
+  margin-bottom: 12px;
+}
+
+.teacher-mission-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.teacher-mission-list-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.teacher-mission-bullet {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #68B2C9;
+  flex-shrink: 0;
+}
+
+.teacher-mission-list-text {
+  color: #5F6C7B;
+  font-size: 14px;
+}
+
+.teacher-mission-cta {
+  margin-top: 22px;
+}
+
+.teacher-mission-button {
+  display: inline-block;
+  background-color: #294954;
+  color: #FAF9F5;
+  padding: 12px 20px;
+  border-radius: 14px;
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgba(41,73,84,0.18);
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.teacher-mission-button:hover {
+  background-color: #1e3a42;
+  text-decoration: none;
+}
+
+.teacher-mission-card-wrapper {
+  position: relative;
+}
+
+.teacher-mission-card {
+  position: relative;
+  padding: 48px;
+  border-radius: 32px;
+  background: linear-gradient(135deg, #8ED4BE 0%, #68B2C9 100%);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  min-height: 420px;
+}
+
+.teacher-mission-card-deco-1 {
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  z-index: 1;
+}
+
+.teacher-mission-card-deco-2 {
+  position: absolute;
+  bottom: -32px;
+  left: -32px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(255, 222, 151, 0.2);
+  z-index: 1;
+}
+
+.teacher-mission-card-content {
+  position: relative;
+  z-index: 2;
+}
+
+.teacher-mission-card-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.teacher-mission-advantages {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.teacher-mission-advantage-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 12px;
+}
+
+.teacher-mission-advantage-check {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background-color: #FFDE97;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  color: #294954;
+  flex-shrink: 0;
+}
+
+.teacher-mission-advantage-text {
+  color: white;
+  font-size: 15px;
+  line-height: 1.7;
+  font-weight: 500;
+}
+
+/* Tablet */
+@media (max-width: 1023px) {
+  .teacher-mission-section { padding: 60px 0; }
+  .teacher-mission-grid { gap: 40px; }
+  .teacher-mission-title { font-size: 32px; }
+  .teacher-mission-description { font-size: 16px; }
+  .teacher-mission-subtitle { font-size: 18px; }
+  .teacher-mission-card { padding: 36px; min-height: 380px; }
+  .teacher-mission-card-title { font-size: 28px; }
+  .teacher-mission-advantage-text { font-size: 14px; }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .teacher-mission-section { padding: 40px 0; }
+  .teacher-mission-container { padding: 0 16px; }
+  .teacher-mission-grid { grid-template-columns: 1fr; gap: 32px; }
+  .teacher-mission-title { font-size: 28px; margin: 14px 0; }
+  .teacher-mission-description { font-size: 15px; line-height: 1.6; margin-bottom: 12px; }
+  .teacher-mission-subtitle { font-size: 17px; margin-top: 16px; margin-bottom: 10px; }
+  .teacher-mission-list-text { font-size: 13px; }
+  .teacher-mission-button { width: 100%; text-align: center; padding: 14px 20px; font-size: 15px; }
+  .teacher-mission-card { padding: 28px 24px; min-height: auto; border-radius: 24px; }
+  .teacher-mission-card-title { font-size: 24px; margin-bottom: 16px; }
+  .teacher-mission-advantages { gap: 14px; }
+  .teacher-mission-advantage-item { padding: 10px 12px; gap: 10px; }
+  .teacher-mission-advantage-check { width: 22px; height: 22px; font-size: 12px; }
+  .teacher-mission-advantage-text { font-size: 13px; line-height: 1.5; }
+  .teacher-mission-card-deco-1 { width: 120px; height: 120px; top: -30px; right: -30px; }
+  .teacher-mission-card-deco-2 { width: 80px; height: 80px; bottom: -20px; left: -20px; }
+}
+
+/* Activation Section */
+.activation-section { padding: 40px 0; background-color: #FFFFFF; }
+.activation-container { max-width: 1200px; margin: 0 auto; text-align: center; }
+.activation-header { display: flex; flex-direction: column; align-items: center; }
+.activation-title { font-size: 1.5rem; font-weight: 700; color: #294954; margin-bottom: 2rem; }
+.activation-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px; }
+.activation-card { background-color: #FFFFFF; border-radius: 24px; padding: 48px 32px; box-shadow: 0 12px 40px rgba(41, 73, 84, 0.08); border: 2px solid rgba(104, 178, 201, 0.08); transition: all 0.5s ease; cursor: pointer; position: relative; overflow: hidden; }
+.activation-card:hover { transform: translateY(-12px) scale(1.02); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border-color: var(--ac1, #68B2C9); }
+.activation-step-number { position: absolute; top: 12px; left: 12px; width: 36px; height: 36px; border-radius: 50%; color: #FFFFFF; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(0,0,0,0.12); border: 3px solid #FFFFFF; z-index: 2; background: linear-gradient(135deg, var(--ac1, #68B2C9), var(--ac2, #68B2C9)); }
+.activation-decor { position: absolute; top: -20px; right: -20px; width: 80px; height: 80px; border-radius: 50%; z-index: 1; background: linear-gradient(135deg, var(--ac20, rgba(104,178,201,0.125)), var(--ac10, rgba(104,178,201,0.0625))); }
+.activation-card-inner { position: relative; z-index: 2; text-align: center; }
+.activation-icon { width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 24px; font-size: 36px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(0,0,0,0.08); background: linear-gradient(135deg, var(--ac1, #68B2C9), var(--ac2, #68B2C9)); }
+.activation-card-title { font-size: 20px; font-weight: bold; color: #294954; margin-bottom: 12px; }
+.activation-card-desc { font-size: 14px; line-height: 1.7; color: #6B7280; }
+.activation-card-divider { width: 60px; height: 4px; border-radius: 2px; margin: 24px auto 0; background: linear-gradient(90deg, var(--ac1, #68B2C9), var(--ac2, #68B2C9)); }
+
+/* Activation color variants via CSS variables */
+.activation-card.is-sky { --ac1: #68B2C9; --ac2: #68B2C9CC; --ac20: #68B2C920; --ac10: #68B2C910; }
+.activation-card.is-mint { --ac1: #8ED4BE; --ac2: #8ED4BECC; --ac20: #8ED4BE20; --ac10: #8ED4BE10; }
+.activation-card.is-yellow { --ac1: #FFDE97; --ac2: #FFDE97CC; --ac20: #FFDE9720; --ac10: #FFDE9710; }
+
+/* Metrics Section */
+.metrics-section { padding: 40px 0; background-color: #FFFFFF; }
+.metrics-container { max-width: 1200px; margin: 0 auto; }
+.metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+.metric-item { text-align: center; }
+.metric-value { font-size: 42px; font-weight: bold; margin-bottom: 8px; background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.metrics-grid .metric-item:nth-child(1) .metric-value { background-image: linear-gradient(135deg, #68B2C9, #8ED4BE); }
+.metrics-grid .metric-item:nth-child(2) .metric-value { background-image: linear-gradient(135deg, #8ED4BE, #68B2C9); }
+.metrics-grid .metric-item:nth-child(3) .metric-value { background-image: linear-gradient(135deg, #FFDE97, #FF9978); }
+.metric-label { font-size: 14px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 1px; }
+
+/* Goals Section */
+.goals-section { padding: 40px 0; background-color: #FAF9F5; }
+.goals-container { max-width: 1200px; margin: 0 auto; text-align: center; }
+.goals-title { font-size: 36px; font-weight: bold; color: #294954; margin-bottom: 12px; line-height: 1.2; }
+.goals-description { font-size: 18px; line-height: 1.8; color: #6B7280; margin-bottom: 40px; max-width: 800px; margin-left: auto; margin-right: auto; }
+.goals-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 28px; margin-top: 20px; }
+.goal-card { background-color: #FFFFFF; border-radius: 20px; padding: 24px 20px; text-align: center; border: 2px solid rgba(104, 178, 201, 0.1); transition: all 0.3s ease; }
+.goal-card:hover { transform: translateY(-6px); border-color: #68B2C9; box-shadow: 0 12px 40px rgba(104, 178, 201, 0.15); }
+.goal-number { font-size: 28px; font-weight: bold; margin-bottom: 8px; background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.goals-grid .goal-card:nth-child(3n+1) .goal-number { background-image: linear-gradient(135deg, #68B2C9, #8ED4BE); }
+.goals-grid .goal-card:nth-child(3n+2) .goal-number { background-image: linear-gradient(135deg, #8ED4BE, #68B2C9); }
+.goals-grid .goal-card:nth-child(3n) .goal-number { background-image: linear-gradient(135deg, #FFDE97, #FF9978); }
+.goal-title { font-size: 18px; font-weight: bold; color: #294954; margin-bottom: 8px; }
+.goal-desc { font-size: 14px; color: #6B7280; line-height: 1.5; }

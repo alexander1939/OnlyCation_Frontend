@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLoginApi } from '../../hooks/auth/useLoginApi';
+import Footer from '../ui/Footer';
 
 interface ActivateAccountCardProps {
   route?: string;
@@ -54,7 +55,7 @@ const ActivateAccountCard: React.FC<ActivateAccountCardProps> = ({
         src="/alert_zorro.png"
         alt="Ilustración"
         style={{
-          position: 'fixed',
+          position: 'absolute',
           right: 24,
           top: '58%',
           transform: 'translateY(-50%)',
@@ -216,41 +217,49 @@ const ActivateAccountCard: React.FC<ActivateAccountCardProps> = ({
               cursor: 'pointer',
               marginBottom: 18
             }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.filter = 'brightness(0.95)';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.filter = 'none';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
           >
             Activar Cuenta
           </button>
 
           {/* Cerrar sesión */}
-          <div style={{ textAlign: 'center', marginTop: 22 }}>
-            <span
-              role="button"
-              tabIndex={0}
+          <div style={{ marginTop: 12 }}>
+            <button
+              type="button"
               onClick={async (e) => {
                 e.stopPropagation();
                 try { await logout?.(); } finally { navigate('/login', { replace: true }); }
               }}
-              onKeyDown={async (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  try { await logout?.(); } finally { navigate('/login', { replace: true }); }
-                }
-              }}
-              onMouseEnter={() => setLogoutHover(true)}
-              onMouseLeave={() => setLogoutHover(false)}
               style={{
-                color: logoutHover ? '#DC2626' : '#294954B3',
+                width: '100%',
+                background: '#f13939ff',
+                color: '#fff',
                 fontWeight: 700,
                 fontSize: 14,
-                textDecoration: logoutHover ? 'underline' : 'none',
-                transition: 'color .2s ease, transform .2s ease, text-decoration-color .2s ease',
+                padding: '12px 14px',
+                borderRadius: 10,
+                border: 'none',
+                boxShadow: '0 1px 0 rgba(0,0,0,0.08) inset',
                 cursor: 'pointer',
-                padding: '2px 6px',
-                borderRadius: 6,
-                transform: logoutHover ? 'translateY(-1px)' : 'translateY(0)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.filter = 'brightness(0.95)';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.filter = 'none';
+                e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
               Cerrar Sesión
-            </span>
+            </button>
           </div>
         </div>
       </div>
@@ -265,7 +274,12 @@ const ActivateAccountCard: React.FC<ActivateAccountCardProps> = ({
   );
 
   if (fullScreen) {
-    return <FullscreenWrapper>{Content}</FullscreenWrapper>;
+    return (
+      <>
+        <FullscreenWrapper>{Content}</FullscreenWrapper>
+        <Footer />
+      </>
+    );
   }
 
   return <CardWrapper>{Content}</CardWrapper>;

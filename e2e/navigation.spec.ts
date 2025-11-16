@@ -10,7 +10,7 @@ test.describe('Site Navigation', () => {
     await page.goto('/');
     await page.click('a[href="/teachers"]');
     await expect(page).toHaveURL(/.*teachers/);
-  });
+  }); 
 
   test('should navigate to about us page', async ({ page }) => {
     await page.goto('/');

@@ -44,6 +44,7 @@ import AllBookings from '../pages/booking/all_bookings';
 import { TeachersProvider } from '../context/teachers/TeachersContext';
 import Terms from '../pages/legal/Terms';
 import Privacy from '../pages/legal/Privacy';
+import ActivateAccountCard from '../components/comptHome/activate-account';
 
 const router = createBrowserRouter([
   {
@@ -157,7 +158,7 @@ const router = createBrowserRouter([
   {
     path: "/teacher-home",
     element: (
-      <PrivateRoute roles={["teacher"]}>
+      <PrivateRoute roles={["teacher"]} requireTeacherStatus="active">
         <TeacherHome />
       </PrivateRoute>
     ),
@@ -297,6 +298,14 @@ const router = createBrowserRouter([
     ),
   },
   // Rutas existentes
+  {
+    path: '/teacher/activate-account',
+    element: (
+      <PrivateRoute roles={["teacher"]} requireTeacherStatus="pending">
+        <ActivateAccountCard />
+      </PrivateRoute>
+    ),
+  },
   {
     path: '/teachers',
     element: <AllTeachers />,

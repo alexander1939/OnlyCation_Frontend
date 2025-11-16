@@ -7,9 +7,11 @@ import { useAuthToken } from "../hooks/auth/useAuthToken";
 interface PrivateRouteProps {
   children: React.ReactNode;
   roles?: string[];
+  requireTeacherStatus?: "active" | "pending" | "any";
+  teacherRedirects?: { active: string; pending: string; default: string };
 }
 
-const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, roles }) => {
+const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, roles, requireTeacherStatus, teacherRedirects }) => {
   const { user } = useAuthContext();
   const { getAccessToken, getRoleFromToken, parseJwt } = useAuthToken();
 
@@ -38,6 +40,19 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, roles }) => {
 
   if (roles && (!role || !roles.includes(role))) {
     return <Navigate to="/" replace />;
+  }
+
+  const required = requireTeacherStatus ?? "any";
+  if (roles && roles.includes("teacher") && required !== "any") {
+    const currentStatus = ((user as any)?.status || localStorage.getItem("user_status") || "").toLowerCase();
+    const redirects = teacherRedirects ?? { active: "/teacher-home", pending: "/teacher/activate-account", default: "/" };
+
+    if (required === "active" && currentStatus !== "active") {
+      return <Navigate to={redirects.pending} replace />;
+    }
+    if (required === "pending" && currentStatus !== "pending") {
+      return <Navigate to={redirects.active} replace />;
+    }
   }
 
   return <>{children}</>;

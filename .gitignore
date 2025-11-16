@@ -38,6 +38,7 @@ node_modules/.tmp/
 # Coverage / test outputs
 coverage
 .nyc_output
+test-report/
 
 # Vite / PWA generated files
 public/sw.js

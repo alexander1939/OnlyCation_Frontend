@@ -50,10 +50,7 @@ const AgendaPage: React.FC = () => {
           <p className="agenda-subtitle agenda-text-sm">
             Necesitas una cartera para administrar pagos. Crea tu cuenta de Stripe Connect.
           </p>
-          <div style={{ position: 'fixed', left: '2rem', bottom: '1rem', pointerEvents: 'none' }}>
-        <img src="/Activar_cuenta.png" alt="activar cuenta" style={{ width: '330px', height: 'auto' }} />
-      </div>
-    </div>
+        </div>
 
         <div className="agenda-card">
           <div className="agenda-body">
@@ -114,6 +111,9 @@ const AgendaPage: React.FC = () => {
             )}
           </div>
         </div>
+      </div>
+      <div className="onboarding-mascot">
+        <img src="/Activar_cuenta.png" alt="activar cuenta" />
       </div>
     </div>
   );

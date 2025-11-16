@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest",
-    "test:ci": "vitest run --reporters default --reporters html --outputFile=./test-report/index.html",
+    "test:ci": "vitest run --reporter default --reporter html --outputFile ./test-report/index.html",
     "test:ui": "vitest --ui",
     "test:report": "vitest run",
     "test:coverage": "vitest run --coverage",

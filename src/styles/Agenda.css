@@ -122,3 +122,29 @@ html, body { background: var(--agenda-soft-white) !important; }
 
 .agenda-link { color: #0ea5e9; text-decoration: underline; }
 .agenda-link:hover { color: #0284c7; }
+
+/* Onboarding mascot: fixed on desktop, inline and smaller on mobile */
+.onboarding-mascot {
+  position: fixed;
+  left: 2rem;
+  bottom: 1rem;
+  pointer-events: none;
+}
+
+.onboarding-mascot img {
+  width: 330px;
+  height: auto;
+}
+
+@media (max-width: 640px) {
+  .onboarding-mascot {
+    position: static;
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .onboarding-mascot img {
+    width: min(220px, 60vw);
+  }
+}

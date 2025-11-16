@@ -155,6 +155,7 @@ const CreatePriceForm: React.FC = () => {
             
 
             <div className="price-actions">
+              <button type="button" className="price-btn--secondary" onClick={() => navigate('/teacher-home')}>Terminar proceso</button>
               <button type="button" className="price-btn--secondary" onClick={onCancel}>Cancelar</button>
               <button type="submit" className="price-btn--primary" disabled={!isValid || creating}>{creating ? 'Guardando...' : 'Guardar'}</button>
             </div>
@@ -166,8 +167,8 @@ const CreatePriceForm: React.FC = () => {
           </form>
         </div>
       </div>
-      <div style={{ position: 'fixed', left: '2rem', bottom: '1rem', pointerEvents: 'none' }}>
-        <img src="/Activar_cuenta.png" alt="activar cuenta" style={{ width: '330px', height: 'auto' }} />
+      <div className="onboarding-mascot">
+        <img src="/Activar_cuenta.png" alt="activar cuenta" />
       </div>
     </div>
   );

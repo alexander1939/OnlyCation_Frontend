@@ -78,10 +78,7 @@ const VideoInner: React.FC = () => {
           <p className="video-subtitle video-text-sm" style={{ marginTop: '0.5rem' }}>
             Agrega tu video de YouTube para mostrarte en tu perfil.
           </p>
-          <div style={{ position: 'fixed', left: '2rem', bottom: '1rem', pointerEvents: 'none' }}>
-        <img src="/Activar_cuenta.png" alt="activar cuenta" style={{ width: '330px', height: 'auto' }} />
-      </div>
-    </div>
+        </div>
 
         <div className="video-card">
           <form onSubmit={handleSubmit} className="video-form">
@@ -117,6 +114,9 @@ const VideoInner: React.FC = () => {
             </div>
 
             <div className="video-actions">
+              <button type="button" onClick={() => navigate('/teacher-home')} className="video-btn--secondary">
+                Terminar proceso
+              </button>
               <button type="button" onClick={handleCancel} className="video-btn--secondary">
                 Cancelar
               </button>
@@ -130,6 +130,9 @@ const VideoInner: React.FC = () => {
             {success && <p className="video-alert video-alert--success">¡Video guardado correctamente!</p>}
           </form>
         </div>
+      </div>
+      <div className="onboarding-mascot">
+        <img src="/Activar_cuenta.png" alt="activar cuenta" />
       </div>
     </div>
   );

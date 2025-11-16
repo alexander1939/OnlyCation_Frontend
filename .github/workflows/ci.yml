@@ -28,4 +28,10 @@ jobs:
       run: npm install
 
     - name: Run tests
-      run: npm run test:ci
+      run: vitest run --reporters default --reporters html --outputFile.html=./test-report/index.html
+
+    - name: Upload test report
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-report
+        path: test-report

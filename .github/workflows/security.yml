@@ -36,9 +36,8 @@ jobs:
 
       - name: Run Gitleaks scan
         uses: gitleaks/gitleaks-action@v2
-        with:
-          report_format: sarif
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Optional: Gitleaks will fail the workflow if secrets are found.
           # To only see a report without failing, add the following line:
           # fail: false

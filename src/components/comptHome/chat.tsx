@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 interface ChatLayoutProps {
   fullScreen?: boolean;
@@ -100,7 +100,7 @@ const Chat: React.FC<ChatLayoutProps> = ({
     },
   ];
 
-  const messages = [
+  const initialMessages = [
     {
       id: 1,
       author: "Ana Garcia",
@@ -123,6 +123,47 @@ const Chat: React.FC<ChatLayoutProps> = ({
       text: "Genial. Tengo una duda sobre la clase del miércoles. ¿Podríamos moverla al jueves?",
     },
   ];
+
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const messagesContainerRef = useRef<HTMLDivElement | null>(null);
+  const [chatMessages, setChatMessages] = useState(initialMessages);
+
+  useEffect(() => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
+  }, [chatMessages, activeConversationId]);
+
+  const handleSendMessage = () => {
+    const raw = inputRef.current?.value ?? "";
+    const trimmed = raw.trim();
+    if (!trimmed) return;
+
+    const nextId = chatMessages.length > 0 ? chatMessages[chatMessages.length - 1].id + 1 : 1;
+    const now = new Date();
+    const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+    const userMessage = {
+      id: nextId,
+      author: "Tú",
+      sender: "me" as const,
+      time,
+      text: trimmed,
+    };
+
+    const autoReply = {
+      id: nextId + 1,
+      author: "Ana Garcia",
+      sender: "other" as const,
+      time,
+      text: "Hola, ¿cómo está?",
+    };
+
+    setChatMessages((prev) => [...prev, userMessage, autoReply]);
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
+  };
 
   const showOnlyListOnMobile = isMobile && activeConversationId === null;
   const showOnlyChatOnMobile = isMobile && activeConversationId !== null;
@@ -272,35 +313,6 @@ const Chat: React.FC<ChatLayoutProps> = ({
           })}
         </div>
 
-        <div
-          style={{
-            padding: "0.7rem 0.9rem",
-            borderTop: "1px solid rgba(41,73,84,0.08)",
-            fontSize: 13,
-            color: "#64748B",
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-          }}
-        >
-          <div
-            style={{
-              width: 28,
-              height: 28,
-              borderRadius: 999,
-              background: "#294954",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#FAF9F5",
-              fontSize: 12,
-              fontWeight: 700,
-            }}
-          >
-            AG
-          </div>
-          <span>Settings</span>
-        </div>
       </div>
       )}
 
@@ -403,6 +415,7 @@ const Chat: React.FC<ChatLayoutProps> = ({
 
         {/* Mensajes */}
         <div
+          ref={messagesContainerRef}
           style={{
             flex: 1,
             padding: "1.2rem 1.0rem 0.9rem",
@@ -412,7 +425,7 @@ const Chat: React.FC<ChatLayoutProps> = ({
             gap: 10,
           }}
         >
-          {messages.map((msg) => {
+          {chatMessages.map((msg) => {
             const isMe = msg.sender === "me";
             return (
               <div key={msg.id} style={{ display: "flex", flexDirection: "column" }}>
@@ -491,6 +504,13 @@ const Chat: React.FC<ChatLayoutProps> = ({
           >
             <input
               placeholder="Escribe un mensaje..."
+              ref={inputRef}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
               style={{
                 flex: 1,
                 border: "none",
@@ -502,6 +522,7 @@ const Chat: React.FC<ChatLayoutProps> = ({
             />
             <button
               type="button"
+              onClick={handleSendMessage}
               style={{
                 border: "none",
                 outline: "none",

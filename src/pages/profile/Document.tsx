@@ -26,28 +26,35 @@ const CreateDocument: React.FC = () => {
   const cvInputRef = React.useRef<HTMLInputElement | null>(null);
 
   const fullName = `${user?.first_name ?? ''} ${user?.last_name ?? ''}`.trim();
-  const norm = (s: string) => s
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim();
-  const includesByTokens = (f: File | null, kind: 'cert' | 'cv') => {
+  const stripAccents = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const properCaseBaseName = (full: string) => {
+    const ascii = stripAccents(full);
+    return ascii
+      .split(/\s+/)
+      .filter(Boolean)
+      .map(t => t.charAt(0).toUpperCase() + t.slice(1).toLowerCase())
+      .join('')
+      .replace(/[^A-Za-z0-9]/g, '');
+  };
+  const matchesExpectedPdfName = (f: File | null, kind: 'cert' | 'cv') => {
     if (!f) return false;
-    const hasPdf = /\.pdf$/i.test(f.name) && (f.type === 'application/pdf' || f.type === '');
-    const nFile = norm(f.name.replace(/\.pdf$/i, ''));
-    const tokens = norm(fullName).split(' ').filter(Boolean);
-    const hasAllNameTokens = tokens.every(t => nFile.includes(t));
-    const kindToken = kind === 'cert' ? 'certificado' : 'curriculum';
-    const hasKind = nFile.includes(kindToken);
-    return hasPdf && hasAllNameTokens && hasKind;
+    const name = f.name;
+    const hasPdfExt = /\.pdf$/i.test(name); // aceptar .pdf en cualquier caso
+    if (!hasPdfExt) return false;
+    if (!(f.type === 'application/pdf' || f.type === '')) return false;
+    const nameNoExt = name.replace(/\.pdf$/i, '');
+    const baseName = properCaseBaseName(fullName);
+    const suffix = kind === 'cert' ? 'certificado' : 'curriculum'; // sufijo en minúsculas
+    const expected = `${baseName}_${suffix}`;
+    return nameNoExt === expected;
   };
 
   const validateFiles = () => {
-    const certOk = includesByTokens(certificate, 'cert');
-    const cvOk = includesByTokens(curriculum, 'cv');
-    const msgCert = `El PDF debe ser .pdf y su nombre debe contener todas las palabras de tu nombre ("${fullName}") y la palabra "Certificado".`;
-    const msgCv = `El PDF debe ser .pdf y su nombre debe contener todas las palabras de tu nombre ("${fullName}") y la palabra "Curriculum".`;
+    const certOk = matchesExpectedPdfName(certificate, 'cert');
+    const cvOk = matchesExpectedPdfName(curriculum, 'cv');
+    const baseName = properCaseBaseName(fullName);
+    const msgCert = `El PDF debe llamarse exactamente: "${baseName}_certificado.pdf"`;
+    const msgCv = `El PDF debe llamarse exactamente: "${baseName}_curriculum.pdf"`;
     setCertError(certOk ? null : msgCert);
     setCvError(cvOk ? null : msgCv);
     return certOk && cvOk;
@@ -80,7 +87,7 @@ const CreateDocument: React.FC = () => {
     const descOk = validateFreeText(description);
     const base = rfcOk && expOk && descOk && certificate && curriculum;
     if (!base) return false;
-    return includesByTokens(certificate, 'cert') && includesByTokens(curriculum, 'cv');
+    return matchesExpectedPdfName(certificate, 'cert') && matchesExpectedPdfName(curriculum, 'cv');
   }, [rfc, expertise, description, certificate, curriculum]);
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -137,10 +144,11 @@ const CreateDocument: React.FC = () => {
                     setRfc(next);
                     setRfcError(validateRfc(next));
                     // Revalidar PDFs al cambiar RFC
-                    const msgCert = `El PDF debe ser .pdf y su nombre debe contener todas las palabras de tu nombre ("${fullName}") y la palabra "Certificado".`;
-                    const msgCv = `El PDF debe ser .pdf y su nombre debe contener todas las palabras de tu nombre ("${fullName}") y la palabra "Curriculum".`;
-                    if (certificate) setCertError(includesByTokens(certificate, 'cert') ? null : msgCert);
-                    if (curriculum) setCvError(includesByTokens(curriculum, 'cv') ? null : msgCv);
+                    const baseName = properCaseBaseName(fullName);
+                    const msgCert = `El PDF debe llamarse exactamente: "${baseName}_certificado.pdf"`;
+                    const msgCv = `El PDF debe llamarse exactamente: "${baseName}_curriculum.pdf"`;
+                    if (certificate) setCertError(matchesExpectedPdfName(certificate, 'cert') ? null : msgCert);
+                    if (curriculum) setCvError(matchesExpectedPdfName(curriculum, 'cv') ? null : msgCv);
                   }}
                   maxLength={13} 
                 />
@@ -152,8 +160,11 @@ const CreateDocument: React.FC = () => {
             {/* Files */}
             <div className="doc-grid">
               <div>
-                <label className="doc-label">Certificado (.pdf)</label>
-                <div>
+                <label className="doc-label">Certificado</label>
+                <div className="doc-hint" style={{ fontSize: '0.85rem', color: '#6b7280', marginTop: '0.25rem' }}>
+                  Ejemplo con tu nombre: {properCaseBaseName(fullName) || 'TuNombreApellido'}_certificado.pdf
+                </div>
+                <div style={{ marginTop: '0.5rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                     <button type="button" className="doc-btn--secondary" onClick={() => certInputRef.current?.click()}>
                       📄 Elegir PDF
@@ -167,8 +178,9 @@ const CreateDocument: React.FC = () => {
                     onChange={(e) => {
                       const f = e.target.files?.[0] || null;
                       setCertificate(f);
-                      const msgCert = `El PDF debe ser .pdf y su nombre debe contener todas las palabras de tu nombre ("${fullName}") y la palabra "Certificado".`;
-                      setCertError(f && includesByTokens(f, 'cert') ? null : msgCert);
+                      const baseName = properCaseBaseName(fullName);
+                      const msgCert = `El PDF debe llamarse exactamente: "${baseName}_certificado.pdf"`;
+                      setCertError(f && matchesExpectedPdfName(f, 'cert') ? null : msgCert);
                     }}
                     style={{ display: 'none' }}
                   />
@@ -176,8 +188,11 @@ const CreateDocument: React.FC = () => {
                 </div>
               </div>
               <div>
-                <label className="doc-label">Curriculum (.pdf)</label>
-                <div>
+                <label className="doc-label">Curriculum</label>
+                <div className="doc-hint" style={{ fontSize: '0.85rem', color: '#6b7280', marginTop: '0.25rem' }}>
+                  Ejemplo con tu nombre: {properCaseBaseName(fullName) || 'TuNombreApellido'}_curriculum.pdf
+                </div>
+                <div style={{ marginTop: '0.5rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                     <button type="button" className="doc-btn--secondary" onClick={() => cvInputRef.current?.click()}>
                       📄 Elegir PDF
@@ -191,8 +206,9 @@ const CreateDocument: React.FC = () => {
                     onChange={(e) => {
                       const f = e.target.files?.[0] || null;
                       setCurriculum(f);
-                      const msgCv = `El PDF debe ser .pdf y su nombre debe contener todas las palabras de tu nombre ("${fullName}") y la palabra "Curriculum".`;
-                      setCvError(f && includesByTokens(f, 'cv') ? null : msgCv);
+                      const baseName = properCaseBaseName(fullName);
+                      const msgCv = `El PDF debe llamarse exactamente: "${baseName}_curriculum.pdf"`;
+                      setCvError(f && matchesExpectedPdfName(f, 'cv') ? null : msgCv);
                     }}
                     style={{ display: 'none' }}
                   />
@@ -256,6 +272,7 @@ const CreateDocument: React.FC = () => {
             {/* Footer */}
             <div className="doc-actions">
               <div style={{ display: 'flex', gap: '0.75rem' }}>
+                <button type="button" className="doc-btn--secondary" onClick={() => navigate('/teacher-home')}>Terminar proceso</button>
                 <button type="button" className="doc-btn--secondary" onClick={onCancel}>Cancelar</button>
                 <button type="submit" className="doc-btn--primary" disabled={!isValid || creating}>{creating ? 'Guardando...' : 'Guardar'}</button>
               </div>
@@ -271,8 +288,8 @@ const CreateDocument: React.FC = () => {
           </form>
         </div>
       </div>
-      <div style={{ position: 'fixed', left: '2rem', bottom: '1rem', pointerEvents: 'none' }}>
-        <img src="/Activar_cuenta.png" alt="activar cuenta" style={{ width: '330px', height: 'auto' }} />
+      <div className="onboarding-mascot">
+        <img src="/Activar_cuenta.png" alt="activar cuenta" />
       </div>
     </div>
   );

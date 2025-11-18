@@ -227,3 +227,29 @@
     radial-gradient(36% 36% at 60% 70%, rgba(255, 153, 120, 0.20) 0%, transparent 72%), /* Coral */
     radial-gradient(40% 40% at 65% 65%, rgba(255, 222, 151, 0.45) 0%, transparent 70%);
 }
+
+/* Onboarding mascot: fixed on desktop, inline and smaller on mobile */
+.onboarding-mascot {
+  position: fixed;
+  left: 2rem;
+  bottom: 1rem;
+  pointer-events: none;
+}
+
+.onboarding-mascot img {
+  width: 330px;
+  height: auto;
+}
+
+@media (max-width: 640px) {
+  .onboarding-mascot {
+    position: static;
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .onboarding-mascot img {
+    width: min(220px, 60vw);
+  }
+}

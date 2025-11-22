@@ -425,7 +425,8 @@ const Chat: React.FC<ChatLayoutProps> = ({
           style={{
             flex: 1,
             padding: "1.2rem 1.0rem 0.9rem",
-            overflowY: "auto",
+            overflowY: "auto",      // scroll solo en la conversación
+            maxHeight:  "420px",     // altura máxima del área de mensajes
             display: "flex",
             flexDirection: "column",
             gap: 10,
@@ -576,8 +577,7 @@ const Chat: React.FC<ChatLayoutProps> = ({
       style={{
         display: "flex",
         flexDirection: "column",
-        height: "100vh",      // altura fija: igual que la pantalla
-        overflow: "hidden",   // la página ya no se alarga; el scroll será interno
+        minHeight: "100vh",   // permite que la página crezca y se pueda scrollear hasta el footer
         background: "#FAF9F5",
       }}
     >
@@ -587,8 +587,8 @@ const Chat: React.FC<ChatLayoutProps> = ({
         style={{
           flex: 1,
           display: "flex",
-          // espacio justo debajo del header, un poco menor para subir el chat
-          padding: "6rem 0 0",
+          // espacio justo debajo del header y un pequeño espacio antes del footer
+          padding: "6rem 0 1rem",
           boxSizing: "border-box",
           width: "100%",
         }}

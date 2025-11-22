@@ -45,6 +45,7 @@ import { TeachersProvider } from '../context/teachers/TeachersContext';
 import Terms from '../pages/legal/Terms';
 import Privacy from '../pages/legal/Privacy';
 import ActivateAccountCard from '../components/comptHome/activate-account';
+import Chat from '../components/comptHome/chat';
 
 const router = createBrowserRouter([
   {
@@ -272,37 +273,14 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: '/chat',
+    element: <Chat />,
+  },
+  {
     path: '/teacher/chat',
     element: (
       <PrivateRoute roles={["teacher"]}>
         <TeacherChat />
-      </PrivateRoute>
-    ),
-  },
-  {
-    path: '/teacher/personal-data',
-    element: (
-      <PrivateRoute roles={["teacher"]}>
-        <DocenteDatosPersonales />
-      </PrivateRoute>
-    ),
-  },
-  {
-    path: '/teacher/documents',
-    element: (
-      <PrivateRoute roles={["teacher"]}>
-        <DocumentsProvider>
-          <DocenteDocumentos />
-        </DocumentsProvider>
-      </PrivateRoute>
-    ),
-  },
-  // Rutas existentes
-  {
-    path: '/teacher/activate-account',
-    element: (
-      <PrivateRoute roles={["teacher"]} requireTeacherStatus="pending">
-        <ActivateAccountCard />
       </PrivateRoute>
     ),
   },

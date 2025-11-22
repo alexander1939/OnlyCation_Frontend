@@ -1,7 +1,7 @@
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
-import PWAInstaller from './components/PWAInstaller'
+
 import { createApiInterceptor } from './utils/apiErrorHandler.ts'
  
 // Inicializar  interceptor de API para detectar errores de conexión
@@ -26,6 +26,6 @@ if ('serviceWorker' in navigator) {
 createRoot(document.getElementById('root')!).render(
   <>
     <App />
-    <PWAInstaller />
+    
   </>
 )

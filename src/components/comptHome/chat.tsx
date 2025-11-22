@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
+import Header from "../ui/Header";
+import Footer from "../ui/Footer";
 
 interface ChatLayoutProps {
   fullScreen?: boolean;
@@ -6,8 +8,8 @@ interface ChatLayoutProps {
 }
 
 const Chat: React.FC<ChatLayoutProps> = ({
-  fullScreen = true,
-  backgroundColor = "#FAF9F5",
+  fullScreen = false,
+  backgroundColor = "#FFFFFF",
 }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [activeConversationId, setActiveConversationId] = useState<number | null>(null);
@@ -29,14 +31,16 @@ const Chat: React.FC<ChatLayoutProps> = ({
       return () => window.removeEventListener("resize", updateIsMobile);
     }
   }, [activeConversationId]);
+
   const CardWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <div
       style={{
         backgroundColor,
-        borderRadius: "1rem",
-        padding: "1.5rem",
+        borderRadius: "0.75rem", // un poco más cuadrado
+        padding: "1rem",         // menos padding para que el contenido se vea más grande
         boxShadow: "0 8px 20px rgba(41,73,84,0.12)",
         height: "100%",
+        width: "100%",
         display: "flex",
         flexDirection: "column",
         fontFamily:
@@ -171,7 +175,7 @@ const Chat: React.FC<ChatLayoutProps> = ({
   const ChatContent = (
     <div
       className="chat-layout-wrapper"
-      style={{ display: "flex", flex: 1, minHeight: "100vh" }}
+      style={{ display: "flex", flex: 1, minHeight: 0 }}
     >
       {/* Columna izquierda: lista de conversaciones */}
       {!showOnlyChatOnMobile && (
@@ -182,7 +186,8 @@ const Chat: React.FC<ChatLayoutProps> = ({
             background: "#FFFFFF",
             display: "flex",
             flexDirection: "column",
-            height: isMobile ? "100vh" : "auto",
+            // en móvil llenamos la pantalla, en escritorio ocupamos solo el alto disponible del contenedor
+            height: isMobile ? "100vh" : "100%",
           }}
         >
         <div
@@ -324,7 +329,8 @@ const Chat: React.FC<ChatLayoutProps> = ({
             display: "flex",
             flexDirection: "column",
             background: "#FAF9F5",
-            height: isMobile ? "100vh" : "auto",
+            // en móvil pantalla completa, en escritorio solo el alto disponible del contenedor
+            height: isMobile ? "100vh" : "100%",
           }}
         >
         {/* Encabezado */}
@@ -565,7 +571,34 @@ const Chat: React.FC<ChatLayoutProps> = ({
     return <FullscreenWrapper>{ChatContent}</FullscreenWrapper>;
   }
 
-  return <CardWrapper>{ChatContent}</CardWrapper>;
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",      // altura fija: igual que la pantalla
+        overflow: "hidden",   // la página ya no se alarga; el scroll será interno
+        background: "#FAF9F5",
+      }}
+    >
+      <Header />
+
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          // espacio justo debajo del header, un poco menor para subir el chat
+          padding: "6rem 0 0",
+          boxSizing: "border-box",
+          width: "100%",
+        }}
+      >
+        <CardWrapper>{ChatContent}</CardWrapper>
+      </div>
+
+      <Footer />
+    </div>
+  );
 };
 
 export default Chat;

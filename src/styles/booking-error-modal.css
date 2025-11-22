@@ -1,0 +1,13 @@
+.bem-overlay{position:fixed;inset:0;background:rgba(17,24,39,.55);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;z-index:70}
+.bem-container{width:min(420px,92vw);background:#FEF2F2;border-radius:18px;box-shadow:0 24px 60px rgba(0,0,0,.25);border:1px solid #fecaca;padding:24px 24px 20px;position:relative;animation:bem-pop .24s ease-out;display:flex;flex-direction:column}
+.bem-close{position:absolute;top:12px;right:14px;border:none;background:transparent;font-size:20px;color:#b91c1c;cursor:pointer;line-height:1;border-radius:999px;padding:2px 6px}
+.bem-close:hover{background:#fee2e2;color:#7f1d1d}
+.bem-icon-wrapper{display:flex;justify-content:center;margin-top:4px;margin-bottom:10px}
+.bem-icon-circle{width:56px;height:56px;border-radius:999px;background:#fee2e2;border:2px solid #fca5a5;display:flex;align-items:center;justify-content:center}
+.bem-icon{font-size:28px;color:#b91c1c;font-weight:700}
+.bem-title{text-align:center;font-size:18px;color:#7f1d1d;margin:0 0 6px}
+.bem-subtitle{text-align:center;font-size:14px;color:#9f1239;margin:0 0 16px}
+.bem-primary{width:100%;margin-top:auto;height:42px;border-radius:999px;border:none;background:#ef4444;color:#fef2f2;font-weight:700;cursor:pointer;font-size:14px;letter-spacing:.2px;transition:transform .08s ease,filter .15s ease}
+.bem-primary:hover{filter:brightness(1.03)}
+.bem-primary:active{transform:translateY(1px)}
+@keyframes bem-pop{from{opacity:0;transform:translateY(6px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}

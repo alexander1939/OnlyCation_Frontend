@@ -13,6 +13,7 @@ import DispAgenda from '../../components/DispAgenda';
 import { Play, Star, BadgeDollarSign } from 'lucide-react';
 import '../../styles/docente-general.css';
 import '../../styles/docente-profile.css';
+import ScheduleButton from '../../components/booking/ScheduleButton';
 
 type TeacherReview = {
   id: string;
@@ -471,6 +472,15 @@ export default function DocenteProfile() {
                       <div className="avail-card" style={{ marginTop: 12 }}>
                         <WeeklyAgendaProvider>
                           <DispAgenda />
+                          <ScheduleButton 
+                            teacher={{ 
+                              name: fullName, 
+                              subject: profile.subject, 
+                              level: profile.level, 
+                              hourlyRate: profile.hourlyRate,
+                              rating: profile.rating
+                            }} 
+                          />
                         </WeeklyAgendaProvider>
                       </div>
 

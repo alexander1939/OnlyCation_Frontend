@@ -1,8 +1,9 @@
-import { useMemo, useState, useEffect, useRef } from 'react';
+import { useMemo, useState, useEffect, useRef,  } from 'react';
 import Header from '../../components/ui/Header';
 import Footer from '../../components/ui/Footer';
 import { useTeachersContext } from '../../context/teachers';
 import '../../styles/teacher-catalog.css';
+import { useNavigate as useRrdNavigate } from 'react-router-dom';
 
 type TeacherItem = {
   id: string;
@@ -35,6 +36,7 @@ function extractYouTubeId(url: string): string | null {
 
 export default function TeacherCatalog() {
   const { teachers, loading, loadingMore, total, getTeachers, searchTeachers } = useTeachersContext();
+  const navigate = useRrdNavigate();
   const [name, setName] = useState('');
   const [subject, setSubject] = useState('');
   const [levels, setLevels] = useState<string[]>([]);
@@ -105,7 +107,7 @@ export default function TeacherCatalog() {
   };
 
   const handleCardClick = (teacherId: string) => {
-    console.log('Navigate to teacher profile:', teacherId);
+    navigate(`/teachers/${teacherId}`);
   };
 
   const loadMore = async () => {

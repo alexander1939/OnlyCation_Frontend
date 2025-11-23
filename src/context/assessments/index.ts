@@ -1,2 +1,3 @@
 export { AssessmentsProvider, useAssessmentsContext } from './AssessmentsContext';
-export type { AssessmentsContextType } from './types';
+export { PublicAssessmentsProvider, usePublicAssessmentsContext } from './PublicAssessmentsContext';
+export type { AssessmentsContextType, PublicAssessmentsContextType, PublicAssessmentComment } from './types';

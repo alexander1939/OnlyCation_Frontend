@@ -12,14 +12,20 @@ export const usePublicAgendaApi = () => {
     });
   }, []);
 
-  const getPublicAgenda = async (teacherId: number): Promise<{ 
+  type PublicAgendaQuery = { week?: string; start_date?: string; end_date?: string };
+
+  const getPublicAgenda = async (
+    teacherId: number,
+    params?: PublicAgendaQuery
+  ): Promise<{ 
     success: boolean; 
     data?: PublicAgendaResponse; 
     message: string 
   }> => {
     try {
       const response = await client.get<PublicAgendaResponse>(
-        `/availability/docente/${teacherId}/agenda/`
+        `/availability/docente/${teacherId}/agenda/`,
+        { params }
       );
 
       const data = response.data;

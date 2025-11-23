@@ -62,3 +62,38 @@ export interface BookingDetailResponse {
   message: string;
   data: BookingDetailData;
 }
+
+// Crear Booking (Stripe Checkout Session)
+export interface BookingCreateRequest {
+  availability_id: number;
+  price_id: number;
+  start_time: string; // ISO 8601
+  end_time: string;   // ISO 8601
+  total_hours: number;
+}
+
+export interface BookingCreateResponseData {
+  url: string;
+  session_id: string;
+  price: number;
+}
+
+export interface BookingCreateResponse {
+  success: boolean;
+  message: string;
+  data: BookingCreateResponseData;
+}
+
+// Verificar Booking (Stripe) y crear registros
+export interface VerifyBookingResponseData {
+  booking_id: number;
+  payment_booking_id: number;
+  confirmation_id: number;
+}
+
+export interface VerifyBookingResponse {
+  success: boolean;
+  message: string;
+  payment_status: string; // e.g., 'completed'
+  data: VerifyBookingResponseData;
+}

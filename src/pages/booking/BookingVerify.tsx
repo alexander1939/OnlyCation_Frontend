@@ -29,24 +29,48 @@ export default function BookingVerify() {
 
     (async () => {
       const res = await verifyBooking(sessionId);
-      if (res.success && res.data?.data?.booking_id) {
-        // Intentar poblar datos del modal con el detalle del booking
-        const detailRes = await getBookingDetail(res.data.data.booking_id);
-        if (detailRes.success && detailRes.data?.data) {
-          const d = detailRes.data.data;
-          const start = new Date(d.start_time);
-          const end = new Date(d.end_time);
-          const dateLabel = start.toLocaleDateString('es-ES', {
-            weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-          });
-          const timeLabel = `${start.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })} - ${end.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}`;
-          setConfirmData({
-            teacherName: `${d.teacher.first_name} ${d.teacher.last_name}`,
-            subject: d.materia,
-            items: [{ dateLabel, timeLabel }],
-          });
+      try { console.log('[BookingVerify][DEBUG] verifyBooking response:', res); } catch {}
+
+      // Intentar recuperar un preview guardado antes de ir a Stripe
+      let preview: BookingConfirmationData | null = null;
+      try {
+        const raw = sessionStorage.getItem('onlycation_booking_preview');
+        if (raw) {
+          preview = JSON.parse(raw) as BookingConfirmationData;
+          console.log('[BookingVerify][DEBUG] preview from sessionStorage:', preview);
+        }
+      } catch (e) {
+        console.log('[BookingVerify][DEBUG] failed to read preview:', e);
+      }
+      try { sessionStorage.removeItem('onlycation_booking_preview'); } catch {}
+
+      if (res.success) {
+        // Si hay booking_id, intentamos obtener detalles para poblar el modal
+        const bookingId = res.data?.data?.booking_id;
+        if (bookingId) {
+          const detailRes = await getBookingDetail(bookingId);
+          try { console.log('[BookingVerify][DEBUG] getBookingDetail response:', detailRes); } catch {}
+          if (detailRes.success && detailRes.data?.data) {
+            const d = detailRes.data.data;
+            const start = new Date(d.start_time);
+            const end = new Date(d.end_time);
+            const dateLabel = start.toLocaleDateString('es-ES', {
+              weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+            });
+            const timeLabel = `${start.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })} - ${end.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}`;
+            setConfirmData({
+              teacherName: `${d.teacher.first_name} ${d.teacher.last_name}`,
+              subject: d.materia,
+              // Si tenemos preview (multi-slot), usarlo; si no, al menos un item con start/end
+              items: preview?.items && preview.items.length > 0 ? preview.items : [{ dateLabel, timeLabel }],
+            });
+          } else {
+            // Éxito pero sin detalle: usar preview si existe; si no, genérico
+            setConfirmData(preview ?? { teacherName: 'Docente', subject: '—', items: [] });
+          }
         } else {
-          setConfirmData({ teacherName: 'Docente', subject: '—', items: [] });
+          // Éxito pero sin booking_id en respuesta: usar preview si existe; si no, genérico
+          setConfirmData(preview ?? { teacherName: 'Docente', subject: '—', items: [] });
         }
         setSuccessOpen(true);
       } else {
@@ -73,11 +97,7 @@ export default function BookingVerify() {
             </p>
           )}
 
-          {loading && (
-            <div style={{ marginTop: 16 }}>
-              <p className="text-gray-700">Procesando verificación con Stripe...</p>
-            </div>
-          )}
+          {loading && null}
 
           {!loading && error && (
             <div style={{ marginTop: 16 }}>
@@ -97,6 +117,20 @@ export default function BookingVerify() {
         </section>
       </main>
       <Footer />
+
+      {loading && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40"
+          role="status"
+          aria-busy="true"
+          aria-live="polite"
+        >
+          <div className="rounded-2xl bg-white p-6 shadow-xl flex flex-col items-center">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-[#294954]" />
+            <p className="mt-3 text-gray-700">Procesando tu pago y creando tu reserva…</p>
+          </div>
+        </div>
+      )}
 
       {/* Modales */}
       <BookingConfirmationModal

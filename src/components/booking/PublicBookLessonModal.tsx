@@ -276,9 +276,28 @@ export default function PublicBookLessonModal({ isOpen, onClose, teacherId, teac
       };
     });
 
-    // DEBUG extra
-    console.log('[Booking][DEBUG] availability_ids:', availabilityIds);
-    console.log('[Booking][DEBUG] items:', items);
+    // Guardar preview para la página de verificación (fallback si el detalle no está disponible)
+    try {
+      const previewItems = selectedSlots.map(s => {
+        const startDate = new Date(`${s.dateKey}T${s.hour}:00`);
+        const endHour = String(parseInt(s.hour.split(':')[0], 10) + 1).padStart(2, '0') + ':00';
+        const endDate = new Date(`${s.dateKey}T${endHour}:00`);
+        const dateLabel = startDate.toLocaleDateString('es-ES', {
+          weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+        });
+        const timeLabel = `${startDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })} - ${endDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}`;
+        return { dateLabel, timeLabel };
+      });
+      const preview = {
+        teacherName: teacher.name || 'Docente',
+        subject: teacher.subject || '—',
+        items: previewItems,
+      };
+      sessionStorage.setItem('onlycation_booking_preview', JSON.stringify(preview));
+      console.log('[Booking][DEBUG] saved preview for verify page:', preview);
+    } catch (e) {
+      console.log('[Booking][DEBUG] failed to save preview:', e);
+    }
 
     try {
       const res = await createBooking({

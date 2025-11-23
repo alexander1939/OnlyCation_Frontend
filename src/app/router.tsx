@@ -46,12 +46,19 @@ import Terms from '../pages/legal/Terms';
 import Privacy from '../pages/legal/Privacy';
 import ActivateAccountCard from '../components/comptHome/activate-account';
 import Chat from '../components/comptHome/chat';
+<<<<<<< HEAD
 import PublicTeacherProfile from '../pages/teachers/PublicTeacherProfile';
 import { PublicTeacherProfileProvider } from '../context/teachers/PublicTeacherProfileContext';
 import { PublicAssessmentsProvider } from '../context/assessments/PublicAssessmentsContext';
 import { PublicAgendaProvider } from '../context/availability/PublicAgendaContext';
 import { CreateBookingProvider, VerifyBookingProvider } from '../context/booking';
 import BookingVerify from '../pages/booking/BookingVerify';
+=======
+import NotFound from '../components/error/NotFound';
+import Forbidden from '../components/error/Forbidden';
+import ServerError from '../components/error/ServerError';
+import GlobalErrorBoundary from '../components/error/GlobalErrorBoundary';
+>>>>>>> main
 
 const router = createBrowserRouter([
   {
@@ -279,14 +286,18 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/chat',
-    element: <Chat />,
-  },
-  {
     path: '/teacher/chat',
     element: (
       <PrivateRoute roles={["teacher"]}>
-        <TeacherChat />
+        <Chat />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/student/chat',
+    element: (
+      <PrivateRoute roles={["student"]}>
+        <Chat />
       </PrivateRoute>
     ),
   },
@@ -365,8 +376,24 @@ const router = createBrowserRouter([
     path: '/privacy',
     element: <Privacy />,
   },
+  {
+    path: '/403',
+    element: <Forbidden />,
+  },
+  {
+    path: '/500',
+    element: <ServerError />,
+  },
+  {
+    path: '*',
+    element: <NotFound />,
+  },
 ]);
 
 export default function AppRouter() {
-  return <RouterProvider router={router} />;
+  return (
+    <GlobalErrorBoundary>
+      <RouterProvider router={router} />
+    </GlobalErrorBoundary>
+  );
 }

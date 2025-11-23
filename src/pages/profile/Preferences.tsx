@@ -247,6 +247,13 @@ const PreferencesPage: React.FC = () => {
             <div className="pref-actions">
               <button
                 type="button"
+                onClick={() => navigate('/teacher-home')}
+                className="pref-btn--secondary"
+              >
+                Terminar proceso
+              </button>
+              <button
+                type="button"
                 onClick={handleCancel}
                 className="pref-btn--secondary"
               >
@@ -271,8 +278,8 @@ const PreferencesPage: React.FC = () => {
           </form>
         </div>
       </div>
-      <div style={{ position: 'fixed', left: '2rem', bottom: '1rem', pointerEvents: 'none' }}>
-        <img src="/Activar_cuenta.png" alt="activar cuenta" style={{ width: '330px', height: 'auto' }} />
+      <div className="onboarding-mascot">
+        <img src="/Activar_cuenta.png" alt="activar cuenta" />
       </div>
     </div>
   );

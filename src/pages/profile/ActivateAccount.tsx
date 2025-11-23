@@ -51,9 +51,6 @@ const ActivateAccount: React.FC = () => {
         <div className="agenda-header">
           <h1 className="agenda-title agenda-title-lg">Activar cuenta</h1>
           <p className="agenda-subtitle agenda-text-sm">Confirmaremos con el servidor y activaremos tu cuenta docente.</p>
-          <div style={{ position: 'fixed', left: '2rem', bottom: '1rem', pointerEvents: 'none' }}>
-            <img src="/Activar_cuenta.png" alt="activar cuenta" style={{ width: '330px', height: 'auto' }} />
-          </div>
         </div>
 
         <div className="agenda-card">
@@ -70,6 +67,9 @@ const ActivateAccount: React.FC = () => {
             )}
           </div>
         </div>
+      </div>
+      <div className="onboarding-mascot">
+        <img src="/Activar_cuenta.png" alt="activar cuenta" />
       </div>
     </div>
   );

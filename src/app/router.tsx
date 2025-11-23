@@ -273,14 +273,18 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/chat',
-    element: <Chat />,
-  },
-  {
     path: '/teacher/chat',
     element: (
       <PrivateRoute roles={["teacher"]}>
-        <TeacherChat />
+        <Chat />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/student/chat',
+    element: (
+      <PrivateRoute roles={["student"]}>
+        <Chat />
       </PrivateRoute>
     ),
   },

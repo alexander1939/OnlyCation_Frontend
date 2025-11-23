@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
+import Header from "../ui/Header";
+import Footer from "../ui/Footer";
 
 interface ChatLayoutProps {
   fullScreen?: boolean;
@@ -6,8 +8,8 @@ interface ChatLayoutProps {
 }
 
 const Chat: React.FC<ChatLayoutProps> = ({
-  fullScreen = true,
-  backgroundColor = "#FAF9F5",
+  fullScreen = false,
+  backgroundColor = "#FFFFFF",
 }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [activeConversationId, setActiveConversationId] = useState<number | null>(null);
@@ -29,14 +31,16 @@ const Chat: React.FC<ChatLayoutProps> = ({
       return () => window.removeEventListener("resize", updateIsMobile);
     }
   }, [activeConversationId]);
+
   const CardWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <div
       style={{
         backgroundColor,
-        borderRadius: "1rem",
-        padding: "1.5rem",
+        borderRadius: "0.75rem", // un poco más cuadrado
+        padding: "1rem",         // menos padding para que el contenido se vea más grande
         boxShadow: "0 8px 20px rgba(41,73,84,0.12)",
         height: "100%",
+        width: "100%",
         display: "flex",
         flexDirection: "column",
         fontFamily:
@@ -171,7 +175,7 @@ const Chat: React.FC<ChatLayoutProps> = ({
   const ChatContent = (
     <div
       className="chat-layout-wrapper"
-      style={{ display: "flex", flex: 1, minHeight: "100vh" }}
+      style={{ display: "flex", flex: 1, minHeight: 0 }}
     >
       {/* Columna izquierda: lista de conversaciones */}
       {!showOnlyChatOnMobile && (
@@ -182,7 +186,8 @@ const Chat: React.FC<ChatLayoutProps> = ({
             background: "#FFFFFF",
             display: "flex",
             flexDirection: "column",
-            height: isMobile ? "100vh" : "auto",
+            // en móvil llenamos la pantalla, en escritorio ocupamos solo el alto disponible del contenedor
+            height: isMobile ? "100vh" : "100%",
           }}
         >
         <div
@@ -211,18 +216,20 @@ const Chat: React.FC<ChatLayoutProps> = ({
               borderRadius: 999,
             }}
           >
-            <span
+            <input
+              placeholder="Buscar chats..."
               style={{
                 fontSize: 13,
                 color: "#294954",
                 flex: 1,
+                border: "none",
+                outline: "none",
+                background: "transparent",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
               }}
-            >
-              Buscar chats...
-            </span>
+            />
           </div>
         </div>
 
@@ -324,7 +331,8 @@ const Chat: React.FC<ChatLayoutProps> = ({
             display: "flex",
             flexDirection: "column",
             background: "#FAF9F5",
-            height: isMobile ? "100vh" : "auto",
+            // en móvil pantalla completa, en escritorio solo el alto disponible del contenedor
+            height: isMobile ? "100vh" : "100%",
           }}
         >
         {/* Encabezado */}
@@ -401,25 +409,16 @@ const Chat: React.FC<ChatLayoutProps> = ({
               </div>
             </div>
           </div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 4,
-              color: "#64748B",
-            }}
-          >
-            <span style={{ fontSize: 22, lineHeight: 1 }}>···</span>
-          </div>
         </div>
 
         {/* Mensajes */}
         <div
           ref={messagesContainerRef}
           style={{
-            flex: 1,
+            // altura fija más grande para que el área del chat sea más larga hacia abajo
+            height: "60vh",
             padding: "1.2rem 1.0rem 0.9rem",
-            overflowY: "auto",
+            overflowY: "auto",      // scroll solo en la conversación
             display: "flex",
             flexDirection: "column",
             gap: 10,
@@ -565,7 +564,33 @@ const Chat: React.FC<ChatLayoutProps> = ({
     return <FullscreenWrapper>{ChatContent}</FullscreenWrapper>;
   }
 
-  return <CardWrapper>{ChatContent}</CardWrapper>;
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",   // permite que la página crezca y se pueda scrollear hasta el footer
+        background: "#FAF9F5",
+      }}
+    >
+      <Header />
+
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          // espacio justo debajo del header y un pequeño espacio antes del footer
+          padding: "6rem 0 1rem",
+          boxSizing: "border-box",
+          width: "100%",
+        }}
+      >
+        <CardWrapper>{ChatContent}</CardWrapper>
+      </div>
+
+      <Footer />
+    </div>
+  );
 };
 
 export default Chat;

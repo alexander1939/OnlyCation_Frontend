@@ -216,18 +216,20 @@ const Chat: React.FC<ChatLayoutProps> = ({
               borderRadius: 999,
             }}
           >
-            <span
+            <input
+              placeholder="Buscar chats..."
               style={{
                 fontSize: 13,
                 color: "#294954",
                 flex: 1,
+                border: "none",
+                outline: "none",
+                background: "transparent",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
               }}
-            >
-              Buscar chats...
-            </span>
+            />
           </div>
         </div>
 
@@ -407,26 +409,16 @@ const Chat: React.FC<ChatLayoutProps> = ({
               </div>
             </div>
           </div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 4,
-              color: "#64748B",
-            }}
-          >
-            <span style={{ fontSize: 22, lineHeight: 1 }}>···</span>
-          </div>
         </div>
 
         {/* Mensajes */}
         <div
           ref={messagesContainerRef}
           style={{
-            flex: 1,
+            // altura fija más grande para que el área del chat sea más larga hacia abajo
+            height: "60vh",
             padding: "1.2rem 1.0rem 0.9rem",
             overflowY: "auto",      // scroll solo en la conversación
-            maxHeight:  "420px",     // altura máxima del área de mensajes
             display: "flex",
             flexDirection: "column",
             gap: 10,

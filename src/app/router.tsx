@@ -46,19 +46,17 @@ import Terms from '../pages/legal/Terms';
 import Privacy from '../pages/legal/Privacy';
 import ActivateAccountCard from '../components/comptHome/activate-account';
 import Chat from '../components/comptHome/chat';
-<<<<<<< HEAD
 import PublicTeacherProfile from '../pages/teachers/PublicTeacherProfile';
 import { PublicTeacherProfileProvider } from '../context/teachers/PublicTeacherProfileContext';
 import { PublicAssessmentsProvider } from '../context/assessments/PublicAssessmentsContext';
 import { PublicAgendaProvider } from '../context/availability/PublicAgendaContext';
 import { CreateBookingProvider, VerifyBookingProvider } from '../context/booking';
 import BookingVerify from '../pages/booking/BookingVerify';
-=======
-import NotFound from '../components/error/NotFound';
-import Forbidden from '../components/error/Forbidden';
-import ServerError from '../components/error/ServerError';
 import GlobalErrorBoundary from '../components/error/GlobalErrorBoundary';
->>>>>>> main
+import ServerError from '../components/error/ServerError';
+import Forbidden from '../components/error/Forbidden';
+import NotFound from '../components/error/NotFound';
+
 
 const router = createBrowserRouter([
   {

@@ -1,2 +1,3 @@
 export { TeachersProvider, useTeachersContext } from './TeachersContext';
-export type { TeachersContextType } from './types';
+export { PublicTeacherProfileProvider, usePublicTeacherProfileContext } from './PublicTeacherProfileContext';
+export type { TeachersContextType, PublicTeacherProfileContextType, PublicTeacherProfile } from './types';

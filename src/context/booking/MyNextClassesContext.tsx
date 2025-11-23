@@ -23,6 +23,17 @@ export const MyNextClassesProvider: React.FC<{ children: React.ReactNode }> = ({
   const [offset, setOffset] = useState(0);
   const LIMIT = 6;
 
+  const sortClasses = (list: NextClass[]) => {
+    return [...list].sort((a, b) => {
+      const dateA = new Date(a.start_time).getTime();
+      const dateB = new Date(b.start_time).getTime();
+      if (dateA === dateB && a.created_at && b.created_at) {
+        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      }
+      return dateA - dateB;
+    });
+  };
+
   const fetchMyNextClasses = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -30,19 +41,7 @@ export const MyNextClassesProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const res = await getMyNextClasses(LIMIT, 0);
       if (res.success && res.data) {
-        // Ordenar clases: primero por fecha de inicio, luego por fecha de creación
-        const sortedClasses = [...res.data.data].sort((a, b) => {
-          const dateA = new Date(a.start_time).getTime();
-          const dateB = new Date(b.start_time).getTime();
-          
-          // Si las fechas de inicio son iguales, ordenar por fecha de creación
-          if (dateA === dateB && a.created_at && b.created_at) {
-            return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-          }
-          
-          return dateA - dateB;
-        });
-        
+        const sortedClasses = sortClasses(res.data.data);
         setClasses(sortedClasses);
         setHasMore(res.data.has_more ?? false);
         setOffset(LIMIT);
@@ -66,7 +65,14 @@ export const MyNextClassesProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const res = await getMyNextClasses(LIMIT, offset);
       if (res.success && res.data) {
-        setClasses(prev => [...prev, ...res.data.data]);
+        setClasses(prev => {
+          const merged = [...prev, ...res.data!.data];
+          // eliminar duplicados por booking_id
+          const map = new Map<number, NextClass>();
+          for (const item of merged) map.set(item.booking_id, item);
+          const deduped = Array.from(map.values());
+          return sortClasses(deduped);
+        });
         setHasMore(res.data.has_more ?? false);
         setOffset(prev => prev + LIMIT);
       } else {

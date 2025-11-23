@@ -62,3 +62,46 @@ export interface BookingDetailResponse {
   message: string;
   data: BookingDetailData;
 }
+
+// Crear Booking (Stripe Checkout Session)
+export interface BookingCreateItem {
+  availability_id: number;
+  start_time: string; // ISO 8601
+  end_time: string;   // ISO 8601
+}
+
+export interface BookingCreateRequest {
+  availability_id: number; // slot de referencia (el primero cronológico)
+  price_id: number;
+  start_time: string; // ISO 8601 del slot de referencia
+  end_time: string;   // ISO 8601 del slot de referencia
+  total_hours: number; // suma de horas seleccionadas
+  availability_ids?: number[]; // todos los availability_id seleccionados
+  items?: BookingCreateItem[]; // detalle de cada slot seleccionado
+}
+
+export interface BookingCreateResponseData {
+  url: string;
+  session_id: string;
+  price: number;
+}
+
+export interface BookingCreateResponse {
+  success: boolean;
+  message: string;
+  data: BookingCreateResponseData;
+}
+
+// Verificar Booking (Stripe) y crear registros
+export interface VerifyBookingResponseData {
+  booking_id: number;
+  payment_booking_id: number;
+  confirmation_id: number;
+}
+
+export interface VerifyBookingResponse {
+  success: boolean;
+  message: string;
+  payment_status: string; // e.g., 'completed'
+  data: VerifyBookingResponseData;
+}

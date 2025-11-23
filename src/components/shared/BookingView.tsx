@@ -60,6 +60,7 @@ export default function BookingView({
   const getStatusLabel = (status: string) => {
     const statusMap: Record<string, string> = {
       'approved': 'Aprobada',
+      'active': 'Activa',
       'pending': 'Pendiente',
       'cancelled': 'Cancelada',
       'completed': 'Completada'
@@ -70,6 +71,7 @@ export default function BookingView({
   const getStatusColor = (status: string) => {
     const colorMap: Record<string, string> = {
       'approved': '#0f9d68',
+      'active': '#0f9d68',
       'pending': '#f59e0b',
       'cancelled': '#ef4444',
       'completed': '#6b7280'
@@ -101,12 +103,19 @@ export default function BookingView({
   };
 
   useEffect(() => {
-    if (classes.length > 0 && classes[0]) {
-      setTimeRemaining(calculateTimeRemaining(classes[0].start_time));
+    // Calcular la verdadera próxima asesoría: estados activos o aprobados ordenados por start_time
+    const upcoming = [...classes]
+      .filter(c => c.status === 'approved' || c.status === 'active')
+      .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
+
+    if (upcoming.length > 0) {
+      setTimeRemaining(calculateTimeRemaining(upcoming[0].start_time));
       const interval = setInterval(() => {
-        setTimeRemaining(calculateTimeRemaining(classes[0].start_time));
+        setTimeRemaining(calculateTimeRemaining(upcoming[0].start_time));
       }, 60000); // Actualizar cada minuto
       return () => clearInterval(interval);
+    } else {
+      setTimeRemaining('');
     }
   }, [classes]);
 
@@ -143,10 +152,12 @@ export default function BookingView({
     return '📖';
   };
 
-  // Separar clases por estado
-  const approvedClasses = classes.filter(c => c.status === 'approved');
-  const nextClass = approvedClasses[0];
-  const futureClasses = approvedClasses.slice(1);
+  // Separar clases por estado (próximas: 'active' y 'approved')
+  const upcomingClasses = [...classes]
+    .filter(c => c.status === 'approved' || c.status === 'active')
+    .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
+  const nextClass = upcomingClasses[0];
+  const futureClasses = upcomingClasses.slice(1);
   const completedClasses = classes.filter(c => c.status === 'completed');
 
   // Estados para mostrar más asesorías
@@ -375,7 +386,7 @@ export default function BookingView({
 
 
               {/* Botón Ver todas */}
-              {showViewAllButton && (approvedClasses.length > 0 || completedClasses.length > 0) && (
+              {showViewAllButton && (upcomingClasses.length > 0 || completedClasses.length > 0) && (
                 <div style={{ marginTop: '32px', textAlign: 'center' }}>
                   <Link to={allBookingsPath} className="view-all-btn-header">
                     📋 Ver todas las reservas

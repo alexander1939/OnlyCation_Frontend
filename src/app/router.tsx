@@ -46,10 +46,17 @@ import Terms from '../pages/legal/Terms';
 import Privacy from '../pages/legal/Privacy';
 import ActivateAccountCard from '../components/comptHome/activate-account';
 import Chat from '../components/comptHome/chat';
-import NotFound from '../components/error/NotFound';
-import Forbidden from '../components/error/Forbidden';
-import ServerError from '../components/error/ServerError';
+import PublicTeacherProfile from '../pages/teachers/PublicTeacherProfile';
+import { PublicTeacherProfileProvider } from '../context/teachers/PublicTeacherProfileContext';
+import { PublicAssessmentsProvider } from '../context/assessments/PublicAssessmentsContext';
+import { PublicAgendaProvider } from '../context/availability/PublicAgendaContext';
+import { CreateBookingProvider, VerifyBookingProvider } from '../context/booking';
+import BookingVerify from '../pages/booking/BookingVerify';
 import GlobalErrorBoundary from '../components/error/GlobalErrorBoundary';
+import ServerError from '../components/error/ServerError';
+import Forbidden from '../components/error/Forbidden';
+import NotFound from '../components/error/NotFound';
+
 
 const router = createBrowserRouter([
   {
@@ -300,10 +307,38 @@ const router = createBrowserRouter([
     path: '/catalog/teachers',
     element: (
       <PublicOrStudentRoute>
-        <TeachersProvider>
-          <TeacherCatalog />
-        </TeachersProvider>
+        <VerifyBookingProvider>
+          <TeachersProvider>
+            <TeacherCatalog />
+          </TeachersProvider>
+        </VerifyBookingProvider>
       </PublicOrStudentRoute>
+    ),
+  },
+  {
+    path: '/teachers/:teacherId',
+    element: (
+      <PublicOrStudentRoute>
+        <PublicTeacherProfileProvider>
+          <PublicAssessmentsProvider>
+            <PublicAgendaProvider>
+              <CreateBookingProvider>
+                <PublicTeacherProfile />
+              </CreateBookingProvider>
+            </PublicAgendaProvider>
+          </PublicAssessmentsProvider>
+        </PublicTeacherProfileProvider>
+      </PublicOrStudentRoute>
+    ),
+  },
+  {
+    path: '/booking/verify',
+    element: (
+      <PrivateRoute roles={["student"]}>
+        <VerifyBookingProvider>
+          <BookingVerify />
+        </VerifyBookingProvider>
+      </PrivateRoute>
     ),
   },
   {

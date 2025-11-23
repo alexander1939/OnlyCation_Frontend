@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import axios, { AxiosError } from 'axios';
-import type { MyNextClassesResponse, BookingDetailResponse } from '../../context/booking/types';
+import type { MyNextClassesResponse, BookingDetailResponse, BookingCreateRequest, BookingCreateResponse, VerifyBookingResponse } from '../../context/booking/types';
 import { useAuthToken } from '../auth/useAuthToken';
 
 const API_URL = import.meta.env.VITE_API_URL as string;
@@ -137,5 +137,60 @@ export const useBookingApi = () => {
     }
   };
 
-  return { getMyNextClasses, getMyAllClasses, searchMyClasses, getBookingDetail };
+  const createBooking = async (payload: BookingCreateRequest): Promise<{
+    success: boolean;
+    data?: BookingCreateResponse;
+    message: string;
+  }> => {
+    try {
+      const token = getAccessToken();
+      if (!token) throw new Error('No hay token de acceso. Inicia sesión nuevamente.');
+
+      const response = await client.post<BookingCreateResponse>(
+        `/bookings/crear-booking/`,
+        payload,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const data = response.data;
+      return {
+        success: !!data?.success,
+        data,
+        message: data?.message ?? 'Sesión de pago creada exitosamente',
+      };
+    } catch (err) {
+      const axErr = err as AxiosError<{ detail?: string }>;
+      const message = axErr.response?.data?.detail || axErr.message || 'Error al crear la sesión de pago';
+      return { success: false, message };
+    }
+  };
+
+  const verifyBooking = async (sessionId: string): Promise<{
+    success: boolean;
+    data?: VerifyBookingResponse;
+    message: string;
+  }> => {
+    try {
+      const token = getAccessToken();
+      if (!token) throw new Error('No hay token de acceso. Inicia sesión nuevamente.');
+
+      const response = await client.get<VerifyBookingResponse>(
+        `/bookings/verificar-booking/${encodeURIComponent(sessionId)}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const data = response.data;
+      return {
+        success: !!data?.success,
+        data,
+        message: data?.message ?? 'Booking payment verified successfully',
+      };
+    } catch (err) {
+      const axErr = err as AxiosError<{ detail?: string }>;
+      const message = axErr.response?.data?.detail || axErr.message || 'Error al verificar el pago del booking';
+      return { success: false, message };
+    }
+  };
+
+  return { getMyNextClasses, getMyAllClasses, searchMyClasses, getBookingDetail, createBooking, verifyBooking };
 };

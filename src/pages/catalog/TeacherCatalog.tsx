@@ -1,8 +1,9 @@
-import { useMemo, useState, useEffect, useRef } from 'react';
+import { useMemo, useState, useEffect, useRef,  } from 'react';
 import Header from '../../components/ui/Header';
 import Footer from '../../components/ui/Footer';
 import { useTeachersContext } from '../../context/teachers';
 import '../../styles/teacher-catalog.css';
+import { useNavigate as useRrdNavigate, useSearchParams } from 'react-router-dom';
 
 type TeacherItem = {
   id: string;
@@ -35,6 +36,8 @@ function extractYouTubeId(url: string): string | null {
 
 export default function TeacherCatalog() {
   const { teachers, loading, loadingMore, total, getTeachers, searchTeachers } = useTeachersContext();
+  const navigate = useRrdNavigate();
+  const [searchParams] = useSearchParams();
   const [name, setName] = useState('');
   const [subject, setSubject] = useState('');
   const [levels, setLevels] = useState<string[]>([]);
@@ -93,6 +96,14 @@ export default function TeacherCatalog() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    const sid = searchParams.get('session_id');
+    if (sid) {
+      console.log('[Booking][DEBUG] Detected session_id on catalog page. Redirecting to /booking/verify...');
+      navigate(`/booking/verify?session_id=${encodeURIComponent(sid)}`, { replace: true });
+    }
+  }, [searchParams, navigate]);
+
   const toggleLevel = (lvl: string) => {
     setLevels((prev) => (prev.includes(lvl) ? prev.filter((x) => x !== lvl) : [...prev, lvl]));
   };
@@ -105,7 +116,7 @@ export default function TeacherCatalog() {
   };
 
   const handleCardClick = (teacherId: string) => {
-    console.log('Navigate to teacher profile:', teacherId);
+    navigate(`/teachers/${teacherId}`);
   };
 
   const loadMore = async () => {

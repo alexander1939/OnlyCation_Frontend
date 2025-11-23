@@ -64,12 +64,20 @@ export interface BookingDetailResponse {
 }
 
 // Crear Booking (Stripe Checkout Session)
-export interface BookingCreateRequest {
+export interface BookingCreateItem {
   availability_id: number;
-  price_id: number;
   start_time: string; // ISO 8601
   end_time: string;   // ISO 8601
-  total_hours: number;
+}
+
+export interface BookingCreateRequest {
+  availability_id: number; // slot de referencia (el primero cronológico)
+  price_id: number;
+  start_time: string; // ISO 8601 del slot de referencia
+  end_time: string;   // ISO 8601 del slot de referencia
+  total_hours: number; // suma de horas seleccionadas
+  availability_ids?: number[]; // todos los availability_id seleccionados
+  items?: BookingCreateItem[]; // detalle de cada slot seleccionado
 }
 
 export interface BookingCreateResponseData {

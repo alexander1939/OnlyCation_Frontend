@@ -213,20 +213,10 @@ export default function PublicBookLessonModal({ isOpen, onClose, teacherId, teac
     return entries.map(([dateKey, set]) => ({ dateKey, hours: Array.from(set).sort() }));
   }, [selectedByDate]);
 
-  const chargedSelection = useMemo(() => {
-    let chosen: { dateKey: string; hour: string } | null = null;
-    for (const sel of selections) {
-      const sorted = [...sel.hours].sort();
-      for (const h of sorted) {
-        if (!chosen || sel.dateKey < chosen.dateKey || (sel.dateKey === chosen.dateKey && h < chosen.hour)) {
-          chosen = { dateKey: sel.dateKey, hour: h };
-        }
-      }
-    }
-    return chosen;
+  const totalHours = useMemo(() => {
+    // Suma de todas las horas seleccionadas en todos los días
+    return selections.reduce((acc, sel) => acc + sel.hours.length, 0);
   }, [selections]);
-
-  const totalHours = chargedSelection ? 1 : 0;
   const total = (teacher.hourlyRate || 0) * totalHours;
 
   const isContiguous = (hours: string[]) => {
@@ -250,44 +240,55 @@ export default function PublicBookLessonModal({ isOpen, onClose, teacherId, teac
 
     if (selections.length === 0) return;
 
-    // Tomar solo 1 hora: la primera cronológica entre todas las selecciones
-    let chosen: { dateKey: string; hour: string } | null = null;
+    // Construir todos los slots seleccionados (multi-día, no contiguos)
+    type SelSlot = { dateKey: string; hour: string; availability_id: number };
+    const selectedSlots: SelSlot[] = [];
     for (const sel of selections) {
-      const sorted = [...sel.hours].sort();
-      for (const h of sorted) {
-        if (!chosen) {
-          chosen = { dateKey: sel.dateKey, hour: h };
-        } else {
-          if (sel.dateKey < chosen.dateKey || (sel.dateKey === chosen.dateKey && h < chosen.hour)) {
-            chosen = { dateKey: sel.dateKey, hour: h };
-          }
+      for (const h of sel.hours) {
+        const m = localSlotsByDate[sel.dateKey] || {};
+        const s = m[h];
+        if (!s) {
+          setValidationError('Uno de los horarios seleccionados ya no está disponible. Actualiza e intenta de nuevo.');
+          return;
         }
+        selectedSlots.push({ dateKey: sel.dateKey, hour: h, availability_id: s.availability_id });
       }
     }
-    if (!chosen) return;
+    if (selectedSlots.length === 0) return;
 
-    const dateKey = chosen.dateKey;
-    const hour = chosen.hour;
-    const slotMap = localSlotsByDate[dateKey] || {};
-    const slot = slotMap[hour];
-    if (!slot) {
-      setValidationError('Uno de los horarios seleccionados ya no está disponible. Actualiza e intenta de nuevo.');
-      return;
-    }
+    // Tomar el primer slot cronológico como referencia para availability_id/start/end
+    const sortedByTime = [...selectedSlots].sort((a, b) => (a.dateKey < b.dateKey ? -1 : a.dateKey > b.dateKey ? 1 : a.hour.localeCompare(b.hour)));
+    const ref = sortedByTime[0];
 
-    const availabilityId = slot.availability_id;
     const pad = (n: number) => String(n).padStart(2, '0');
-    const start = `${dateKey}T${hour}:00`;
-    const hNum = parseInt(hour.split(':')[0], 10);
-    const end = `${dateKey}T${pad(hNum + 1)}:00:00`;
+    const start = `${ref.dateKey}T${ref.hour}:00`;
+    const hNum = parseInt(ref.hour.split(':')[0], 10);
+    const end = `${ref.dateKey}T${pad(hNum + 1)}:00:00`;
+    const totalSelectedHours = selectedSlots.length;
+
+    const availabilityIds = selectedSlots.map(s => s.availability_id);
+    const items = selectedSlots.map(s => {
+      const h = parseInt(s.hour.split(':')[0], 10);
+      return {
+        availability_id: s.availability_id,
+        start_time: `${s.dateKey}T${s.hour}:00`,
+        end_time: `${s.dateKey}T${pad(h + 1)}:00:00`,
+      };
+    });
+
+    // DEBUG extra
+    console.log('[Booking][DEBUG] availability_ids:', availabilityIds);
+    console.log('[Booking][DEBUG] items:', items);
 
     try {
       const res = await createBooking({
-        availability_id: availabilityId,
+        availability_id: ref.availability_id,
         price_id: 1,
         start_time: start,
         end_time: end,
-        total_hours: 1,
+        total_hours: totalSelectedHours,
+        availability_ids: availabilityIds,
+        items,
       });
       if (res.success && res.data?.data?.url) {
         window.location.href = res.data.data.url;
@@ -295,6 +296,7 @@ export default function PublicBookLessonModal({ isOpen, onClose, teacherId, teac
         setValidationError(res.message || 'No fue posible iniciar el pago.');
       }
     } catch (e: any) {
+      console.log('[Booking][DEBUG] API error:', e);
       setValidationError(e?.message || 'No fue posible iniciar el pago.');
     }
   };
@@ -348,8 +350,8 @@ export default function PublicBookLessonModal({ isOpen, onClose, teacherId, teac
                 <button className="blm-nav" onClick={goNextMonth}>›</button>
               </div>
               <div className="blm-weekdays">
-                {WEEKDAY_LABELS.map((wd) => (
-                  <div key={wd} className="blm-wd">{wd}</div>
+                {WEEKDAY_LABELS.map((wd, idx) => (
+                  <div key={`${wd}-${idx}`} className="blm-wd">{wd}</div>
                 ))}
               </div>
               <div className="blm-grid">
@@ -474,29 +476,12 @@ export default function PublicBookLessonModal({ isOpen, onClose, teacherId, teac
                   </div>
                 );
               })}
-              {chargedSelection && (
-                <div className="blm-summary-row" style={{ marginTop: 8 }}>
-                  <div className="blm-summary-label">Se cobrará</div>
-                  <div className="blm-summary-value">
-                    {(() => {
-                      const dateObj = new Date(chargedSelection.dateKey + 'T00:00:00');
-                      const dateLabel = dateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
-                      const startH = chargedSelection.hour;
-                      const endH = (() => {
-                        const h = parseInt(startH.split(':')[0], 10) + 1;
-                        return `${String(h).padStart(2, '0')}:00`;
-                      })();
-                      return `${dateLabel}: ${startH} - ${endH}`;
-                    })()}
-                  </div>
-                </div>
-              )}
+              <div className="blm-summary-total">
+                <span>Total ({totalHours} {totalHours === 1 ? 'hora' : 'horas'}):</span>
+                <strong>${total.toFixed(2)} MXN</strong>
+              </div>
             </>
           )}
-          <div className="blm-summary-total">
-            <span>Total ({totalHours} {totalHours === 1 ? 'hora' : 'horas'}):</span>
-            <strong>${total.toFixed(2)} MXN</strong>
-          </div>
         </div>
 
         <div className="blm-footer">

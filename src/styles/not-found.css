@@ -1,0 +1,165 @@
+/* OnlyCation Not Found (404) Page Styles */
+
+.oc-notfound-root {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #7FD9C7 0%, #97DBF3 55%, #4F9CB5 100%);
+  font-family: Roboto, Arial, sans-serif;
+}
+
+.oc-notfound-blobs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.oc-notfound-blob {
+  position: absolute;
+  border-radius: 999px;
+}
+
+.oc-notfound-blob--tl {
+  top: -10%;
+  left: -10%;
+  width: 24rem;
+  height: 24rem;
+  background: rgba(255, 255, 255, 0.20);
+  filter: blur(120px);
+}
+
+.oc-notfound-blob--br {
+  right: -12%;
+  bottom: -12%;
+  width: 26rem;
+  height: 26rem;
+  background: rgba(255, 255, 255, 0.15);
+  filter: blur(140px);
+}
+
+.oc-notfound-main {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 960px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 2.5rem;
+  animation: oc-fade-in 0.4s ease-out both;
+}
+
+.oc-notfound-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.oc-notfound-code {
+  font-weight: 900;
+  color: #294954;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-size: clamp(64px, 12vw, 140px);
+}
+
+.oc-notfound-title {
+  font-weight: 800;
+  color: #294954;
+  font-size: clamp(22px, 3.2vw, 36px);
+}
+
+.oc-notfound-text {
+  max-width: 56ch;
+  color: rgba(41, 73, 84, 0.8);
+  font-size: clamp(16px, 1.8vw, 20px);
+  line-height: 1.7;
+  font-weight: 500;
+}
+
+.oc-notfound-illustration {
+  width: clamp(260px, 40vw, 380px);
+  aspect-ratio: 1 / 1;
+  border-radius: 999px;
+  background: #C5F2E3;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+
+.oc-notfound-illustration:hover {
+  transform: scale(1.03);
+}
+
+.oc-notfound-image {
+  width: 88%;
+  height: 88%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+}
+
+.oc-notfound-actions {
+  margin-top: 2rem;
+}
+
+@keyframes oc-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive line-break helper (replaces Tailwind hidden md:block) */
+.oc-notfound-br { display: none; }
+@media (min-width: 768px) {
+  .oc-notfound-br { display: inline; }
+}
+
+/* Not Found Page - Home button style refinement */
+.oc-notfound-actions .oc-notfound-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 32px;
+  min-width: 220px;
+  height: 48px;
+  border-radius: 999px;
+  border: none;
+  appearance: none;
+  background: #7FD9C7; /* coral (alto contraste con el fondo azul/verde) */
+  color: #294954cc; /* petróleo oscuro para máximo contraste */
+  font-size: 1.0625rem; /* ~17px */
+  font-weight: 800;
+  letter-spacing: 0.1px;
+  text-transform: none;
+  border-color: #000000;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+  box-shadow: 0 8px 22px #478d70;
+}
+
+.oc-notfound-actions .oc-notfound-btn:hover {
+  background: #478d70; /* un poco más oscuro */
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(255, 153, 120, 0.45);
+}
+
+.oc-notfound-actions .oc-notfound-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 18px rgba(255, 153, 120, 0.35);
+}
+
+.oc-notfound-actions .oc-notfound-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px #ffffff, 0 0 0 6px #FF9978;
+}
+

@@ -46,6 +46,10 @@ import Terms from '../pages/legal/Terms';
 import Privacy from '../pages/legal/Privacy';
 import ActivateAccountCard from '../components/comptHome/activate-account';
 import Chat from '../components/comptHome/chat';
+import NotFound from '../components/error/NotFound';
+import Forbidden from '../components/error/Forbidden';
+import ServerError from '../components/error/ServerError';
+import GlobalErrorBoundary from '../components/error/GlobalErrorBoundary';
 
 const router = createBrowserRouter([
   {
@@ -331,8 +335,24 @@ const router = createBrowserRouter([
     path: '/privacy',
     element: <Privacy />,
   },
+  {
+    path: '/403',
+    element: <Forbidden />,
+  },
+  {
+    path: '/500',
+    element: <ServerError />,
+  },
+  {
+    path: '*',
+    element: <NotFound />,
+  },
 ]);
 
 export default function AppRouter() {
-  return <RouterProvider router={router} />;
+  return (
+    <GlobalErrorBoundary>
+      <RouterProvider router={router} />
+    </GlobalErrorBoundary>
+  );
 }

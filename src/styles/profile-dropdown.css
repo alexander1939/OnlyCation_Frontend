@@ -12,6 +12,13 @@
   font-family: 'Roboto', sans-serif;
 }
 
+/* Responsive adjustment for smaller screens */
+@media (max-width: 1280px) {
+  .profile-dropdown {
+    right: 0;
+  }
+}
+
 /* Header con info del usuario */
 .profile-dropdown-header {
   padding: 20px;

@@ -74,7 +74,9 @@ export const useAgendaApi = () => {
   const deleteAvailability = async (availabilityId: number): Promise<{ 
     success: boolean; 
     data?: any; 
-    message: string 
+    message: string;
+    action?: string;
+    warning?: string;
   }> => {
     try {
       const token = getAccessToken();
@@ -84,11 +86,16 @@ export const useAgendaApi = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      const data = response.data;
+      const data: any = response.data;
+      const softDeactivated = data?.action === 'deactivated';
+
       return {
-        success: !!data?.success,
+        // Tratar soft delete (action: 'deactivated') como éxito con advertencia
+        success: !!data?.success || softDeactivated,
         data: data?.data,
-        message: data?.message ?? 'Horario eliminado exitosamente',
+        message: data?.message ?? (softDeactivated ? (data?.warning ?? 'Disponibilidad desactivada para nuevas reservas') : 'Horario eliminado exitosamente'),
+        action: data?.action,
+        warning: data?.warning,
       };
     } catch (err) {
       const axErr = err as AxiosError<{ detail?: string }>;

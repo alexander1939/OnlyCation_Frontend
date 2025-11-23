@@ -10,7 +10,7 @@ interface AvailabilityConfigProps {
   onAvailabilityDeleted?: () => void;
 }
 
-const AvailabilityConfig: React.FC<AvailabilityConfigProps> = () => {
+const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityAdded, onAvailabilityDeleted }) => {
   const { dayLabels, enabledDays, slots, availableSlots, removeSlot, toggleDay, dayKeyToIndex, toHH, loadFromAgenda } = useSchedule();
   const { deleteAvailability, createAvailability, fetchWeeklyAgenda } = useAgendaApi();
   const { showSuccess, showError, showWarning } = useNotificationContext();
@@ -114,6 +114,8 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = () => {
         if (agendaResponse.success && agendaResponse.data) {
           console.log('✅ Agenda recibida del backend:', agendaResponse.data);
           loadFromAgenda?.(agendaResponse.data);
+          // Notificar al padre para refrescar DispAgenda inmediatamente
+          onAvailabilityAdded?.();
         } else {
           showError('Error al recargar la agenda');
         }
@@ -172,9 +174,18 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = () => {
       const result = await deleteAvailability(Number(id));
       setDeleting(null);
       
+      // Si el backend devuelve 'deactivated', es un soft delete → advertencia, no error
       if (!result.success) {
-        showError(`Error al eliminar horario ${slotToRemove.hour}: ${result.message}`);
-        return;
+        if (result.action === 'deactivated' || result.warning) {
+          showWarning(result.warning || result.message);
+          // Continuar para reflejar el cambio localmente
+        } else {
+          showError(`Error al eliminar horario ${slotToRemove.hour}: ${result.message}`);
+          return;
+        }
+      } else if (result.action === 'deactivated' || result.warning) {
+        // success true con advertencia informativa
+        showWarning(result.warning || result.message);
       }
     }
     
@@ -186,6 +197,8 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = () => {
     const hourNum = parseInt(hourStr);
     const endTime = `${String((hourNum + 1) % 24).padStart(2, '0')}:00`;
     showSuccess(`Disponibilidad eliminada: ${slotToRemove.hour} - ${endTime}`);
+    // Notificar al padre para refrescar DispAgenda inmediatamente
+    onAvailabilityDeleted?.();
   };
 
   return (

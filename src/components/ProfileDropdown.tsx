@@ -80,6 +80,10 @@ export default function ProfileDropdown({ user, isTeacher, isStudent, onClose, o
               <span className="profile-dropdown-icon">📊</span>
               Mi Perfil
             </Link>
+            <Link to="AQUI LA RUTA" className="profile-dropdown-item" onClick={onClose}>
+              <span className="profile-dropdown-icon">👜</span>
+              Cartera
+            </Link>
             <Link to="/teacher/personal-data" className="profile-dropdown-item" onClick={onClose}>
               <span className="profile-dropdown-icon">👤</span>
               Actualizar Datos Personales

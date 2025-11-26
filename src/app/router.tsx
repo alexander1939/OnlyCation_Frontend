@@ -192,6 +192,14 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: '/teacher/personal-data',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <DocenteDatosPersonales />
+      </PrivateRoute>
+    ),
+  },
+  {
     path: '/student/my_next_booking',
     element: (
       <PrivateRoute roles={["student"]}>
@@ -240,15 +248,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/docente/profile',
-    element: (
-      <PrivateRoute roles={["teacher"]}>
-        <DocenteProfile />
-      </PrivateRoute>
-    ),
-  },
-  {
-    path: '/docente/profile',
+    path: '/teacher/profile',
     element: (
       <PrivateRoute roles={["teacher"]}>
         <DocenteProfile />

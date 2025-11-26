@@ -31,7 +31,7 @@ const PublicHeader: React.FC = () => {
       fontSize: '16px',
       textDecoration: 'none',
       color: isActive ? '#68B2C9' : '#294954',
-      fontFamily: 'Inter, sans-serif',
+      fontFamily: 'Roboto, sans-serif',
       padding: mobile ? '16px 24px' : '4px 6px',
       borderRadius: mobile ? '16px' : '0',
       textAlign: mobile ? 'center' : 'left',
@@ -102,7 +102,7 @@ const PublicHeader: React.FC = () => {
           }}>
             <Link to="/" className="flex items-center space-x-2" style={{ textDecoration: 'none' }}>
               <img src="/logo.png" alt="OnlyCation Logo" className="w-[60px] h-[60px]" style={{ objectFit: 'contain' }} />
-              <span className="font-semibold text-lg" style={{ color: '#294954', fontFamily: 'Inter, sans-serif' }}>OnlyCation</span>
+              <span className="font-semibold text-lg" style={{ color: '#294954', fontFamily: 'Roboto, sans-serif' }}>OnlyCation</span>
             </Link>
 
             {/* Desktop Navigation */}

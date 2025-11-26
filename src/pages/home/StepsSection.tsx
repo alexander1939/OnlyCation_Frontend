@@ -46,7 +46,7 @@ const StepsSection: React.FC = () => {
   return (
     <section 
       ref={sectionRef} 
-      className="h-[100vh] snap-start flex items-center justify-center px-[50px]" 
+      className="h-[100vh] snap-start flex items-center justify-center px-[50px] mb-[160px] sm:mb-[180px] md:mb-[220px]" 
       style={{backgroundColor: '#FAF9F5'}}
     >
       <div className="max-w-[1700px] mx-auto w-full">

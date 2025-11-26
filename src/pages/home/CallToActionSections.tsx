@@ -4,11 +4,11 @@ const CallToActionSections: React.FC = () => {
   return (
     <>
       {/* Sección Quiero ser docente */}
-      <section className="py-[30px] px-4 sm:px-[50px] bg-soft-white">
+      <section className="py-[30px] px-4 sm:px-[50px] bg-soft-white overflow-x-hidden">
         <div className="max-w-[1200px] mx-auto">
           <div className="flex items-center gap-[10px]">
             {/* Imagen del zorro docente a la izquierda */}
-            <div className="flex-shrink-0 md:-ml-[50px] overflow-hidden rounded-[20px] w-auto flex justify-center">
+            <div className="flex-shrink-0 overflow-hidden rounded-[20px] w-auto flex justify-center">
               <img 
                 src="/zorro_docnte_.png" 
                 alt="Zorro docente" 
@@ -66,7 +66,7 @@ const CallToActionSections: React.FC = () => {
       </section>
 
       {/* Sección Conviértete en estudiante */}
-      <section className="py-[80px] px-4 sm:px-[50px] bg-soft-white">
+      <section className="py-[80px] px-4 sm:px-[50px] bg-soft-white overflow-x-hidden">
         <div className="max-w-[1200px] mx-auto">
           <div className="flex items-center gap-[10px]">
             {/* Contenido de texto a la izquierda en card */}
@@ -118,7 +118,7 @@ const CallToActionSections: React.FC = () => {
             </div>
             
             {/* Imagen del zorro estudiante a la derecha */}
-            <div className="flex-shrink-0 md:-mr-[50px] overflow-hidden rounded-[20px] w-auto flex justify-center">
+            <div className="flex-shrink-0 overflow-hidden rounded-[20px] w-auto flex justify-center">
               <img 
                 src="/buscando_zorro.png" 
                 alt="Zorro estudiante" 

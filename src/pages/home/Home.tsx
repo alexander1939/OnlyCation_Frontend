@@ -11,7 +11,7 @@ import { TeachersProvider } from '../../context/teachers/TeachersContext';
 
 const Home: React.FC = () => {
   return (
-    <div className="min-h-screen w-full snap-y snap-mandatory overflow-y-scroll" style={{backgroundColor: '#FAF9F5', margin: 0, padding: 0}}>
+    <div className="min-h-screen w-full overflow-x-hidden" style={{backgroundColor: '#FAF9F5', margin: 0, padding: 0}}>
       <Header />
       <HeroSection />
       <AdvantagesSection />

@@ -132,7 +132,7 @@ const TeachersSection: React.FC = () => {
   };
 
   return (
-    <section className="px-[20px] mb-[100px]" style={{backgroundColor: '#FAF9F5'}}>
+    <section className="px-[20px] mb-[100px]" style={{backgroundColor: '#FAF9F5', fontFamily: 'Roboto, sans-serif'}}>
       <div className="max-w-[1000px] mx-auto">
         <div className="text-center mb-[60px]">
           <h2 className="text-[42px] font-bold mb-4" style={{color: '#294954', fontFamily: 'Roboto, sans-serif'}}>

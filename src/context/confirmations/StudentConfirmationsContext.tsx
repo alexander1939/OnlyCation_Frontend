@@ -5,6 +5,7 @@ import type {
   StudentHistoryRecentResponse,
   StudentHistoryAllResponse,
   ConfirmationHistoryItem,
+  StudentHistoryByDateResponse,
 } from './types';
 
 export interface StudentConfirmationsContextType {
@@ -35,6 +36,12 @@ export interface StudentConfirmationsContextType {
     offset?: number,
     limit?: number
   ) => Promise<{ success: boolean; data?: StudentHistoryAllResponse; message: string }>;
+
+  // by-date
+  dateLoading: boolean;
+  dateError: string | null;
+  dateItems: ConfirmationHistoryItem[];
+  loadStudentByDate: (dateStr: string) => Promise<{ success: boolean; data?: StudentHistoryByDateResponse; message: string }>;
 
   // evidence convenience
   getStudentEvidenceUrl: (confirmationId: number) => Promise<{ success: boolean; url?: string; message: string }>;
@@ -132,6 +139,28 @@ export const StudentConfirmationsProvider: React.FC<{ children: React.ReactNode 
     }
   }, [api]);
 
+  // by-date
+  const [dateLoading, setDateLoading] = useState(false);
+  const [dateError, setDateError] = useState<string | null>(null);
+  const [dateItems, setDateItems] = useState<ConfirmationHistoryItem[]>([]);
+
+  const loadStudentByDate = useCallback(async (dateStr: string) => {
+    setDateLoading(true);
+    setDateError(null);
+    try {
+      const res = await api.getStudentHistoryByDate(dateStr);
+      if (res.success && res.data) setDateItems(res.data.items || []);
+      else setDateError(res.message);
+      return res;
+    } catch (e: any) {
+      const message = e?.message || 'Error al buscar por fecha (alumno)';
+      setDateError(message);
+      return { success: false, message };
+    } finally {
+      setDateLoading(false);
+    }
+  }, [api]);
+
   // evidence helper (creates object URL)
   const getStudentEvidenceUrl = useCallback(async (confirmationId: number) => {
     const res = await api.getStudentEvidence(confirmationId);
@@ -159,12 +188,17 @@ export const StudentConfirmationsProvider: React.FC<{ children: React.ReactNode 
     offset,
     limit,
     loadStudentAll,
+    dateLoading,
+    dateError,
+    dateItems,
+    loadStudentByDate,
     getStudentEvidenceUrl,
     resetSubmit,
   }), [
     submitLoading, submitError, submitResult, submitStudentConfirmation,
     recentLoading, recentError, recentItems, loadStudentRecent,
     allLoading, allError, allItems, total, hasMore, offset, limit, loadStudentAll,
+    dateLoading, dateError, dateItems, loadStudentByDate,
     getStudentEvidenceUrl, resetSubmit,
   ]);
 

@@ -8,6 +8,9 @@ import BookingDetailModal from './BookingDetailModal';
 import '../../styles/booking-view.css';
 import '../../styles/new-booking-view.css';
 import { useOptionalTeacherConfirmationsContext, useOptionalStudentConfirmationsContext } from '../../context/confirmations';
+import ConfirmAttendanceModal from './ConfirmAttendanceModal';
+import type { ConfirmationHistoryItem } from '../../context/confirmations';
+import { useNotificationContext } from '../NotificationProvider';
 
 type BookingViewProps = {
   user: {
@@ -158,6 +161,14 @@ export default function BookingView({
   const studentConfCtx = useOptionalStudentConfirmationsContext();
   const loadedRecentRef = useRef(false);
 
+  const { showSuccess, showError } = useNotificationContext();
+
+  // Modal confirmación
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [selectedConfirmItem, setSelectedConfirmItem] = useState<ConfirmationHistoryItem | null>(null);
+  const [confirmSubmitting, setConfirmSubmitting] = useState(false);
+  const [confirmError, setConfirmError] = useState<string | null>(null);
+
   useEffect(() => {
     if (loadedRecentRef.current) return;
     if (user?.role === 'teacher' && teacherConfCtx) {
@@ -192,6 +203,60 @@ export default function BookingView({
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m}m ${s < 10 ? '0' : ''}${s}s`;
+  };
+
+  const openConfirmModal = (item: ConfirmationHistoryItem) => {
+    setSelectedConfirmItem(item);
+    setConfirmError(null);
+    setConfirmModalOpen(true);
+  };
+
+  const closeConfirmModal = () => {
+    setConfirmModalOpen(false);
+    setSelectedConfirmItem(null);
+  };
+
+  const handleSubmitConfirm = async ({ description, file }: { description: string; file: File | Blob }) => {
+    if (!selectedConfirmItem) return;
+    setConfirmSubmitting(true);
+    setConfirmError(null);
+    try {
+      const paymentBookingId = selectedConfirmItem.payment_booking_id;
+      let res: { success: boolean; message?: string } | undefined;
+      if (user?.role === 'teacher' && teacherConfCtx) {
+        res = await teacherConfCtx.submitTeacherConfirmation(paymentBookingId, {
+          confirmation: true,
+          description_teacher: description,
+          evidence_file: file,
+        });
+      } else if (user?.role === 'student' && studentConfCtx) {
+        res = await studentConfCtx.submitStudentConfirmation(paymentBookingId, {
+          confirmation: true,
+          description_student: description,
+          evidence_file: file,
+        });
+      } else {
+        setConfirmError('No hay contexto de confirmación disponible.');
+        return;
+      }
+
+      if (res?.success) {
+        showSuccess('Confirmación enviada');
+        if (user?.role === 'teacher') await teacherConfCtx?.loadTeacherRecent?.();
+        else await studentConfCtx?.loadStudentRecent?.();
+        closeConfirmModal();
+      } else {
+        const msg = res?.message || 'No se pudo enviar la confirmación';
+        setConfirmError(msg);
+        showError(msg);
+      }
+    } catch (e: any) {
+      const msg = e?.message || 'Error al enviar la confirmación';
+      setConfirmError(msg);
+      showError(msg);
+    } finally {
+      setConfirmSubmitting(false);
+    }
   };
 
   // Separar clases por estado (próximas: 'active' y 'approved')
@@ -361,6 +426,15 @@ export default function BookingView({
                 )}
               </div>
 
+                 {/* Botón Ver todas */}
+                 {showViewAllButton && (upcomingClasses.length > 0 || completedClasses.length > 0) && (
+                <div style={{ marginTop: '32px', textAlign: 'center' }}>
+                  <Link to={allBookingsPath} className="view-all-btn-header">
+                    📋 Ver todas las reservas
+                  </Link>
+                </div>
+              )}
+
               {/* CLASES ASISTIDAS */}
               <div className="asesorias-section">
                 <h2 className="asesorias-section-title">Clases Asistidas</h2>
@@ -390,16 +464,25 @@ export default function BookingView({
                                 Finalizó: {formatDate(it.booking_end)}, {formatTime(it.booking_end)} · Tiempo restante: {formatSecondsLeft(it.seconds_left)}
                               </div>
                             </div>
-                            <Link 
-                              to={user?.role === 'teacher' ? '/teacher/confirmation' : '/student/confirmation'} 
+                            <button
                               className="btn-confirmar-asistencia"
-                              style={{ textDecoration: 'none' }}
+                              onClick={() => openConfirmModal(it)}
+                              disabled={!it.confirmable_now || (it.seconds_left ?? 0) <= 0}
                             >
                               <span>✓</span>
                               Confirmar ahora
-                            </Link>
+                            </button>
                           </div>
                         ))}
+                        {/* Link a listado completo de confirmaciones */}
+                        <div style={{ textAlign: 'right', marginTop: 8 }}>
+                          <Link
+                            to={user?.role === 'teacher' ? '/teacher/confirmation' : '/student/confirmation'}
+                            className="view-all-btn-header"
+                          >
+                            📋 Ver todas las reservas
+                          </Link>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -462,14 +545,7 @@ export default function BookingView({
               </div>
 
 
-              {/* Botón Ver todas */}
-              {showViewAllButton && (upcomingClasses.length > 0 || completedClasses.length > 0) && (
-                <div style={{ marginTop: '32px', textAlign: 'center' }}>
-                  <Link to={allBookingsPath} className="view-all-btn-header">
-                    📋 Ver todas las reservas
-                  </Link>
-                </div>
-              )}
+           
             </>
           )}
         </section>
@@ -483,6 +559,17 @@ export default function BookingView({
         bookingDetail={bookingDetail}
         loading={detailLoading}
         error={detailError}
+      />
+
+      {/* Modal Confirmar asistencia (solo para items de recent) */}
+      <ConfirmAttendanceModal
+        isOpen={confirmModalOpen}
+        onClose={closeConfirmModal}
+        role={(user?.role === 'teacher' ? 'teacher' : 'student')}
+        item={selectedConfirmItem}
+        loading={confirmSubmitting}
+        error={confirmError}
+        onSubmit={handleSubmitConfirm}
       />
     </div>
   );

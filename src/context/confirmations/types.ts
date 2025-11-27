@@ -80,3 +80,14 @@ export interface TeacherHistoryAllResponse {
   has_more: boolean;
   items: ConfirmationHistoryItem[];
 }
+
+// By date responses
+export interface TeacherHistoryByDateResponse {
+  success: boolean;
+  items: ConfirmationHistoryItem[];
+}
+
+export interface StudentHistoryByDateResponse {
+  success: boolean;
+  items: ConfirmationHistoryItem[];
+}

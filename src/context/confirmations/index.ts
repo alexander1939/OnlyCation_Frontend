@@ -10,4 +10,6 @@ export type {
   TeacherHistoryRecentResponse,
   TeacherHistoryAllResponse,
   ConfirmationHistoryItem,
+  TeacherHistoryByDateResponse,
+  StudentHistoryByDateResponse,
 } from './types';

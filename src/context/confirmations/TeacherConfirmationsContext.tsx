@@ -5,6 +5,7 @@ import type {
   TeacherHistoryRecentResponse,
   TeacherHistoryAllResponse,
   ConfirmationHistoryItem,
+  TeacherHistoryByDateResponse,
 } from './types';
 
 export interface TeacherConfirmationsContextType {
@@ -35,6 +36,12 @@ export interface TeacherConfirmationsContextType {
     offset?: number,
     limit?: number
   ) => Promise<{ success: boolean; data?: TeacherHistoryAllResponse; message: string }>;
+
+  // by-date
+  dateLoading: boolean;
+  dateError: string | null;
+  dateItems: ConfirmationHistoryItem[];
+  loadTeacherByDate: (dateStr: string) => Promise<{ success: boolean; data?: TeacherHistoryByDateResponse; message: string }>;
 
   // evidence convenience
   getTeacherEvidenceUrl: (confirmationId: number) => Promise<{ success: boolean; url?: string; message: string }>;
@@ -132,6 +139,28 @@ export const TeacherConfirmationsProvider: React.FC<{ children: React.ReactNode 
     }
   }, [api]);
 
+  // by-date
+  const [dateLoading, setDateLoading] = useState(false);
+  const [dateError, setDateError] = useState<string | null>(null);
+  const [dateItems, setDateItems] = useState<ConfirmationHistoryItem[]>([]);
+
+  const loadTeacherByDate = useCallback(async (dateStr: string) => {
+    setDateLoading(true);
+    setDateError(null);
+    try {
+      const res = await api.getTeacherHistoryByDate(dateStr);
+      if (res.success && res.data) setDateItems(res.data.items || []);
+      else setDateError(res.message);
+      return res;
+    } catch (e: any) {
+      const message = e?.message || 'Error al buscar por fecha (docente)';
+      setDateError(message);
+      return { success: false, message };
+    } finally {
+      setDateLoading(false);
+    }
+  }, [api]);
+
   // evidence helper (creates object URL)
   const getTeacherEvidenceUrl = useCallback(async (confirmationId: number) => {
     const res = await api.getTeacherEvidence(confirmationId);
@@ -159,12 +188,17 @@ export const TeacherConfirmationsProvider: React.FC<{ children: React.ReactNode 
     offset,
     limit,
     loadTeacherAll,
+    dateLoading,
+    dateError,
+    dateItems,
+    loadTeacherByDate,
     getTeacherEvidenceUrl,
     resetSubmit,
   }), [
     submitLoading, submitError, submitResult, submitTeacherConfirmation,
     recentLoading, recentError, recentItems, loadTeacherRecent,
     allLoading, allError, allItems, total, hasMore, offset, limit, loadTeacherAll,
+    dateLoading, dateError, dateItems, loadTeacherByDate,
     getTeacherEvidenceUrl, resetSubmit,
   ]);
 

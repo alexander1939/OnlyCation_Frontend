@@ -8,6 +8,8 @@ import type {
   StudentHistoryAllResponse,
   TeacherHistoryRecentResponse,
   TeacherHistoryAllResponse,
+  TeacherHistoryByDateResponse,
+  StudentHistoryByDateResponse,
 } from '../../context/confirmations/types';
 
 const API_URL = import.meta.env.VITE_API_URL as string;
@@ -116,6 +118,23 @@ export const useConfirmationsApi = () => {
     }
   };
 
+  const getStudentHistoryByDate = async (dateStr: string): Promise<{ success: boolean; data?: StudentHistoryByDateResponse; message: string }> => {
+    try {
+      const token = getAccessToken();
+      if (!token) throw new Error('No hay token de acceso. Inicia sesión nuevamente.');
+      const response = await client.get<StudentHistoryByDateResponse>(
+        `/confirmation/student/history/by-date?date=${encodeURIComponent(dateStr)}`,
+        { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
+      );
+      const data = response.data;
+      return { success: !!data?.success, data, message: 'OK' };
+    } catch (err) {
+      const axErr = err as AxiosError<{ detail?: string }>;
+      const message = axErr.response?.data?.detail || axErr.message || 'Error al buscar por fecha (alumno)';
+      return { success: false, message };
+    }
+  };
+
   // TEACHER
   const postTeacherConfirmation = async (
     paymentBookingId: number | string,
@@ -209,16 +228,35 @@ export const useConfirmationsApi = () => {
     }
   };
 
+  const getTeacherHistoryByDate = async (dateStr: string): Promise<{ success: boolean; data?: TeacherHistoryByDateResponse; message: string }> => {
+    try {
+      const token = getAccessToken();
+      if (!token) throw new Error('No hay token de acceso. Inicia sesión nuevamente.');
+      const response = await client.get<TeacherHistoryByDateResponse>(
+        `/confirmation/teacher/history/by-date?date=${encodeURIComponent(dateStr)}`,
+        { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
+      );
+      const data = response.data;
+      return { success: !!data?.success, data, message: 'OK' };
+    } catch (err) {
+      const axErr = err as AxiosError<{ detail?: string }>;
+      const message = axErr.response?.data?.detail || axErr.message || 'Error al buscar por fecha (docente)';
+      return { success: false, message };
+    }
+  };
+
   return {
     // Student
     postStudentConfirmation,
     getStudentEvidence,
     getStudentHistoryRecent,
     getStudentHistoryAll,
+    getStudentHistoryByDate,
     // Teacher
     postTeacherConfirmation,
     getTeacherEvidence,
     getTeacherHistoryRecent,
     getTeacherHistoryAll,
+    getTeacherHistoryByDate,
   };
 };

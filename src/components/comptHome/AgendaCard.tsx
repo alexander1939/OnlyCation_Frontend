@@ -26,6 +26,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
 
   return (
     <div
+      className="info-card"
       style={{
         backgroundColor,
         borderRadius: "1rem",
@@ -98,15 +99,9 @@ const InfoCard: React.FC<InfoCardProps> = ({
       {/* 🔹 Responsividad */}
       <style>{`
         @media (max-width: 768px) {
-          div {
-            padding: 1.2rem !important;
-          }
-          h3 {
-            font-size: 1rem !important;
-          }
-          p, span {
-            font-size: 0.9rem !important;
-          }
+          .info-card { padding: 1.2rem !important; }
+          .info-card h3 { font-size: 1rem !important; }
+          .info-card p, .info-card span { font-size: 0.9rem !important; }
         }
       `}</style>
     </div>

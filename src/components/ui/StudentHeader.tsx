@@ -109,9 +109,9 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
             padding: isDesktop ? '8px 24px' : '12px 22px',
             gap: '32px',
             boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-            width: 'auto',
-            maxWidth: '100%',
-            minWidth: isDesktop ? undefined : 'min(92vw, 440px)',
+            width: isDesktop ? 'auto' : 'calc(100% - 32px)',
+            maxWidth: isDesktop ? '100%' : '500px',
+            margin: isDesktop ? undefined : '0 auto',
             justifyContent: 'space-between'
           }}>
             <Link to="/student-home" className="flex items-center space-x-2" style={{ textDecoration: 'none' }}>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../ui/Header';
 import Footer from '../ui/Footer';
@@ -7,6 +7,7 @@ import '../../styles/docente-general.css';
 import BookingDetailModal from './BookingDetailModal';
 import '../../styles/booking-view.css';
 import '../../styles/new-booking-view.css';
+import { useOptionalTeacherConfirmationsContext, useOptionalStudentConfirmationsContext } from '../../context/confirmations';
 
 type BookingViewProps = {
   user: {
@@ -150,6 +151,47 @@ export default function BookingView({
     if (lowerMateria.includes('historia')) return '📚';
     if (lowerMateria.includes('biología')) return '🧬';
     return '📖';
+  };
+
+  // Confirmables ahora (recent) por rol
+  const teacherConfCtx = useOptionalTeacherConfirmationsContext();
+  const studentConfCtx = useOptionalStudentConfirmationsContext();
+  const loadedRecentRef = useRef(false);
+
+  useEffect(() => {
+    if (loadedRecentRef.current) return;
+    if (user?.role === 'teacher' && teacherConfCtx) {
+      loadedRecentRef.current = true;
+      teacherConfCtx.loadTeacherRecent?.();
+    } else if (user?.role === 'student' && studentConfCtx) {
+      loadedRecentRef.current = true;
+      studentConfCtx.loadStudentRecent?.();
+    }
+  }, [user?.role, teacherConfCtx, studentConfCtx]);
+
+  const recentLoading = useMemo(() => {
+    if (user?.role === 'teacher') return teacherConfCtx?.recentLoading;
+    if (user?.role === 'student') return studentConfCtx?.recentLoading;
+    return false;
+  }, [user?.role, teacherConfCtx?.recentLoading, studentConfCtx?.recentLoading]);
+
+  const recentError = useMemo(() => {
+    if (user?.role === 'teacher') return teacherConfCtx?.recentError || null;
+    if (user?.role === 'student') return studentConfCtx?.recentError || null;
+    return null;
+  }, [user?.role, teacherConfCtx?.recentError, studentConfCtx?.recentError]);
+
+  const recentItems = useMemo(() => {
+    if (user?.role === 'teacher') return teacherConfCtx?.recentItems || [];
+    if (user?.role === 'student') return studentConfCtx?.recentItems || [];
+    return [];
+  }, [user?.role, teacherConfCtx?.recentItems, studentConfCtx?.recentItems]);
+
+  const formatSecondsLeft = (seconds?: number) => {
+    if (!seconds || seconds <= 0) return 'Expirado';
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}m ${s < 10 ? '0' : ''}${s}s`;
   };
 
   // Separar clases por estado (próximas: 'active' y 'approved')
@@ -322,6 +364,46 @@ export default function BookingView({
               {/* CLASES ASISTIDAS */}
               <div className="asesorias-section">
                 <h2 className="asesorias-section-title">Clases Asistidas</h2>
+
+                {/* Confirmables ahora (según rol) */}
+                {(user?.role === 'teacher' || user?.role === 'student') && (
+                  <div className="empty-confirmacion-state" style={{ marginBottom: 16 }}>
+                    <div className="empty-confirmacion-icon">⏱️</div>
+                    <div className="empty-confirmacion-title">Confirmables ahora</div>
+                    {recentLoading && (
+                      <div className="text-gray-600" style={{ padding: '6px 0' }}>Cargando confirmaciones…</div>
+                    )}
+                    {recentError && (
+                      <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-3 text-red-600">{recentError}</div>
+                    )}
+                    {!recentLoading && !recentError && recentItems.length === 0 && (
+                      <div className="empty-confirmacion-desc">No tienes confirmaciones pendientes en este momento.</div>
+                    )}
+                    {!recentLoading && !recentError && recentItems.length > 0 && (
+                      <div className="asesorias-list" style={{ marginTop: 8 }}>
+                        {recentItems.map((it) => (
+                          <div key={it.id} className="clase-asistida-item">
+                            <div className="clase-asistida-icon">📝</div>
+                            <div className="clase-asistida-content">
+                              <div className="clase-asistida-materia">Reserva #{it.payment_booking_id}</div>
+                              <div className="clase-asistida-datetime">
+                                Finalizó: {formatDate(it.booking_end)}, {formatTime(it.booking_end)} · Tiempo restante: {formatSecondsLeft(it.seconds_left)}
+                              </div>
+                            </div>
+                            <Link 
+                              to={user?.role === 'teacher' ? '/teacher/confirmation' : '/student/confirmation'} 
+                              className="btn-confirmar-asistencia"
+                              style={{ textDecoration: 'none' }}
+                            >
+                              <span>✓</span>
+                              Confirmar ahora
+                            </Link>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
                 {completedClasses.length > 0 ? (
                   <>
                     <div className="asesorias-list">
@@ -373,13 +455,8 @@ export default function BookingView({
                     </div>
                   </>
                 ) : (
-                  <div className="empty-confirmacion-state">
-                    <div className="empty-confirmacion-icon">📋</div>
-                    <p className="empty-confirmacion-title">Todavía no hay reservaciones por confirmar</p>
-                    <p className="empty-confirmacion-desc">
-                      Recuerda que tienes un máximo de 2 horas después de finalizar cada asesoría 
-                      para confirmar tu asistencia, de lo contrario pueden haber consecuencias.
-                    </p>
+                  <div >
+
                   </div>
                 )}
               </div>

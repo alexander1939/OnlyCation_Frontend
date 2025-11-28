@@ -36,6 +36,14 @@ export interface ChatSummary {
   created_at: string;
 }
 
+export interface ChatPreview {
+  chat_id: number;
+  participant: { id: number; full_name: string; avatar_url?: string };
+  last_message_preview: string | null;
+  last_message_at: string | null;
+  unread_count: number;
+}
+
 export const useChatApi = () => {
   const { getAccessToken } = useAuthToken();
 
@@ -72,7 +80,7 @@ export const useChatApi = () => {
     }
   }, [client, getAccessToken]);
 
-  // Obtener mis chats
+  // Obtener mis chats (completo)
   const getMyChats = useCallback(async () => {
     try {
       const token = getAccessToken();
@@ -93,6 +101,33 @@ export const useChatApi = () => {
         success: false,
         data: [],
         message: 'Error al obtener los chats'
+      };
+    }
+  }, [client, getAccessToken]);
+
+  // Obtener previews ligeros (auto-asegura chats activos)
+  const getChatPreviews = useCallback(async () => {
+    try {
+      const token = getAccessToken();
+      if (!token) throw new Error('No hay token de acceso. Inicia sesión nuevamente.');
+
+      const response = await client.get('/chat/chats/previews', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      return {
+        success: !!response.data?.success,
+        data: (response.data?.data || []) as ChatPreview[],
+        total: Number(response.data?.total || 0),
+        message: response.data?.message || 'OK',
+      };
+    } catch (error: any) {
+      console.error('Error al obtener previews de chats:', error);
+      return {
+        success: false,
+        data: [] as ChatPreview[],
+        total: 0,
+        message: error.response?.data?.detail || 'Error al obtener previews de chats',
       };
     }
   }, [client, getAccessToken]);
@@ -236,6 +271,7 @@ export const useChatApi = () => {
   return {
     createChat,
     getMyChats,
+    getChatPreviews,
     getChatMessages,
     sendMessage,
     markMessagesAsRead,

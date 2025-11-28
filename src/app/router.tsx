@@ -56,7 +56,8 @@ import GlobalErrorBoundary from '../components/error/GlobalErrorBoundary';
 import ServerError from '../components/error/ServerError';
 import Forbidden from '../components/error/Forbidden';
 import NotFound from '../components/error/NotFound';
-
+import { StudentConfirmationsProvider, TeacherConfirmationsProvider, ConfirmationDetailProvider } from '../context/confirmations';
+import { StudentAssessmentsProvider } from '../context/assessments/StudentAssessmentsContext';
 
 const router = createBrowserRouter([
   {
@@ -203,11 +204,15 @@ const router = createBrowserRouter([
     path: '/student/my_next_booking',
     element: (
       <PrivateRoute roles={["student"]}>
-        <MyNextClassesProvider>
-          <BookingDetailProvider>
-            <MyNextBooking />
-          </BookingDetailProvider>
-        </MyNextClassesProvider>
+        <StudentAssessmentsProvider>
+          <StudentConfirmationsProvider>
+            <MyNextClassesProvider>
+              <BookingDetailProvider>
+                <MyNextBooking />
+              </BookingDetailProvider>
+            </MyNextClassesProvider>
+          </StudentConfirmationsProvider>
+        </StudentAssessmentsProvider>
       </PrivateRoute>
     ),
   },
@@ -227,11 +232,13 @@ const router = createBrowserRouter([
     path: '/teacher/my_next_booking',
     element: (
       <PrivateRoute roles={["teacher"]}>
-        <MyNextClassesProvider>
-          <BookingDetailProvider>
-            <MyNextBooking />
-          </BookingDetailProvider>
-        </MyNextClassesProvider>
+        <TeacherConfirmationsProvider>
+          <MyNextClassesProvider>
+            <BookingDetailProvider>
+              <MyNextBooking />
+            </BookingDetailProvider>
+          </MyNextClassesProvider>
+        </TeacherConfirmationsProvider>
       </PrivateRoute>
     ),
   },
@@ -279,7 +286,23 @@ const router = createBrowserRouter([
     path: '/teacher/confirmation',
     element: (
       <PrivateRoute roles={["teacher"]}>
-        <TeacherConfirmation />
+        <TeacherConfirmationsProvider>
+          <ConfirmationDetailProvider>
+            <TeacherConfirmation />
+          </ConfirmationDetailProvider>
+        </TeacherConfirmationsProvider>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/student/confirmation',
+    element: (
+      <PrivateRoute roles={["student"]}>
+        <StudentConfirmationsProvider>
+          <ConfirmationDetailProvider>
+            <TeacherConfirmation />
+          </ConfirmationDetailProvider>
+        </StudentConfirmationsProvider>
       </PrivateRoute>
     ),
   },

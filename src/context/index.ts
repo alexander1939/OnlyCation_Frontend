@@ -5,3 +5,9 @@ export { DocumentsProvider, useDocumentsContext } from './documents';
 export { PreferencesProvider, usePreferencesContext } from './preferences';
 export { PricesProvider, usePricesContext } from './prices';
 export { CatalogsProvider, useCatalogsContext } from './catalogs/CatalogsContext';
+export { 
+  StudentConfirmationsProvider, 
+  useStudentConfirmationsContext,
+  TeacherConfirmationsProvider,
+  useTeacherConfirmationsContext,
+} from './confirmations';

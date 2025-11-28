@@ -16,6 +16,7 @@ export interface User {
   role: string;
   status?: string | null;
   preference_id?: number | null;
+  id?: number;
 }
 
 // 📦 Respuesta del login
@@ -32,6 +33,7 @@ export interface LoginResponse {
     role: string;
     status?: string | null;
     preference_id?: number | null;
+    id?: number;
   } | null;
 }
 

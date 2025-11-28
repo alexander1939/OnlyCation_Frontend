@@ -1,5 +1,6 @@
 // import React from 'react';
 import { Link } from 'react-router-dom';
+import { useWallet } from '../context/wallet/WalletContext';
 import '../styles/profile-dropdown.css';
 
 type ProfileDropdownProps = {
@@ -16,6 +17,7 @@ export default function ProfileDropdown({ user, isTeacher, isStudent, onClose, o
     : '';
   const fullName = user ? `${user.first_name} ${user.last_name}`.trim() : '';
   const userEmail = user?.email || '';
+  const { fetchWalletBalance } = useWallet();
 
   return (
     <div className="profile-dropdown">
@@ -80,7 +82,15 @@ export default function ProfileDropdown({ user, isTeacher, isStudent, onClose, o
               <span className="profile-dropdown-icon">📊</span>
               Mi Perfil
             </Link>
-            <Link to="AQUI LA RUTA" className="profile-dropdown-item" onClick={onClose}>
+            <Link 
+              to="#" 
+              className="profile-dropdown-item" 
+              onClick={(e) => {
+                e.preventDefault();
+                onClose();
+                fetchWalletBalance();
+              }}
+            >
               <span className="profile-dropdown-icon">👜</span>
               Cartera
             </Link>

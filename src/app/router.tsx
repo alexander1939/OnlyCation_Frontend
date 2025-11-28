@@ -169,6 +169,14 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: '/teacher/activate-account',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <ActivateAccountCard />
+      </PrivateRoute>
+    ),
+  },
+  {
     path: "/teacher-home",
     element: (
       <PrivateRoute roles={["teacher"]} requireTeacherStatus="active">

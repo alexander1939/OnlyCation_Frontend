@@ -4,20 +4,39 @@ import type { PublicTeacherProfile } from '../../context/teachers/types';
 
 const API_URL = import.meta.env.VITE_API_URL as string;
 
+// --- Caché persistente por docente (localStorage) ---
+const PROFILE_CACHE_PREFIX = 'public_profile_';
+const getProfileCacheKey = (teacherId: number) => `${PROFILE_CACHE_PREFIX}${teacherId}`;
+
+const saveProfileToCache = (teacherId: number, data: PublicTeacherProfile) => {
+  try {
+    const payload = { data, ts: Date.now() };
+    localStorage.setItem(getProfileCacheKey(teacherId), JSON.stringify(payload));
+  } catch {}
+};
+
+const getProfileFromCache = (teacherId: number): PublicTeacherProfile | null => {
+  try {
+    const raw = localStorage.getItem(getProfileCacheKey(teacherId));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed?.data ?? null;
+  } catch {
+    return null;
+  }
+};
+
 export const usePublicTeacherProfileApi = () => {
-  const client = useMemo(() => {
-    return axios.create({
-      baseURL: API_URL,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }, []);
+  // Usar axios global para aprovechar interceptores globales
+  const client = useMemo(() => axios, []);
 
   const getPublicTeacherProfile = async (
     teacherId: number
   ): Promise<{ success: boolean; message: string; data?: PublicTeacherProfile }> => {
     try {
       const res = await client.get(
-        `/public/teachers/${teacherId}`
+        `/public/teachers/${teacherId}`,
+        { baseURL: API_URL, headers: { 'Content-Type': 'application/json' } }
       );
 
       const raw: any = res.data;
@@ -29,6 +48,10 @@ export const usePublicTeacherProfileApi = () => {
         } else if ('data' in raw) {
           data = raw.data as PublicTeacherProfile;
         }
+      }
+
+      if (data) {
+        saveProfileToCache(teacherId, data);
       }
 
       return {
@@ -45,6 +68,12 @@ export const usePublicTeacherProfileApi = () => {
         (status === 404 ? 'Perfil público no encontrado' : undefined) ||
         axErr.message ||
         'Error al obtener el perfil público del docente';
+
+      // Fallback a caché local si existe
+      const cached = getProfileFromCache(teacherId);
+      if (cached) {
+        return { success: true, message: 'Datos del caché', data: cached };
+      }
       return { success: false, message };
     }
   };

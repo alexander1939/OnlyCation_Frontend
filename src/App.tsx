@@ -1,6 +1,7 @@
 import { LoginProvider } from './context/auth';
 import { RegisterAuthProvider } from './context/regAuth';
 import { ChatProvider } from './context/chat/ChatContext';
+import { WalletProvider } from './context/wallet/WalletContext';
 import AppRouter from './app/router';
 import { useNetworkStatus } from './hooks/useNetworkStatus';
 import { NotificationProvider } from './components/NotificationProvider';
@@ -16,7 +17,9 @@ function App() {
     <LoginProvider>
       <RegisterAuthProvider>
         <ChatProvider>
-          <AppRouter />
+          <WalletProvider>
+            <AppRouter />
+          </WalletProvider>
         </ChatProvider>
       </RegisterAuthProvider>
     </LoginProvider>

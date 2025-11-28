@@ -54,7 +54,16 @@ const buildMonthGrid = (visibleMonth: Date) => {
 
 export default function PublicBookLessonModal({ isOpen, onClose, teacherId, teacher, availabilityByDate, onProceed }: PublicBookLessonModalProps) {
   const { getPublicAgenda } = usePublicAgendaApi();
-  const { createBooking, loading: creatingBooking, error: createError } = useCreateBookingContext();
+  const { 
+    createBooking, 
+    loading: creatingBooking, 
+    error: createError,
+    // Cotización
+    quoteBooking,
+    quoteLoading,
+    quoteError,
+    quoteResult,
+  } = useCreateBookingContext();
   const { getAccessToken } = useAuthToken();
   const navigate = useNavigate();
 
@@ -219,6 +228,100 @@ export default function PublicBookLessonModal({ isOpen, onClose, teacherId, teac
   }, [selections]);
   const total = (teacher.hourlyRate || 0) * totalHours;
 
+  // Construir bloques contiguos por día para cotización
+  const quoteItems = useMemo(() => {
+    const items: { availability_id: number; start_time: string; end_time: string }[] = [];
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const entries = Object.entries(selectedByDate);
+    if (entries.length === 0) return items;
+    for (const [dateKey, set] of entries) {
+      const hours = Array.from(set || []).sort(); // ['09:00','10:00','12:00']
+      if (hours.length === 0) continue;
+      const nums = hours
+        .map((h) => parseInt(h.split(':')[0], 10))
+        .sort((a, b) => a - b);
+      let blockStart = nums[0];
+      let prev = nums[0];
+      const pushBlock = (startH: number, endH: number) => {
+        const startKey = `${pad(startH)}:00`;
+        const slot = (localSlotsByDate[dateKey] || {})[startKey];
+        if (!slot) return; // si ya no está disponible, omitimos este bloque en la cotización
+        items.push({
+          availability_id: slot.availability_id,
+          start_time: `${dateKey}T${pad(startH)}:00:00`,
+          end_time: `${dateKey}T${pad(endH)}:00:00`,
+        });
+      };
+      for (let i = 1; i < nums.length; i++) {
+        const curr = nums[i];
+        if (curr === prev + 1) {
+          prev = curr; // continúa el bloque
+        } else {
+          // cerrar bloque anterior [blockStart, prev]
+          pushBlock(blockStart, prev + 1);
+          // iniciar nuevo
+          blockStart = curr;
+          prev = curr;
+        }
+      }
+      // último bloque del día
+      pushBlock(blockStart, prev + 1);
+    }
+    return items;
+  }, [selectedByDate, localSlotsByDate]);
+
+  // Control de cotización para evitar peticiones repetidas
+  const quoteTimerRef = useRef<number | undefined>(undefined);
+  const lastQuoteKeyRef = useRef<string | null>(null);
+  const inFlightQuoteRef = useRef<boolean>(false);
+
+  // Firma estable de la cotización para deduplicar (cambia solo si cambian los items)
+  const quoteKey = useMemo(() => {
+    if (!quoteItems || quoteItems.length === 0) return '';
+    const parts = quoteItems.map(i => `${i.availability_id}|${i.start_time}|${i.end_time}`).sort();
+    return parts.join(';');
+  }, [quoteItems]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    if (!quoteItems || quoteItems.length === 0) return;
+    const token = getAccessToken();
+    if (!token) return; // si no hay token, no cotizamos para evitar errores en UI pública
+
+    // Si la firma no cambió desde la última cotización exitosa, no volver a cotizar
+    if (quoteKey && quoteKey === lastQuoteKeyRef.current) return;
+
+    // Reiniciar debounce previo
+    if (quoteTimerRef.current) {
+      window.clearTimeout(quoteTimerRef.current);
+      quoteTimerRef.current = undefined;
+    }
+
+    // Debounce y control de concurrencia
+    quoteTimerRef.current = window.setTimeout(async () => {
+      if (!quoteKey) return;
+      if (inFlightQuoteRef.current) return;
+      inFlightQuoteRef.current = true;
+      try {
+        console.log('[Booking][DEBUG] quoting payload:', { items: quoteItems });
+        await quoteBooking({ items: quoteItems });
+        // Guardar como última firma cotizada exitosamente
+        lastQuoteKeyRef.current = quoteKey;
+      } catch (e) {
+        // no-op, el contexto ya maneja errores
+      } finally {
+        inFlightQuoteRef.current = false;
+      }
+    }, 450);
+
+    return () => {
+      if (quoteTimerRef.current) {
+        window.clearTimeout(quoteTimerRef.current);
+        quoteTimerRef.current = undefined;
+      }
+    };
+  }, [isOpen, quoteKey, quoteItems, quoteBooking, getAccessToken]);
+
   const isContiguous = (hours: string[]) => {
     if (hours.length <= 1) return true;
     const nums = hours.map(h => parseInt(h.split(':')[0], 10)).sort((a, b) => a - b);
@@ -337,6 +440,20 @@ export default function PublicBookLessonModal({ isOpen, onClose, teacherId, teac
       document.body.style.overflow = original;
     };
   }, [isOpen]);
+
+  // Formatear política de precios en español
+  const formatPolicyEs = (policy: string | { base_hours: number; rule: string; scope?: string }) => {
+    if (typeof policy === 'string') return policy;
+    const base = policy?.base_hours ?? 0;
+    const nextHour = base + 1;
+    const scopeTxt = policy?.scope === 'per_block'
+      ? 'por bloque'
+      : policy?.scope === 'per_booking'
+        ? 'por reserva'
+        : '';
+    // Ej.: "Primeras 2 horas por bloque base, desde la 3ª hora por bloque extra"
+    return `Primeras ${base} horas ${scopeTxt} base, desde la ${nextHour}ª hora ${scopeTxt} extra`;
+  };
 
   if (!isOpen) return null;
 
@@ -497,8 +614,46 @@ export default function PublicBookLessonModal({ isOpen, onClose, teacherId, teac
               })}
               <div className="blm-summary-total">
                 <span>Total ({totalHours} {totalHours === 1 ? 'hora' : 'horas'}):</span>
-                <strong>${total.toFixed(2)} MXN</strong>
+                <strong>
+                  {quoteResult?.data?.total_amount_mxn !== undefined
+                    ? `$${quoteResult.data.total_amount_mxn.toFixed(2)} MXN`
+                    : `$${total.toFixed(2)} MXN`}
+                  {quoteLoading && <span className="blm-spinner-inline" aria-hidden="true"></span>}
+                </strong>
               </div>
+              {quoteError && (
+                <p className="blm-help-text" style={{ color: '#b91c1c', marginTop: 6 }}>Error al cotizar: {quoteError}</p>
+              )}
+              {quoteResult?.data?.global_pricing_policy && (
+                <div className="blm-summary-row" style={{ marginTop: 6 }}>
+                  <div className="blm-summary-label"></div>
+                  <div className="blm-summary-value">
+                    <span className="blm-policy-badge">
+                      {formatPolicyEs(quoteResult.data.global_pricing_policy)}
+                    </span>
+                  </div>
+                </div>
+              )}
+              {quoteResult?.data?.blocks?.length ? (
+                <div className="blm-summary-row" style={{ marginTop: 8, display: 'grid', gap: 4 }}>
+                  <div className="blm-summary-label">Desglose</div>
+                  <div className="blm-summary-value" style={{ display: 'grid', gap: 2 }}>
+                    {quoteResult.data.blocks.map((b, idx) => {
+                      const s = new Date(b.start);
+                      const e = new Date(b.end);
+                      const dateLabel = s.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+                      const timeLabel = `${s.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })} - ${e.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}`;
+                      const amount = (b.amount_cents ?? 0) / 100;
+                      return (
+                        <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+                          <span>{dateLabel} · {timeLabel} ({b.hours} {b.hours === 1 ? 'hora' : 'horas'})</span>
+                          <strong>${amount.toFixed(2)} MXN</strong>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null}
             </>
           )}
         </div>

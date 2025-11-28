@@ -3,6 +3,8 @@ import { useAuthContext } from "../../context/auth";
 import { useChatContext } from "../../context/chat";
 import Header from "../ui/Header";
 import Footer from "../ui/Footer";
+import { useNotificationContext } from "../NotificationProvider";
+import ConfirmDialog from "../shared/ConfirmDialog";
 
 // --- Local Hooks & Components ---
 
@@ -82,6 +84,11 @@ const Chat: React.FC<ChatLayoutProps> = ({ fullScreen = false }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const hasFetchedChats = useRef(false);
   const [hoveredMessageId, setHoveredMessageId] = useState<number | null>(null);
+  const { showSuccess, showError } = useNotificationContext();
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [messageToDelete, setMessageToDelete] = useState<number | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Cargar chats al montar (solo una vez)
   useEffect(() => {
@@ -111,10 +118,29 @@ const Chat: React.FC<ChatLayoutProps> = ({ fullScreen = false }) => {
   };
 
   // Manejar eliminación de mensaje
-  const handleDeleteMessage = async (messageId: number) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este mensaje?')) {
-      await deleteMessage(messageId);
+  const handleAskDeleteMessage = (messageId: number) => {
+    setMessageToDelete(messageId);
+    setConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!messageToDelete) return;
+    setDeleting(true);
+    const res = await deleteMessage(messageToDelete);
+    setDeleting(false);
+    setConfirmOpen(false);
+    setMessageToDelete(null);
+    if (res?.success) {
+      showSuccess('Mensaje eliminado');
+    } else {
+      showError(res?.message || 'No se pudo eliminar el mensaje');
     }
+  };
+
+  const handleCancelDelete = () => {
+    if (deleting) return;
+    setConfirmOpen(false);
+    setMessageToDelete(null);
   };
 
   // Helper para obtener nombre del participante
@@ -161,9 +187,31 @@ const Chat: React.FC<ChatLayoutProps> = ({ fullScreen = false }) => {
       >
         {/* Header de conversaciones */}
         <div style={{ padding: "1.2rem 1rem", borderBottom: "1px solid #E2E8F0" }}>
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: "#294954", marginBottom: "0.8rem" }}>
-            Conversaciones Activas
-          </h2>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: '0.6rem' }}>
+            <h2 style={{ fontSize: 18, fontWeight: 700, color: "#294954", margin: 0 }}>
+              Conversaciones Activas
+            </h2>
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  setRefreshing(true);
+                  await fetchChats();
+                  showSuccess('Conversaciones actualizadas');
+                } catch (e) {
+                  showError('No se pudieron actualizar las conversaciones');
+                } finally {
+                  setRefreshing(false);
+                }
+              }}
+              disabled={refreshing}
+              className="btn-ver-detalles"
+              style={{ minWidth: 112, height: 32, padding: '0 10px' }}
+              title="Actualizar conversaciones"
+            >
+              {refreshing ? 'Actualizando…' : 'Actualizar'}
+            </button>
+          </div>
           <input
             type="text"
             placeholder="Buscar chats..."
@@ -446,7 +494,7 @@ const Chat: React.FC<ChatLayoutProps> = ({ fullScreen = false }) => {
                         {/* Botón de eliminar (solo para mensajes propios) */}
                         {isMe && hoveredMessageId === msg.id && (
                           <button
-                            onClick={() => handleDeleteMessage(msg.id)}
+                            onClick={() => handleAskDeleteMessage(msg.id)}
                             style={{
                               position: "absolute",
                               top: -8,
@@ -572,7 +620,21 @@ const Chat: React.FC<ChatLayoutProps> = ({ fullScreen = false }) => {
   );
 
   if (fullScreen) {
-    return <FullscreenWrapper>{ChatContent}</FullscreenWrapper>;
+    return (
+      <>
+        <FullscreenWrapper>{ChatContent}</FullscreenWrapper>
+        <ConfirmDialog
+          isOpen={confirmOpen}
+          title="Eliminar mensaje"
+          description="Esta acción no se puede deshacer. ¿Deseas eliminar este mensaje?"
+          confirmText="Eliminar"
+          cancelText="Cancelar"
+          loading={deleting}
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+        />
+      </>
+    );
   }
 
   return (
@@ -599,6 +661,16 @@ const Chat: React.FC<ChatLayoutProps> = ({ fullScreen = false }) => {
       </div>
 
       <Footer />
+      <ConfirmDialog
+        isOpen={confirmOpen}
+        title="Eliminar mensaje"
+        description="Esta acción no se puede deshacer. ¿Deseas eliminar este mensaje?"
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        loading={deleting}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </div>
   );
 };

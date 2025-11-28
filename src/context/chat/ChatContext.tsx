@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { useChatApi } from '../../hooks/chat/useChatApi';
 import type { ChatSummary, Message } from '../../hooks/chat/useChatApi';
+import { useAuthContext } from '../auth';
 
 interface ChatContextType {
   chats: ChatSummary[];
@@ -14,19 +15,22 @@ interface ChatContextType {
   fetchChats: () => Promise<void>;
   selectChat: (chatId: number) => Promise<void>;
   sendMessage: (content: string) => Promise<boolean>;
-  deleteMessage: (messageId: number) => Promise<boolean>;
+  deleteMessage: (messageId: number) => Promise<{ success: boolean; message?: string }>;
   getUnreadCount: () => number;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user } = useAuthContext();
   const {
     createChat: createChatApi,
     getMyChats,
+    getChatPreviews,
     getChatMessages,
     sendMessage: sendMessageApi,
-    deleteMessage: deleteMessageApi
+    deleteMessage: deleteMessageApi,
+    markMessagesAsRead,
   } = useChatApi();
   const [chats, setChats] = useState<ChatSummary[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -36,14 +40,23 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [sendingMessage, setSendingMessage] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Obtener todos los chats del usuario
+  // Obtener chats (previews ligeros, auto-asegura según reservas activas)
   const fetchChats = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await getMyChats();
+      const response = await getChatPreviews();
       if (response.success && response.data) {
-        setChats(response.data);
+        const mapped: ChatSummary[] = response.data.map((p) => ({
+          chat_id: p.chat_id,
+          participant: p.participant,
+          last_message: (p.last_message_preview != null || p.last_message_at != null)
+            ? { content: p.last_message_preview ?? '', created_at: p.last_message_at ?? '', read: (p.unread_count || 0) === 0 }
+            : undefined,
+          unread_count: p.unread_count || 0,
+          created_at: p.last_message_at ?? new Date().toISOString(),
+        }));
+        setChats(mapped);
       } else {
         throw new Error(response.message);
       }
@@ -53,7 +66,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       setLoading(false);
     }
-  }, [getMyChats]);
+  }, [getChatPreviews]);
 
   // Seleccionar un chat y cargar sus mensajes
   const selectChat = useCallback(async (chatId: number) => {
@@ -69,6 +82,31 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (response.success && response.data) {
         console.log('[ChatContext] Messages loaded:', response.data.length, 'messages');
         setMessages(response.data);
+
+        // Marcar como leídos los mensajes no leídos de otros (no marcar los propios)
+        const currentUserId = user?.id != null ? Number(user.id) : null;
+        const unreadIds = response.data
+          .filter((m) => !m.is_read && (currentUserId == null || Number(m.sender_id) !== currentUserId))
+          .map((m) => m.id);
+
+        if (unreadIds.length > 0) {
+          const markRes = await markMessagesAsRead(unreadIds);
+          if (markRes.success) {
+            // Actualizar estado local: mensajes y contador de no leídos del chat seleccionado
+            setMessages((prev) => prev.map((m) => (unreadIds.includes(m.id) ? { ...m, is_read: true } : m)));
+            setChats((prev) => prev.map((c) => {
+              const id = c.chat_id || (c as any).id;
+              if (id === chatId) {
+                return {
+                  ...c,
+                  unread_count: 0,
+                  last_message: c.last_message ? { ...c.last_message, read: true } : c.last_message,
+                };
+              }
+              return c;
+            }));
+          }
+        }
       } else {
         throw new Error(response.message);
       }
@@ -79,7 +117,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       setLoadingMessages(false);
     }
-  }, [getChatMessages]);
+  }, [getChatMessages, markMessagesAsRead, user?.id]);
 
   // Enviar un mensaje
   const sendMessage = useCallback(async (content: string) => {
@@ -117,14 +155,15 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (response.success) {
         // Remover el mensaje de la lista local
         setMessages(prev => prev.filter(msg => msg.id !== messageId));
-        return true;
+        return { success: true, message: response.message };
       } else {
         throw new Error(response.message);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error al eliminar el mensaje:', err);
-      setError(err instanceof Error ? err.message : 'Error al eliminar el mensaje');
-      return false;
+      const msg = err?.message || 'Error al eliminar el mensaje';
+      setError(msg);
+      return { success: false, message: msg };
     }
   }, [deleteMessageApi]);
 
@@ -185,4 +224,3 @@ export const useChatContext = () => {
   }
   return context;
 };
-

@@ -205,7 +205,12 @@
   display: flex;
   gap: 16px;
   width: max-content;
-  animation: sc-marquee 22s linear infinite;
+  /* JS-driven auto-scroll; disable CSS animation */
+  animation: none;
+  will-change: transform;
+  user-select: none;
+  cursor: grab;
+  touch-action: pan-y;
 }
 .sc-card--carousel {
   width: 260px;
@@ -213,6 +218,11 @@
 }
 .sc-carousel-empty {
   animation: none;
+}
+
+/* Dragging state */
+.dragging {
+  cursor: grabbing !important;
 }
 @keyframes sc-marquee {
   0% { transform: translateX(0); }

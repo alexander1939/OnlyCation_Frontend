@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import HintBadge from './HintBadge';
 
 const PublicHeader: React.FC = () => {
   const location = useLocation();
@@ -11,6 +12,8 @@ const PublicHeader: React.FC = () => {
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
+
+  // Tooltip auto-hint behavior moved to reusable HintBadge component
 
   // No bloquear el scroll del fondo en móvil para mantener la interacción fluida
 
@@ -114,9 +117,11 @@ const PublicHeader: React.FC = () => {
 
             {/* Desktop User Icon */}
             {isDesktop && (
-              <Link to="/login">
-                <img src="/usuario.png" alt="Usuario" className="w-[30px] h-[30px]" style={{ objectFit: 'contain' }} />
-              </Link>
+              <HintBadge text="Inicia sesión aquí" intervalMs={15000} showDurationMs={5000} fixed={false}>
+                <Link to="/login" aria-label="Iniciar sesión">
+                  <img src="/usuario.png" alt="Usuario" className="w-[30px] h-[30px]" style={{ objectFit: 'contain' }} />
+                </Link>
+              </HintBadge>
             )}
 
             {/* Mobile Hamburger */}

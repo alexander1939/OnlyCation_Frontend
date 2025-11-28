@@ -93,7 +93,7 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
   return (
     <>
       <header 
-        className="fixed top-0 left-0 right-0 z-50 w-full" 
+        className="fixed top-0 left-0 right-0 z-[70] w-full" 
         style={{
           fontFamily: 'Roboto, sans-serif',
           backgroundColor: 'transparent',

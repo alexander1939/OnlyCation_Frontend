@@ -50,3 +50,22 @@
 /* --- 🔹 Responsividad agregada 🔹 --- */ 
 @media(max-width:900px){.login-page .login-card{max-width:95%;flex-direction:column;border-radius:1.5rem;}.login-page .login-card-left{display:none;}.login-page .login-card-right{padding:2rem 1.5rem;}} 
 @media(max-width:600px){.login-page .login-card-right{padding:1.5rem 1rem;}.login-page .login-card-right input,.login-page .login-card-right button{font-size:0.9rem;}.login-page .login-card-right .info-text,.login-page .login-card-right .login-link{font-size:0.8rem;}}
+
+/* --- Volver al inicio (pill) --- */
+.login-page .login-card-right .back-home{position:absolute;top:12px;left:12px;z-index:5;}
+.login-page .login-card-right .back-home-link{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 12px;border-radius:9999px;
+  background:#ffffff;border:1px solid #68B2C9;
+  color:#294954;text-decoration:none;font-weight:700;
+  box-shadow:0 4px 12px rgba(41,73,84,0.10);
+  transition:background-color .2s ease, transform .15s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.login-page .login-card-right .back-home-link:hover{background:#E6F4FA;transform:translateY(-1px);box-shadow:0 8px 20px rgba(41,73,84,0.14);border-color:#5aa8c0;}
+.login-page .login-card-right .back-home-link:active{transform:translateY(0);}
+.login-page .login-card-right .back-home-link:focus-visible{outline:3px solid rgba(104,178,201,0.35);outline-offset:2px;border-color:#68B2C9;}
+
+@media(max-width:600px){
+  .login-page .login-card-right .back-home{top:10px;left:10px;}
+  .login-page .login-card-right .back-home-link{padding:7px 10px;font-size:0.85rem;}
+}

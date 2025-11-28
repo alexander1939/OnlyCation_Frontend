@@ -17,41 +17,27 @@ export default defineConfig({
         display: 'standalone',
         start_url: '/',
         icons: [
-          {
-            src: 'pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png',
-            purpose: 'any maskable'
-          },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any'
-          },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'maskable'
-          }
+          { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+          { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
         ]
       },
       workbox: {
+        // Producción: servir SIEMPRE el app shell cacheado
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api\//],
+        cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        skipWaiting: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,json}'],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*$/i,
             handler: 'CacheFirst',
             options: {
               cacheName: 'google-fonts-cache',
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // 365 days
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
+              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              cacheableResponse: { statuses: [0, 200] }
             }
           },
           {
@@ -59,23 +45,21 @@ export default defineConfig({
             handler: 'CacheFirst',
             options: {
               cacheName: 'images-cache',
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
-              }
+              expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 * 30 }
             }
           },
           {
-            // Caché de documentos/navegación para funcionar sin conexión (usa precache)
-            urlPattern: ({ request }) => request.mode === 'navigate',
-            handler: 'StaleWhileRevalidate',
+            urlPattern: /\/api\/.*$/i,
+            handler: 'NetworkFirst',
+            method: 'GET',
             options: {
-              cacheName: 'html-cache',
-              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 14 },
-            },
+              cacheName: 'api-cache',
+              networkTimeoutSeconds: 3,
+              cacheableResponse: { statuses: [0, 200] },
+              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 7 },
+            }
           },
           {
-            // API con Background Sync cuando esté sin conexión
             urlPattern: /\/api\//i,
             handler: 'NetworkOnly',
             method: 'POST',
@@ -91,6 +75,7 @@ export default defineConfig({
       devOptions: {
         enabled: true,
         type: 'module',
+        // Desarrollo: evita blanco; muestra offline.html cuando no haya server
         navigateFallback: 'offline.html',
       },
     })
@@ -98,6 +83,5 @@ export default defineConfig({
   server: {
     host: 'localhost',
     port: 5173,
-    // HTTPS disabled for local development as requested
   },
 })

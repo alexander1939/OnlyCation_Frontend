@@ -46,25 +46,76 @@ export interface SearchTeachersResponse {
   total_pages: number;
 }
 
+// Normaliza distintas formas de respuesta del backend a SearchTeachersResponse
+const normalizeTeachersResponse = (
+  raw: any,
+  fallbackPage = 1,
+  fallbackPageSize = 12
+): SearchTeachersResponse => {
+  let data: Teacher[] = [];
+  let total = 0;
+  let page = fallbackPage;
+  let page_size = fallbackPageSize;
+  let total_pages = 1;
+
+  if (raw && Array.isArray(raw.data)) {
+    // Forma { data: Teacher[], total?, page?, page_size?, total_pages? }
+    data = raw.data as Teacher[];
+    total = typeof raw.total === 'number' ? raw.total : data.length;
+    page = typeof raw.page === 'number' ? raw.page : page;
+    page_size = typeof raw.page_size === 'number' ? raw.page_size : page_size;
+    total_pages = typeof raw.total_pages === 'number' ? raw.total_pages : Math.max(1, Math.ceil(total / page_size));
+  } else if (raw && Array.isArray(raw.results)) {
+    // Forma { results: Teacher[], count?, page?, page_size? }
+    data = raw.results as Teacher[];
+    total = typeof raw.count === 'number' ? raw.count : data.length;
+    page = typeof raw.page === 'number' ? raw.page : page;
+    page_size = typeof raw.page_size === 'number' ? raw.page_size : page_size;
+    total_pages = Math.max(1, Math.ceil(total / page_size));
+  } else if (Array.isArray(raw)) {
+    // Forma simple: Teacher[]
+    data = raw as Teacher[];
+    total = data.length;
+    total_pages = Math.max(1, Math.ceil(total / page_size));
+  } else if (raw && typeof raw === 'object' && Array.isArray(raw.items)) {
+    // Forma { items: Teacher[], total? }
+    data = raw.items as Teacher[];
+    total = typeof raw.total === 'number' ? raw.total : data.length;
+    total_pages = Math.max(1, Math.ceil(total / page_size));
+  } else {
+    // Desconocido: retornar vacío pero success=true para no bloquear UI
+    data = [];
+    total = 0;
+    total_pages = 0;
+  }
+
+  return {
+    success: true,
+    message: 'ok',
+    data,
+    total,
+    page,
+    page_size,
+    total_pages,
+  };
+};
+
 export const useTeachersApi = () => {
-  const client = useMemo(() => {
-    return axios.create({
-      baseURL: API_URL,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }, []);
+  // Usar axios global para aprovechar interceptores globales (apiErrorHandler)
+  const client = useMemo(() => axios, []);
 
   const getTeachers = async (page: number = 1, pageSize: number = 12): Promise<SearchTeachersResponse> => {
     try {
       const url = `/public/teachers/?page=${page}&page_size=${pageSize}`;
-      const res = await client.get<SearchTeachersResponse>(url);
-      
-      // Guardar en caché cuando la API responde correctamente
-      if (res.data.data && res.data.data.length > 0) {
-        saveTeachersToCache(res.data.data);
+      const res = await client.get<SearchTeachersResponse>(url, {
+        baseURL: API_URL,
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const normalized = normalizeTeachersResponse(res.data, page, pageSize);
+      if (normalized.data && normalized.data.length > 0) {
+        saveTeachersToCache(normalized.data);
       }
-      
-      return res.data;
+      return normalized;
     } catch (err) {
       const axErr = err as AxiosError<{ detail?: string; message?: string }>;
       const message = axErr.response?.data?.detail || axErr.response?.data?.message || axErr.message || 'Error al obtener profesores';
@@ -84,7 +135,7 @@ export const useTeachersApi = () => {
           page: 1,
           page_size: limitedTeachers.length,
           total_pages: 1
-        };
+        } as SearchTeachersResponse;
       }
       
       // Si es página > 1 o no hay caché, devolver vacío
@@ -96,7 +147,7 @@ export const useTeachersApi = () => {
         page: page || 1,
         page_size: pageSize,
         total_pages: 0
-      };
+      } as SearchTeachersResponse;
     }
   };
 
@@ -115,14 +166,15 @@ export const useTeachersApi = () => {
       const queryString = queryParams.toString();
       const url = `/public/search-teachers/${queryString ? `?${queryString}` : ''}`;
 
-      const res = await client.get<SearchTeachersResponse>(url);
-      
-      // Guardar en caché cuando la API responde correctamente
-      if (res.data.data && res.data.data.length > 0) {
-        saveTeachersToCache(res.data.data);
+      const res = await client.get<SearchTeachersResponse>(url, {
+        baseURL: API_URL,
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const normalized = normalizeTeachersResponse(res.data, params?.page ?? 1, params?.page_size ?? 12);
+      if (normalized.data && normalized.data.length > 0) {
+        saveTeachersToCache(normalized.data);
       }
-      
-      return res.data;
+      return normalized;
     } catch (err) {
       const axErr = err as AxiosError<{ detail?: string; message?: string }>;
       const message = axErr.response?.data?.detail || axErr.response?.data?.message || axErr.message || 'Error al buscar profesores';
@@ -138,7 +190,7 @@ export const useTeachersApi = () => {
           page: 1,
           page_size: cachedTeachers.length,
           total_pages: 1
-        };
+        } as SearchTeachersResponse;
       }
       
       return {
@@ -149,7 +201,7 @@ export const useTeachersApi = () => {
         page: 1,
         page_size: 12,
         total_pages: 0
-      };
+      } as SearchTeachersResponse;
     }
   };
 

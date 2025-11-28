@@ -1,200 +1,217 @@
-# OnlyCation Frontend
+# OnlyCation Frontend (PWA)
 
-OnlyCation es una plataforma educativa que conecta estudiantes con tutores especializados. Este es el frontend de la aplicación desarrollado con React, TypeScript, TailwindCSS y Vite.
+Frontend de OnlyCation creado con React + TypeScript + Vite. La aplicación está configurada como PWA mediante `vite-plugin-pwa`.
 
-## 🚀 Características
+## Tabla de contenido
+- Introducción breve
+- Instalación y ejecución
+- Evidencias solicitadas
+  - Configuración del host virtual (HTTP/HTTPS)
+  - Configuración del proyecto y rutas (framework)
+  - Configuración del manifiesto (manifest.json)
+  - Configuración del service worker (serviceworker.js / equivalente)
 
-- **Interfaz moderna**: Diseño limpio y responsivo con TailwindCSS
-- **Navegación fluida**: Implementado con React Router DOM
-- **Componentes reutilizables**: Arquitectura modular y escalable
-- **TypeScript**: Tipado estático para mayor robustez
-- **Desarrollo rápido**: Hot Module Replacement con Vite
+---
 
-## 📋 Requisitos previos
+## Introducción breve
+Esta SPA utiliza `vite-plugin-pwa` para habilitar instalación, funcionamiento offline con `offline.html` y caché de recursos. Las rutas se manejan con React Router v7.
 
-Antes de ejecutar el proyecto, asegúrate de tener instalado:
-
-- **Node.js** (versión 18 o superior)
-- **npm** (viene incluido con Node.js)
-
-## 🛠️ Instalación
-
-1. **Clona el repositorio**:
-   ```bash
-   git clone <url-del-repositorio>
-   cd OnlyCation_frontend
-   ```
-
-2. **Instala las dependencias**:
-   ```bash
-   npm install
-   ```
-
-## 🚀 Ejecución del proyecto
-
-### Modo desarrollo
-Para ejecutar el proyecto en modo desarrollo con hot reload:
-
+## Instalación y ejecución
 ```bash
+# Instalar dependencias
+npm install
+
+# Desarrollo (HTTP en localhost:5173)
 npm run dev
-```
 
-El servidor se iniciará en `http://localhost:5173`
-
-### Construcción para producción
-Para crear una versión optimizada para producción:
-
-```bash
+# Build producción
 npm run build
-```
 
-### Vista previa de la construcción
-Para previsualizar la versión de producción:
-
-```bash
+# Vista previa del build
 npm run preview
 ```
 
-### Linting
-Para ejecutar el linter y verificar el código:
+---
 
-```bash
-npm run lint
+## Evidencias solicitadas
+
+### 1) Configuración del host virtual (HTTP/HTTPS)
+
+- Explicación
+  - En desarrollo, el servidor de Vite expone la app por HTTP en `localhost:5173`. No se requiere HTTPS para probar PWA en `localhost`.
+  - Para instalar la PWA en la mayoría de navegadores en producción, el sitio debe servirse por HTTPS. Esta habilitación se realiza en el servidor/proxy (fuera del código del frontend). No hay archivos de configuración de virtual host/HTTPS dentro de este repo.
+  - Equivalente en este proyecto: la sección `server` de `vite.config.ts` define host y puerto en desarrollo (HTTP), sin HTTPS.
+
+- Evidencia (archivo `vite.config.ts`):
+```ts
+export default defineConfig({
+  plugins: [react(), VitePWA({ /* ... */ })],
+  server: {
+    host: 'localhost',
+    port: 5173,
+    // HTTPS disabled for local development as requested
+  },
+})
 ```
 
-## 📁 Estructura del proyecto
+- Nota: No existe `nginx.conf` o similar en el repo. Para producción, basta servir el contenido generado (`dist/`) detrás de HTTPS (reverse proxy o plataforma de hosting). La PWA funciona sin HTTPS solo en `localhost` durante el desarrollo.
 
+---
+
+### 2) Configuración del proyecto y rutas (framework)
+
+- Explicación
+  - Framework: React 19 + Vite 7, enrutamiento con React Router v7.
+  - Las rutas se definen con `createBrowserRouter` en `src/app/router.tsx` y se inyectan con `RouterProvider`.
+
+- Evidencias
+  - Dependencias (archivo `package.json`):
+```json
+{
+  "dependencies": {
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.8.2"
+  },
+  "devDependencies": {
+    "vite": "^7.1.2",
+    "vite-plugin-pwa": "^1.1.0"
+  }
+}
 ```
-src/
-├── app/
-│   └── router.tsx          # Configuración de rutas
-├── components/
-│   ├── Header.tsx          # Componente del header
-│   ├── Footer.tsx          # Componente del footer
-│   ├── Button.tsx          # Componente de botón reutilizable
-│   └── Card.tsx            # Componente de tarjeta reutilizable
-├── pages/
-│   ├── Home.tsx            # Página principal
-│   ├── VerMas.tsx          # Página de tutores
-│   ├── SobreNosotros.tsx   # Página sobre nosotros
-│   └── SerDocente.tsx      # Página para ser docente
-├── context/
-│   ├── AuthContext.tsx     # Contexto de autenticación
-│   └── ThemeContext.tsx    # Contexto de tema
-├── assets/                 # Recursos estáticos
-├── App.tsx                 # Componente principal
-└── main.tsx               # Punto de entrada
-```
+  - Rutas (archivo `src/app/router.tsx`, extracto):
+```tsx
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-## 🎨 Tecnologías utilizadas
+const router = createBrowserRouter([
+  { path: '/', element: <Home /> },
+  { path: '/teachers', element: <AllTeachers /> },
+  { path: '/about-us', element: <AboutUs /> },
+  { path: '/be-teacher', element: <BeTeacher /> },
+  { path: '/login', element: <Login /> },
+  { path: '/register', element: <Register /> },
+  // ...rutas privadas y páginas de error
+]);
 
-- **React 19** - Biblioteca de interfaz de usuario
-- **TypeScript** - Superset de JavaScript con tipado estático
-- **Vite** - Herramienta de construcción y desarrollo
-- **TailwindCSS** - Framework de CSS utilitario
-- **React Router DOM** - Enrutamiento del lado del cliente
-- **ESLint** - Linter para mantener calidad del código
-
-## 🎯 Rutas disponibles
-
-- `/` - Página principal (Home)
-- `/ver-mas` - Lista de tutores disponibles
-- `/about-us` - Información sobre la plataforma
-- `/ser-docente` - Información para convertirse en tutor
-
-## 🎨 Paleta de colores
-
-El proyecto utiliza una paleta de colores personalizada definida en `tailwind.config.js`:
-
-- **soft-white**: #FAF9F5 (Fondo principal)
-- **mint-green**: #8ED4BE (Acentos y botones)
-- **pastel-yellow**: #FFDE97 (Bordes y destacados)
-- **petroleum-blue**: #294954 (Texto principal y navegación)
-
-## 🤝 Contribución
-
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios siguiendo Conventional Commits:
-   ```bash
-   git commit -m "feat: Agregar nueva funcionalidad para X"
-   ```
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
-
-### Convención de Commits
-
-Seguimos la convención de **Conventional Commits** para mantener un historial claro:
-
-- `feat:` → cuando agregas una nueva característica
-- `fix:` → cuando corriges un bug
-- `docs:` → cuando actualizas documentación
-- `style:` → cambios de formato (espacios, puntos y comas, etc.)
-- `refactor:` → reestructuración de código sin cambiar funcionalidad
-- `test:` → cuando agregas o corriges pruebas
-- `chore:` → tareas varias (build, configs, etc.)
-
-**Ejemplos:**
-```bash
-git commit -m "feat: agregar página de perfil de usuario"
-git commit -m "fix: corregir navegación en header"
-git commit -m "docs: actualizar README con instrucciones"
-git commit -m "style: aplicar formato consistente en componentes"
+export default function AppRouter() {
+  return (
+    <GlobalErrorBoundary>
+      <RouterProvider router={router} />
+    </GlobalErrorBoundary>
+  );
+}
 ```
 
-## 📝 Notas de desarrollo
+---
 
-- El proyecto utiliza **Vite** como bundler para un desarrollo más rápido
-- **TailwindCSS** está configurado con colores personalizados
-- Los componentes están diseñados para ser reutilizables y modulares
-- Se implementa **React Router** para navegación SPA (Single Page Application)
+### 3) Configuración del manifiesto (manifest.json)
 
-## 🔧 Configuración de Variables de Entorno
+- Explicación
+  - El `manifest.json` se sirve desde `public/manifest.json` y se enlaza en `index.html`.
+  - Adicionalmente, `vite-plugin-pwa` define un manifest en `vite.config.ts` que se utiliza al construir el proyecto (build). Ambos enfoques son válidos; se puede unificar si se desea.
 
-El proyecto utiliza variables de entorno para configurar la API. Crea un archivo `.env` en la raíz del proyecto:
-
-```bash
-VITE_API_URL=http://localhost:8000/api
-VITE_APP_NAME=OnlyCation
-VITE_APP_VERSION=1.0.0
+- Evidencias
+  - Enlace al manifest (archivo `index.html`):
+```html
+<link rel="manifest" href="/manifest.json" />
+```
+  - Contenido del manifest (archivo `public/manifest.json`, extracto):
+```json
+{
+  "name": "OnlyCation",
+  "short_name": "OnlyCation",
+  "description": "Plataforma educativa para conectar estudiantes con los mejores profesores",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAF9F5",
+  "theme_color": "#8ED4BE",
+  "icons": [
+    { "src": "logo.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" },
+    { "src": "logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
+```
+  - Manifest definido por el plugin (archivo `vite.config.ts`, extracto):
+```ts
+VitePWA({
+  manifest: {
+    name: 'OnlyCation',
+    short_name: 'OnlyCation',
+    description: 'Plataforma educativa para conectar estudiantes con los mejores profesores',
+    theme_color: '#8ED4BE',
+    background_color: '#FAF9F5',
+    display: 'standalone',
+    start_url: '/',
+    icons: [
+      { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+      { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any' }
+    ]
+  }
+})
 ```
 
-### Uso de Variables de Entorno
+---
 
-Para usar las variables de entorno en tu código React, utiliza `import.meta.env`:
+### 4) Configuración del service worker (serviceworker.js)
 
-```typescript
-// Ejemplo: Hacer petición a la API
-const API_URL = import.meta.env.VITE_API_URL;
+- Explicación
+  - No existe un `serviceworker.js` manual en el repo. El service worker es generado automáticamente por `vite-plugin-pwa` (usa Workbox). La configuración del SW está en `vite.config.ts`.
+  - Durante el desarrollo, los archivos del SW se crean bajo `dev-dist/`. En producción, se generan en el build final (`dist/`) y están ignorados por git.
 
-const fetchData = async () => {
-  const response = await fetch(`${API_URL}/endpoint`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-  
-  return await response.json();
-};
+- Evidencias
+  - Configuración del SW (archivo `vite.config.ts`, extracto):
+```ts
+VitePWA({
+  registerType: 'autoUpdate',
+  workbox: {
+    globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,json}'],
+    runtimeCaching: [
+      {
+        urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+        handler: 'CacheFirst',
+        options: { cacheName: 'google-fonts-cache' }
+      },
+      {
+        urlPattern: /^https:\/\/.*\.(png|jpg|jpeg|svg|gif|webp)$/i,
+        handler: 'CacheFirst',
+        options: { cacheName: 'images-cache' }
+      },
+      {
+        urlPattern: ({ request }) => request.mode === 'navigate',
+        handler: 'StaleWhileRevalidate',
+        options: { cacheName: 'html-cache' }
+      },
+      {
+        urlPattern: /\/api\//i,
+        handler: 'NetworkOnly',
+        method: 'POST',
+        options: {
+          backgroundSync: { name: 'onlycation-api-queue', options: { maxRetentionTime: 24 * 60 } }
+        }
+      }
+    ]
+  },
+  devOptions: { enabled: true, type: 'module', navigateFallback: 'offline.html' }
+})
+```
+  - Archivos generados del SW ignorados por git (archivo `.gitignore`):
+```gitignore
+public/sw.js
+public/workbox-*.js
+public/registerSW.js
+dev-dist/sw.js
+dev-dist/workbox-*.js
+dev-dist/registerSW.js
+```
+  - Página de fallback offline (archivo `public/offline.html`, extracto):
+```html
+<h1>Estás sin conexión</h1>
+<a class="btn" href="/">Reintentar</a>
 ```
 
-**Importante:** 
-- Las variables deben tener el prefijo `VITE_` para ser accesibles en el frontend
-- `import.meta.env.VITE_API_URL` obtiene la URL de la API desde el archivo `.env`
-- Esto permite cambiar fácilmente entre diferentes entornos (desarrollo, producción, etc.)
+- Registro del SW
+  - El registro es gestionado automáticamente por el plugin (autoUpdate). No se usa el registro manual en `src/main.tsx` (está comentado).
 
-## 🐛 Solución de problemas
+---
 
-### El servidor no inicia
-- Verifica que Node.js esté instalado: `node --version`
-- Asegúrate de que las dependencias estén instaladas: `npm install`
-
-### Errores de TypeScript
-- Ejecuta el linter: `npm run lint`
-- Verifica que todas las importaciones sean correctas
-
-### Problemas de navegación
-- Asegúrate de que React Router DOM esté instalado
-- Verifica que las rutas estén correctamente definidas en `router.tsx`
+Si deseas que unifiquemos el manifest (dejar solo el de `public/manifest.json` o solo el del plugin), o que agreguemos una frase estándar sobre HTTPS para documentación académica, te lo preparo en seguida.

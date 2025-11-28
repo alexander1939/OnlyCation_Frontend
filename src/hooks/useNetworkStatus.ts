@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNotificationContext } from '../components/NotificationProvider';
-
-const API_URL = import.meta.env.VITE_API_URL as string;
+import { API_ERROR_EVENT, API_SUCCESS_EVENT } from '../utils/apiErrorHandler';
 
 interface NetworkStatus {
   isOnline: boolean;
@@ -13,13 +12,12 @@ export const useNetworkStatus = (): NetworkStatus => {
   const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
   const [wasOffline, setWasOffline] = useState<boolean>(false);
   const [apiConnected, setApiConnected] = useState<boolean>(true);
-  const [hasShownOffline, setHasShownOffline] = useState<boolean>(false);
-  
+
   const { showSuccess, showError } = useNotificationContext();
 
   const updatePageTitle = (online: boolean) => {
     const baseTitle = "OnlyCation - Aprende con los mejores profesores";
-    
+
     if (!online) {
       document.title = "OnlyCation - Sin Internet";
     } else {
@@ -28,75 +26,20 @@ export const useNetworkStatus = (): NetworkStatus => {
   };
 
   const checkBackend = useCallback(async () => {
-    try {
-      // Construir la URL correctamente usando URL object
-      const url = new URL(API_URL);
-      const healthCheckUrl = `${url.protocol}//${url.host}/`;
-      
-      const response = await fetch(healthCheckUrl, {
-        method: 'GET',
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        
-        console.log('🔍 Backend check:', { data, apiConnected, hasShownOffline });
-        
-        if (data && data.status === 'ok') {
-          
-          if (!apiConnected && hasShownOffline) {
-            setApiConnected(true);
-            setHasShownOffline(false);
-            showSuccess('Conexión restaurada');
-            updatePageTitle(true);
-          } else if (!hasShownOffline) {
-            setApiConnected(true);
-          }
-        } else {
-          // Backend responde pero sin status ok
-          if (apiConnected || !hasShownOffline) {
-            setApiConnected(false);
-            setHasShownOffline(true);
-            showError('Servidor no disponible - Modo offline');
-            updatePageTitle(false);
-          }
-        }
-      } else {
-        if (apiConnected || !hasShownOffline) {
-          setApiConnected(false);
-          setHasShownOffline(true);
-          showError('Servidor no disponible - Modo offline');
-          updatePageTitle(false);
-        }
-      }
-    } catch (error) {
-      // Backend no disponible
-      if (apiConnected || !hasShownOffline) {
-        setApiConnected(false);
-        setHasShownOffline(true);
-        showError('Servidor no disponible - Modo offline');
-        updatePageTitle(false);
-      }
-    }
-  }, [apiConnected, hasShownOffline, showSuccess, showError]);
-
-  // Verificar backend solo al inicio
-  useEffect(() => {
-    checkBackend();
+    return;
   }, []);
 
-  // Verificar backend cuando el usuario vuelve a la pestaña o ventana
+  useEffect(() => {
+    // Sin chequeos automáticos al montar
+  }, []);
+
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (!document.hidden && !apiConnected) {
-        checkBackend();
-      }
+      // Sin chequeos adicionales; el estado del servidor se actualizará por eventos de la app
     };
 
     const handleFocus = () => {
-      if (!apiConnected) {
-        checkBackend();
-      }
+      // Sin chequeos adicionales en focus
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -106,14 +49,15 @@ export const useNetworkStatus = (): NetworkStatus => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleFocus);
     };
-  }, [apiConnected, checkBackend]);
+  }, []);
 
   useEffect(() => {
     const handleOnline = () => {
+      setIsOnline(true);
       if (wasOffline) {
-        setIsOnline(true);
         setWasOffline(false);
-        checkBackend();
+        showSuccess('🌐 Conexión a internet restaurada');
+        updatePageTitle(true);
       }
     };
 
@@ -122,8 +66,7 @@ export const useNetworkStatus = (): NetworkStatus => {
         setIsOnline(false);
         setWasOffline(true);
         setApiConnected(false);
-        setHasShownOffline(true);
-        showError('Servidor no disponible - Modo offline');
+        showError('⚠️ Servidor no disponible - Modo offline');
         updatePageTitle(false);
       }
     };
@@ -135,7 +78,33 @@ export const useNetworkStatus = (): NetworkStatus => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [isOnline, wasOffline, showError, checkBackend]);
+  }, [isOnline, wasOffline, showError, showSuccess]);
+
+  useEffect(() => {
+    const onApiError = () => {
+      if (navigator.onLine) {
+        setApiConnected(false);
+        showError('⚠️ Servidor no disponible - Modo offline');
+        updatePageTitle(false);
+      }
+    };
+
+    const onApiSuccess = () => {
+      if (!apiConnected && navigator.onLine) {
+        setApiConnected(true);
+        showSuccess('✅ Conexión al servidor restaurada');
+        updatePageTitle(true);
+      }
+    };
+
+    window.addEventListener(API_ERROR_EVENT, onApiError as EventListener);
+    window.addEventListener(API_SUCCESS_EVENT, onApiSuccess as EventListener);
+
+    return () => {
+      window.removeEventListener(API_ERROR_EVENT, onApiError as EventListener);
+      window.removeEventListener(API_SUCCESS_EVENT, onApiSuccess as EventListener);
+    };
+  }, [apiConnected, showError, showSuccess]);
 
   return { 
     isOnline, 

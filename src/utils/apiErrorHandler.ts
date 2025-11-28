@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 // Evento personalizado para notificar errores de API
 export const API_ERROR_EVENT = 'api-connection-error';
 export const API_SUCCESS_EVENT = 'api-connection-success';
@@ -25,6 +27,29 @@ export const notifyApiSuccess = (url: string) => {
 export const createApiInterceptor = () => {
   const originalFetch = window.fetch;
   
+  // Axios: notificar éxito/error también para peticiones hechas con axios
+  axios.interceptors.response.use(
+    (response) => {
+      try {
+        const url = response?.config?.url || 'axios';
+        notifyApiSuccess(url);
+      } catch {}
+      return response;
+    },
+    (error) => {
+      try {
+        const url = error?.config?.url || error?.request?.responseURL || 'axios';
+        notifyApiError({
+          url,
+          status: error?.response?.status,
+          message: error?.message || 'Error de conexión',
+          timestamp: Date.now(),
+        });
+      } catch {}
+      return Promise.reject(error);
+    }
+  );
+
   window.fetch = async (...args) => {
     try {
       const response = await originalFetch(...args);

@@ -11,22 +11,15 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
   const location = useLocation();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDesktop, setIsDesktop] = useState<boolean>(typeof window !== 'undefined' ? window.innerWidth >= 768 : false);
+  const [isProfileExpanded, setIsProfileExpanded] = useState(false);
+  const [isDesktop, setIsDesktop] = useState<boolean>(typeof window !== 'undefined' ? window.innerWidth >= 1024 : false);
 
   React.useEffect(() => {
-    const onResize = () => setIsDesktop(window.innerWidth >= 768);
+    const onResize = () => setIsDesktop(window.innerWidth >= 1024);
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  React.useEffect(() => {
-    if (!isDesktop) {
-      document.body.style.overflow = isMenuOpen ? 'hidden' : '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isMenuOpen, isDesktop]);
   
   const userInitials = user 
     ? `${user.first_name?.[0] ?? ''}${user.last_name?.[0] ?? ''}`.toUpperCase() || 'U'
@@ -46,23 +39,25 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
     const linkStyle: React.CSSProperties = {
       position: 'relative',
       fontWeight: '600',
-      fontSize: mobile ? '16px' : '18px',
+      fontSize: mobile ? '15px' : '18px',
       textDecoration: 'none',
       color: isActive ? '#68B2C9' : '#294954',
       fontFamily: 'Inter, sans-serif',
-      padding: mobile ? '16px 24px' : '8px 12px',
-      borderRadius: mobile ? '16px' : 0,
-      textAlign: mobile ? 'center' : 'left',
+      padding: mobile ? '14px 20px' : '8px 12px',
+      borderRadius: mobile ? '12px' : 0,
+      textAlign: mobile ? 'left' : 'left',
       display: 'block',
-      transition: 'color 200ms ease'
+      width: mobile ? '100%' : undefined,
+      backgroundColor: mobile ? (hover || isActive ? 'rgba(104, 178, 201, 0.12)' : 'transparent') : 'transparent',
+      border: 'none',
+      transition: 'all 200ms ease'
     };
 
-    const underlineStyle: React.CSSProperties = {
+    const underlineStyle: React.CSSProperties = mobile ? {} : {
       position: 'absolute',
-      left: mobile ? '24px' : '0',
-      right: mobile ? '24px' : 'auto',
-      bottom: mobile ? '8px' : '-4px',
-      width: mobile ? 'auto' : '100%',
+      left: '0',
+      bottom: '-4px',
+      width: '100%',
       height: '2px',
       backgroundColor: '#68B2C9',
       transform: hover ? 'scaleX(1)' : 'scaleX(0)',
@@ -70,10 +65,10 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
       transition: 'transform 300ms cubic-bezier(0.4, 0, 0.2, 1)'
     };
 
-    const activeDotStyle: React.CSSProperties = {
+    const activeDotStyle: React.CSSProperties = mobile ? {} : {
       position: 'absolute',
-      right: mobile ? '20px' : '-8px',
-      top: mobile ? '16px' : '8px',
+      right: '-8px',
+      top: '8px',
       width: '6px',
       height: '6px',
       backgroundColor: '#68B2C9',
@@ -87,9 +82,10 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
         onMouseLeave={() => setHover(false)}
         style={linkStyle}
       >
+        {mobile && isActive && <span style={{ marginRight: '8px', fontSize: '18px' }}>•</span>}
         <span style={{ position: 'relative', zIndex: 10 }}>{label}</span>
-        <span style={underlineStyle} />
-        {isActive && <span style={activeDotStyle} />}
+        {!mobile && <span style={underlineStyle} />}
+        {!mobile && isActive && <span style={activeDotStyle} />}
       </Link>
     );
   };
@@ -113,9 +109,9 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
             padding: isDesktop ? '8px 24px' : '12px 22px',
             gap: '32px',
             boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-            width: 'auto',
-            maxWidth: '100%',
-            minWidth: isDesktop ? undefined : 'min(92vw, 440px)',
+            width: isDesktop ? 'auto' : 'calc(100% - 32px)',
+            maxWidth: isDesktop ? '100%' : '500px',
+            margin: isDesktop ? undefined : '0 auto',
             justifyContent: 'space-between'
           }}>
             <Link to="/student-home" className="flex items-center space-x-2" style={{ textDecoration: 'none' }}>
@@ -166,34 +162,43 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
             {!isDesktop && (
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="flex flex-col justify-center items-center w-8 h-8"
-                style={{ border: 'none', background: 'transparent', cursor: 'pointer' }}
+                className="flex flex-col justify-center items-center"
+                style={{ 
+                  border: 'none', 
+                  background: 'transparent', 
+                  cursor: 'pointer', 
+                  position: 'relative',
+                  width: '44px',
+                  height: '44px',
+                  padding: '10px'
+                }}
               >
                 <span style={{
                   display: 'block',
                   width: '24px',
                   height: '2px',
                   backgroundColor: '#294954',
-                  marginBottom: '5px',
-                  transition: 'all 0.3s',
-                  transform: isMenuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none'
+                  position: 'absolute',
+                  transition: 'all 0.3s ease',
+                  transform: isMenuOpen ? 'rotate(45deg)' : 'translateY(-6px)'
                 }} />
                 <span style={{
                   display: 'block',
                   width: '24px',
                   height: '2px',
                   backgroundColor: '#294954',
-                  marginBottom: '5px',
+                  position: 'absolute',
                   opacity: isMenuOpen ? 0 : 1,
-                  transition: 'all 0.3s'
+                  transition: 'all 0.3s ease'
                 }} />
                 <span style={{
                   display: 'block',
                   width: '24px',
                   height: '2px',
                   backgroundColor: '#294954',
-                  transition: 'all 0.3s',
-                  transform: isMenuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none'
+                  position: 'absolute',
+                  transition: 'all 0.3s ease',
+                  transform: isMenuOpen ? 'rotate(-45deg)' : 'translateY(6px)'
                 }} />
               </button>
             )}
@@ -208,26 +213,125 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
         />
       )}
 
-      {!isDesktop && isMenuOpen && (
-        <div className="fixed inset-0 z-[60]">
-          <div className="fixed inset-0 bg-[#294954]/20 backdrop-blur-sm" onClick={() => setIsMenuOpen(false)}></div>
-          <div className="fixed top-24 left-4 right-4 bg-[#FAF9F5]/95 backdrop-blur-xl rounded-[28px] shadow-xl border border-[#68B2C9]/20 p-8">
-            <nav className="flex flex-col space-y-6">
-              {menuItems.map((item) => (
-                <NavItem key={item.label} to={item.to} label={item.label} mobile />
-              ))}
-
-              <div className="pt-6 border-t border-[#68B2C9]/20">
-                <button 
-                  onClick={() => { setIsMenuOpen(false); onLogout(); }}
-                  className="w-full bg-[#68B2C9] text-[#FAF9F5] rounded-2xl px-6 py-4 text-base font-medium shadow-lg hover:bg-[#294954] transition-all duration-300 block text-center"
-                  style={{ border: 'none', cursor: 'pointer' }}
-                >
-                  Cerrar sesión
-                </button>
+      {!isDesktop && (
+        <div
+          style={{
+            position: 'fixed',
+            top: '92px',
+            left: '50%',
+            transform: isMenuOpen ? 'translateX(-50%)' : 'translateX(-50%) translateY(-10px)',
+            width: 'calc(100% - 32px)',
+            maxWidth: '500px',
+            backgroundColor: '#FAF9F5',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+            borderRadius: '0 0 20px 20px',
+            padding: isMenuOpen ? '20px' : '0',
+            maxHeight: isMenuOpen ? '80vh' : '0',
+            overflow: isMenuOpen ? 'auto' : 'hidden',
+            opacity: isMenuOpen ? 1 : 0,
+            transition: 'all 300ms ease',
+            pointerEvents: isMenuOpen ? 'auto' : 'none',
+            WebkitOverflowScrolling: 'touch',
+            zIndex: 40
+          }}
+        >
+          <nav className="flex flex-col" style={{ gap: '0', maxWidth: '600px', margin: '0 auto' }}>
+            {menuItems.map((item, index) => (
+              <div key={item.label}>
+                <NavItem to={item.to} label={item.label} mobile />
+                {index < menuItems.length - 1 && (
+                  <div style={{ height: '1px', backgroundColor: 'rgba(104, 178, 201, 0.15)', margin: '0 20px' }} />
+                )}
               </div>
-            </nav>
-          </div>
+            ))}
+
+            <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '2px solid rgba(104, 178, 201, 0.25)' }}>
+              <button
+                onClick={() => setIsProfileExpanded(!isProfileExpanded)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px 20px',
+                  marginBottom: '8px',
+                  width: '100%',
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  borderRadius: '12px',
+                  transition: 'background-color 200ms ease'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(104, 178, 201, 0.08)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                <div style={{ width: 40, height: 40, borderRadius: '50%', backgroundColor: '#0f9d68', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Roboto, sans-serif', fontWeight: 700, fontSize: '14px' }}>
+                  {userInitials}
+                </div>
+                <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
+                  <div style={{ color: '#294954', fontFamily: 'Roboto, sans-serif', fontWeight: 700, fontSize: '14px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.first_name} {user?.last_name}</div>
+                  <div style={{ color: '#294954', opacity: 0.7, fontFamily: 'Roboto, sans-serif', fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</div>
+                </div>
+                <div style={{ color: '#294954', fontSize: '18px', transition: 'transform 200ms ease', transform: isProfileExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                  ▼
+                </div>
+              </button>
+
+              {isProfileExpanded && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <Link
+                    to="/student/personal-data"
+                    onClick={() => setIsMenuOpen(false)}
+                    style={{
+                      position: 'relative',
+                      fontWeight: '600',
+                      fontSize: '15px',
+                      textDecoration: 'none',
+                      color: '#294954',
+                      fontFamily: 'Inter, sans-serif',
+                      padding: '14px 20px',
+                      borderRadius: '12px',
+                      textAlign: 'left',
+                      display: 'block',
+                      width: '100%',
+                      backgroundColor: 'transparent',
+                      transition: 'all 200ms ease'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(104, 178, 201, 0.12)'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  >
+                    <span style={{ marginRight: '8px', fontSize: '18px' }}>👤</span>
+                    Datos Personales
+                  </Link>
+
+                  <button 
+                    onClick={() => { setIsMenuOpen(false); onLogout(); }}
+                    style={{
+                      position: 'relative',
+                      fontWeight: '600',
+                      fontSize: '15px',
+                      textDecoration: 'none',
+                      color: '#294954',
+                      fontFamily: 'Inter, sans-serif',
+                      padding: '14px 20px',
+                      borderRadius: '12px',
+                      textAlign: 'left',
+                      display: 'block',
+                      width: '100%',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      transition: 'all 200ms ease'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(104, 178, 201, 0.12)'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  >
+                    <span style={{ marginRight: '8px', fontSize: '18px' }}>🚪</span>
+                    Cerrar sesión
+                  </button>
+                </div>
+              )}
+            </div>
+          </nav>
         </div>
       )}
     </>

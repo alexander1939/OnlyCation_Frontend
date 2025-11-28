@@ -6,7 +6,7 @@ const Footer: React.FC = () => {
       style={{
         backgroundColor: '#294954',
         color: '#FFFFFF',
-        fontFamily: 'Inter, sans-serif',
+        fontFamily: 'Roboto, sans-serif',
         padding: '20px 48px 30px 48px'
       }}
     >

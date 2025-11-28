@@ -56,7 +56,8 @@ import GlobalErrorBoundary from '../components/error/GlobalErrorBoundary';
 import ServerError from '../components/error/ServerError';
 import Forbidden from '../components/error/Forbidden';
 import NotFound from '../components/error/NotFound';
-
+import { StudentConfirmationsProvider, TeacherConfirmationsProvider, ConfirmationDetailProvider } from '../context/confirmations';
+import { StudentAssessmentsProvider } from '../context/assessments/StudentAssessmentsContext';
 
 const router = createBrowserRouter([
   {
@@ -168,6 +169,14 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: '/teacher/activate-account',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <ActivateAccountCard />
+      </PrivateRoute>
+    ),
+  },
+  {
     path: "/teacher-home",
     element: (
       <PrivateRoute roles={["teacher"]} requireTeacherStatus="active">
@@ -192,14 +201,26 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: '/teacher/personal-data',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <DocenteDatosPersonales />
+      </PrivateRoute>
+    ),
+  },
+  {
     path: '/student/my_next_booking',
     element: (
       <PrivateRoute roles={["student"]}>
-        <MyNextClassesProvider>
-          <BookingDetailProvider>
-            <MyNextBooking />
-          </BookingDetailProvider>
-        </MyNextClassesProvider>
+        <StudentAssessmentsProvider>
+          <StudentConfirmationsProvider>
+            <MyNextClassesProvider>
+              <BookingDetailProvider>
+                <MyNextBooking />
+              </BookingDetailProvider>
+            </MyNextClassesProvider>
+          </StudentConfirmationsProvider>
+        </StudentAssessmentsProvider>
       </PrivateRoute>
     ),
   },
@@ -219,11 +240,13 @@ const router = createBrowserRouter([
     path: '/teacher/my_next_booking',
     element: (
       <PrivateRoute roles={["teacher"]}>
-        <MyNextClassesProvider>
-          <BookingDetailProvider>
-            <MyNextBooking />
-          </BookingDetailProvider>
-        </MyNextClassesProvider>
+        <TeacherConfirmationsProvider>
+          <MyNextClassesProvider>
+            <BookingDetailProvider>
+              <MyNextBooking />
+            </BookingDetailProvider>
+          </MyNextClassesProvider>
+        </TeacherConfirmationsProvider>
       </PrivateRoute>
     ),
   },
@@ -240,15 +263,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/docente/profile',
-    element: (
-      <PrivateRoute roles={["teacher"]}>
-        <DocenteProfile />
-      </PrivateRoute>
-    ),
-  },
-  {
-    path: '/docente/profile',
+    path: '/teacher/profile',
     element: (
       <PrivateRoute roles={["teacher"]}>
         <DocenteProfile />
@@ -279,7 +294,23 @@ const router = createBrowserRouter([
     path: '/teacher/confirmation',
     element: (
       <PrivateRoute roles={["teacher"]}>
-        <TeacherConfirmation />
+        <TeacherConfirmationsProvider>
+          <ConfirmationDetailProvider>
+            <TeacherConfirmation />
+          </ConfirmationDetailProvider>
+        </TeacherConfirmationsProvider>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/student/confirmation',
+    element: (
+      <PrivateRoute roles={["student"]}>
+        <StudentConfirmationsProvider>
+          <ConfirmationDetailProvider>
+            <TeacherConfirmation />
+          </ConfirmationDetailProvider>
+        </StudentConfirmationsProvider>
       </PrivateRoute>
     ),
   },

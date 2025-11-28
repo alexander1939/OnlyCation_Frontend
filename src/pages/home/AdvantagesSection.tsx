@@ -51,7 +51,8 @@ const AdvantagesSection: React.FC = () => {
           fontWeight: 'bold',
           color: '#294954',
           marginBottom: '20px',
-          lineHeight: '1.2'
+          lineHeight: '1.2',
+          fontFamily: 'Roboto, sans-serif'
         }}>
           El futuro de la educación está aquí
         </h2>
@@ -61,7 +62,8 @@ const AdvantagesSection: React.FC = () => {
           color: '#5F6C7B',
           maxWidth: '800px',
           margin: '0 auto 60px',
-          lineHeight: '1.6'
+          lineHeight: '1.6',
+          fontFamily: 'Roboto, sans-serif'
         }}>
           Descubre por qué miles de estudiantes confían en nosotros para su aprendizaje
         </p>
@@ -134,7 +136,8 @@ const AdvantagesSection: React.FC = () => {
                   minHeight: '68px',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  fontFamily: 'Roboto, sans-serif'
                 }}>
                   {advantage.title}
                 </h3>
@@ -143,7 +146,8 @@ const AdvantagesSection: React.FC = () => {
                   color: '#5F6C7B',
                   fontSize: '16px',
                   lineHeight: '1.7',
-                  margin: 0
+                  margin: 0,
+                  fontFamily: 'Roboto, sans-serif'
                 }}>
                   {advantage.description}
                 </p>

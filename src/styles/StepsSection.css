@@ -80,7 +80,7 @@
 
 .status-left .status-time {
   color: #fff;
-  font-family: 'SF Pro Display', -apple-system, sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 .status-right {
@@ -124,7 +124,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  font-family: 'SF Pro Display', -apple-system, sans-serif;
+  font-family: 'Roboto', sans-serif;
   margin: 0;
 }
 
@@ -141,7 +141,7 @@
   color: #6c757d;
   font-weight: 400;
   margin: 0;
-  font-family: 'SF Pro Display', -apple-system, sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 /* Contenido con scroll */
@@ -218,7 +218,7 @@
   font-weight: 700;
   color: #294954;
   margin-bottom: 12px;
-  font-family: 'SF Pro Display', -apple-system, sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 .step-description {
@@ -226,7 +226,7 @@
   color: #6c757d;
   line-height: 1.6;
   margin-bottom: 20px;
-  font-family: 'SF Pro Display', -apple-system, sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 /* Contenedor de imagen */

@@ -22,3 +22,20 @@ export interface PublicAssessmentsContextType {
   fetchPublicComments: (teacherId: number, options?: { force?: boolean }) => Promise<{ success: boolean; message: string; data?: PublicAssessmentComment[] }>;
   resetStatus: () => void;
 }
+
+// Creación de evaluación (respuesta tipada como AssessmentCreate)
+export interface AssessmentCreate {
+  qualification: number; // 1-5 recomendado
+  comment: string;
+}
+
+export interface StudentAssessmentsContextType {
+  createLoading: boolean;
+  createError: string | null;
+  lastCreated: AssessmentCreate | null;
+  createAssessment: (
+    paymentBookingId: number | string,
+    payload: { qualification: number; comment: string }
+  ) => Promise<{ success: boolean; message: string; data?: AssessmentCreate }>;
+  resetCreate: () => void;
+}

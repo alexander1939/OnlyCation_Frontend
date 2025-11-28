@@ -6,7 +6,22 @@ export const useAuthToken = () => {
   // Mantiene acceso al contexto por si se requiere información adicional
   const { user } = useAuthContext();
 
-  const getAccessToken = (): string | null => localStorage.getItem('access_token');
+  const getCookie = (name: string): string | null => {
+    try {
+      if (typeof document === 'undefined') return null;
+      const match = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/([.$?*|{}()\[\]\\/+^])/g, '\\$1') + '=([^;]*)'));
+      return match ? decodeURIComponent(match[1]) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const getAccessToken = (): string | null => {
+    const ls = localStorage.getItem('access_token');
+    if (ls) return ls;
+    // Fallback a cookies si no está en localStorage
+    return getCookie('access_token') || getCookie('token') || null;
+  };
 
   // Decodifica un JWT (Base64URL) de manera segura
   const parseJwt = <T = any>(token: string): T | null => {
@@ -48,6 +63,7 @@ export const useAuthToken = () => {
 
   return {
     getAccessToken,
+    getCookie,
     parseJwt,
     getRoleFromToken,
     isTeacher,

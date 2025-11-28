@@ -11,6 +11,8 @@ import { useOptionalTeacherConfirmationsContext, useOptionalStudentConfirmations
 import ConfirmAttendanceModal from './ConfirmAttendanceModal';
 import type { ConfirmationHistoryItem } from '../../context/confirmations';
 import { useNotificationContext } from '../NotificationProvider';
+import AssessmentModal from './AssessmentModal';
+import { useOptionalStudentAssessmentsContext } from '../../context/assessments/StudentAssessmentsContext';
 
 type BookingViewProps = {
   user: {
@@ -169,6 +171,12 @@ export default function BookingView({
   const [confirmSubmitting, setConfirmSubmitting] = useState(false);
   const [confirmError, setConfirmError] = useState<string | null>(null);
 
+  // Modal evaluación (solo alumno)
+  const studentAssessCtx = useOptionalStudentAssessmentsContext();
+  const [assessmentOpen, setAssessmentOpen] = useState(false);
+  const [assessmentPaymentBookingId, setAssessmentPaymentBookingId] = useState<number | string | null>(null);
+  const [assessmentError, setAssessmentError] = useState<string | null>(null);
+
   useEffect(() => {
     if (loadedRecentRef.current) return;
     if (user?.role === 'teacher' && teacherConfCtx) {
@@ -223,6 +231,17 @@ export default function BookingView({
     try {
       const paymentBookingId = selectedConfirmItem.payment_booking_id;
       let res: { success: boolean; message?: string } | undefined;
+      // Revalidar ventana justo antes de enviar si es ALUMNO
+      if (user?.role === 'student' && studentConfCtx) {
+        const latest = await studentConfCtx.loadStudentRecent();
+        const latestItem = latest?.data?.items?.find((i) => i.payment_booking_id === paymentBookingId);
+        if (!latestItem || !latestItem.confirmable_now || (latestItem.seconds_left ?? 0) <= 0) {
+          const msg = 'El tiempo de confirmación expiró.';
+          setConfirmError(msg);
+          showError(msg);
+          return;
+        }
+      }
       if (user?.role === 'teacher' && teacherConfCtx) {
         res = await teacherConfCtx.submitTeacherConfirmation(paymentBookingId, {
           confirmation: true,
@@ -244,7 +263,17 @@ export default function BookingView({
         showSuccess('Confirmación enviada');
         if (user?.role === 'teacher') await teacherConfCtx?.loadTeacherRecent?.();
         else await studentConfCtx?.loadStudentRecent?.();
+        // Cerrar modal de confirmación primero
         closeConfirmModal();
+        // Si es alumno y no tiene evaluación previa, abrir modal de evaluación
+        if (user?.role === 'student') {
+          const hasAssessment = selectedConfirmItem.has_assessment_by_student === true;
+          if (!hasAssessment) {
+            setAssessmentPaymentBookingId(paymentBookingId);
+            setAssessmentError(null);
+            setAssessmentOpen(true);
+          }
+        }
       } else {
         const msg = res?.message || 'No se pudo enviar la confirmación';
         setConfirmError(msg);
@@ -464,6 +493,19 @@ export default function BookingView({
                                 Finalizó: {formatDate(it.booking_end)}, {formatTime(it.booking_end)} · Tiempo restante: {formatSecondsLeft(it.seconds_left)}
                               </div>
                             </div>
+                            {typeof it.has_assessment_by_student === 'boolean' && (
+                              <div style={{ marginTop: 6 }}>
+                                <div
+                                  className={`confirmacion-badge ${it.has_assessment_by_student ? 'confirmada' : 'pendiente'}`}
+                                  title={it.has_assessment_by_student ? 'El alumno ya contestó la evaluación' : 'El alumno no ha contestado la evaluación'}
+                                >
+                                  <span>🧾</span>
+                                  {user?.role === 'teacher'
+                                    ? (it.has_assessment_by_student ? 'Evaluación del alumno' : 'Sin evaluación del alumno')
+                                    : (it.has_assessment_by_student ? 'Tu evaluación enviada' : 'Tu evaluación pendiente')}
+                                </div>
+                              </div>
+                            )}
                             <button
                               className="btn-confirmar-asistencia"
                               onClick={() => openConfirmModal(it)}
@@ -570,6 +612,36 @@ export default function BookingView({
         loading={confirmSubmitting}
         error={confirmError}
         onSubmit={handleSubmitConfirm}
+      />
+
+      {/* Modal Evaluación (solo alumno) */}
+      <AssessmentModal
+        isOpen={assessmentOpen && user?.role === 'student'}
+        onClose={() => setAssessmentOpen(false)}
+        paymentBookingId={assessmentPaymentBookingId}
+        teacherName={undefined}
+        loading={!!studentAssessCtx?.createLoading}
+        error={assessmentError || studentAssessCtx?.createError || null}
+        onSubmit={async ({ qualification, comment }) => {
+          try {
+            if (!assessmentPaymentBookingId || !studentAssessCtx) return;
+            const res = await studentAssessCtx.createAssessment(assessmentPaymentBookingId, { qualification, comment });
+            if (res.success) {
+              showSuccess('Evaluación enviada');
+              setAssessmentOpen(false);
+              // Opcional: recargar recientes para reflejar bandera de evaluación
+              await studentConfCtx?.loadStudentRecent?.();
+            } else {
+              const msg = res.message || 'No se pudo enviar la evaluación';
+              setAssessmentError(msg);
+              showError(msg);
+            }
+          } catch (e: any) {
+            const msg = e?.message || 'Error al enviar la evaluación';
+            setAssessmentError(msg);
+            showError(msg);
+          }
+        }}
       />
     </div>
   );

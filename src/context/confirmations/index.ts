@@ -2,6 +2,7 @@ export { StudentConfirmationsProvider, useStudentConfirmationsContext } from './
 export { TeacherConfirmationsProvider, useTeacherConfirmationsContext } from './TeacherConfirmationsContext';
 export { useOptionalTeacherConfirmationsContext } from './TeacherConfirmationsContext';
 export { useOptionalStudentConfirmationsContext } from './StudentConfirmationsContext';
+export { ConfirmationDetailProvider, useConfirmationDetailContext, useOptionalConfirmationDetailContext } from './ConfirmationDetailContext';
 export type { 
   StudentConfirmationPostResponse,
   TeacherConfirmationPostResponse,
@@ -12,4 +13,6 @@ export type {
   ConfirmationHistoryItem,
   TeacherHistoryByDateResponse,
   StudentHistoryByDateResponse,
+  ConfirmationDetailData,
+  ConfirmationDetailResponse,
 } from './types';

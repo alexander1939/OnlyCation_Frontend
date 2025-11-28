@@ -14,6 +14,7 @@ export interface ConfirmationHistoryItem {
   window_status: WindowStatus;
   confirmable_now: boolean;
   seconds_left: number;
+  has_assessment_by_student?: boolean;
 }
 
 // Student POST /student/{payment_booking_id}
@@ -90,4 +91,25 @@ export interface TeacherHistoryByDateResponse {
 export interface StudentHistoryByDateResponse {
   success: boolean;
   items: ConfirmationHistoryItem[];
+}
+
+// Detail response for a specific confirmation
+export interface ConfirmationDetailData {
+  id: number;
+  teacher_id: number;
+  student_id: number;
+  payment_booking_id: number;
+  booking_start: string; // ISO
+  booking_end: string;   // ISO
+  confirmed_by_student: string | null;
+  confirmed_by_teacher: string | null;
+  evidence_student?: string | null;
+  evidence_teacher?: string | null;
+  description_student?: string | null;
+  description_teacher?: string | null;
+}
+
+export interface ConfirmationDetailResponse {
+  success: boolean;
+  data: ConfirmationDetailData;
 }

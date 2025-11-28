@@ -56,7 +56,8 @@ import GlobalErrorBoundary from '../components/error/GlobalErrorBoundary';
 import ServerError from '../components/error/ServerError';
 import Forbidden from '../components/error/Forbidden';
 import NotFound from '../components/error/NotFound';
-import { StudentConfirmationsProvider, TeacherConfirmationsProvider } from '../context/confirmations';
+import { StudentConfirmationsProvider, TeacherConfirmationsProvider, ConfirmationDetailProvider } from '../context/confirmations';
+import { StudentAssessmentsProvider } from '../context/assessments/StudentAssessmentsContext';
 
 const router = createBrowserRouter([
   {
@@ -195,13 +196,15 @@ const router = createBrowserRouter([
     path: '/student/my_next_booking',
     element: (
       <PrivateRoute roles={["student"]}>
-        <StudentConfirmationsProvider>
-          <MyNextClassesProvider>
-            <BookingDetailProvider>
-              <MyNextBooking />
-            </BookingDetailProvider>
-          </MyNextClassesProvider>
-        </StudentConfirmationsProvider>
+        <StudentAssessmentsProvider>
+          <StudentConfirmationsProvider>
+            <MyNextClassesProvider>
+              <BookingDetailProvider>
+                <MyNextBooking />
+              </BookingDetailProvider>
+            </MyNextClassesProvider>
+          </StudentConfirmationsProvider>
+        </StudentAssessmentsProvider>
       </PrivateRoute>
     ),
   },
@@ -284,7 +287,9 @@ const router = createBrowserRouter([
     element: (
       <PrivateRoute roles={["teacher"]}>
         <TeacherConfirmationsProvider>
-          <TeacherConfirmation />
+          <ConfirmationDetailProvider>
+            <TeacherConfirmation />
+          </ConfirmationDetailProvider>
         </TeacherConfirmationsProvider>
       </PrivateRoute>
     ),
@@ -294,7 +299,9 @@ const router = createBrowserRouter([
     element: (
       <PrivateRoute roles={["student"]}>
         <StudentConfirmationsProvider>
-          <TeacherConfirmation />
+          <ConfirmationDetailProvider>
+            <TeacherConfirmation />
+          </ConfirmationDetailProvider>
         </StudentConfirmationsProvider>
       </PrivateRoute>
     ),

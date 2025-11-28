@@ -10,6 +10,7 @@ import type {
   TeacherHistoryAllResponse,
   TeacherHistoryByDateResponse,
   StudentHistoryByDateResponse,
+  ConfirmationDetailResponse,
 } from '../../context/confirmations/types';
 
 const API_URL = import.meta.env.VITE_API_URL as string;
@@ -245,6 +246,59 @@ export const useConfirmationsApi = () => {
     }
   };
 
+  // DETAIL (teacher or student owner)
+  const getConfirmationDetail = async (
+    confirmationId: number | string
+  ): Promise<{ success: boolean; data?: ConfirmationDetailResponse; message: string }> => {
+    try {
+      const token = getAccessToken();
+      if (!token) throw new Error('No hay token de acceso. Inicia sesión nuevamente.');
+      const response = await client.get<ConfirmationDetailResponse>(
+        `/confirmation/detail/${encodeURIComponent(String(confirmationId))}`,
+        { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
+      );
+      const data = response.data;
+      return { success: !!data?.success, data, message: 'OK' };
+    } catch (err) {
+      const axErr = err as AxiosError<{ detail?: string }>;
+      const status = axErr.response?.status;
+      const message =
+        axErr.response?.data?.detail ||
+        (status === 403 ? 'No tienes acceso a esta confirmación' : undefined) ||
+        (status === 404 ? 'Confirmación no encontrada' : undefined) ||
+        axErr.message ||
+        'Error al obtener el detalle de la confirmación';
+      return { success: false, message };
+    }
+  };
+
+  // Evidence downloader/viewer (teacher or student owner)
+  const getConfirmationEvidence = async (
+    confirmationId: number | string,
+    side: 'student' | 'teacher',
+    download: boolean = true
+  ): Promise<{ success: boolean; blob?: Blob; message: string }> => {
+    try {
+      const token = getAccessToken();
+      if (!token) throw new Error('No hay token de acceso. Inicia sesión nuevamente.');
+      const response = await client.get(
+        `/confirmation/evidence/${encodeURIComponent(String(confirmationId))}?side=${encodeURIComponent(side)}&download=${download ? 'true' : 'false'}`,
+        { headers: { Authorization: `Bearer ${token}` }, withCredentials: true, responseType: 'blob' }
+      );
+      return { success: true, blob: response.data as Blob, message: 'OK' };
+    } catch (err) {
+      const axErr = err as AxiosError<{ detail?: string }>;
+      const status = axErr.response?.status;
+      const message =
+        axErr.response?.data?.detail ||
+        (status === 403 ? 'No tienes acceso a la evidencia' : undefined) ||
+        (status === 404 ? 'Evidencia no encontrada' : undefined) ||
+        axErr.message ||
+        'Error al obtener la evidencia';
+      return { success: false, message };
+    }
+  };
+
   return {
     // Student
     postStudentConfirmation,
@@ -258,5 +312,8 @@ export const useConfirmationsApi = () => {
     getTeacherHistoryRecent,
     getTeacherHistoryAll,
     getTeacherHistoryByDate,
+    // Detail
+    getConfirmationDetail,
+    getConfirmationEvidence,
   };
 };

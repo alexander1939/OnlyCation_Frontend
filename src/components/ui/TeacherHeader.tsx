@@ -260,10 +260,10 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
           {label === 'Reservas y confirmaciones' ? (
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
               <span>Reservas</span>
-              {renderBadge(rsvCount ?? 0, '#F59E0B', !!(rsvCount && rsvCount > 0))}
+              {renderBadge(rsvCount ?? 0, '#F59E0B', true)}
               <span style={{ opacity: 0.8, margin: '0 2px' }}>y</span>
               <span>Confirmaciones</span>
-              {renderBadge(confCount ?? 0, '#F59E0B', !!(confCount && confCount > 0))}
+              {renderBadge(confCount ?? 0, '#F59E0B', true)}
             </span>
           ) : (
             <>

@@ -245,7 +245,7 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
           ) : (
             <>
               {label}
-              {badgeCount !== undefined && (
+              {!!badgeCount && badgeCount > 0 && (
                 <span
                   style={{
                     display: 'inline-block',

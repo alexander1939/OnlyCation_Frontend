@@ -180,19 +180,7 @@ export default function ConfirmationView({ role }: ConfirmationViewProps) {
                     <div className="clase-asistida-datetime">
                       Finalizó: {formatDate(it.booking_end)}, {formatTime(it.booking_end)}
                     </div>
-                    {typeof it.has_assessment_by_student === 'boolean' && (
-                      <div style={{ marginTop: 6 }}>
-                        <div
-                          className={`confirmacion-badge ${it.has_assessment_by_student ? 'confirmada' : 'pendiente'}`}
-                          title={it.has_assessment_by_student ? 'El alumno ya contestó la evaluación' : 'El alumno no ha contestado la evaluación'}
-                        >
-                          <span>🧾</span>
-                          {isTeacher
-                            ? (it.has_assessment_by_student ? 'Evaluación del alumno' : 'Sin evaluación del alumno')
-                            : (it.has_assessment_by_student ? 'Tu evaluación enviada' : 'Tu evaluación pendiente')}
-                        </div>
-                      </div>
-                    )}
+                    {/* Evaluación del alumno ocultada por requerimiento */}
                   </div>
                   {it.confirmable_now ? (
                     <div className="confirmacion-badge pendiente">

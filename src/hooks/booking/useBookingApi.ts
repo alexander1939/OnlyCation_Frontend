@@ -233,6 +233,61 @@ export const useBookingApi = () => {
     }
   };
 
+  type RescheduleItem = {
+    availability_id: number;
+    start_time: string; // ISO 8601 HH:00:00
+    end_time: string;   // ISO 8601 HH:00:00
+  };
+  type RescheduleRequestSingle = {
+    booking_id: number;
+    new_availability_id: number;
+    new_start_time: string; // ISO 8601 HH:00:00
+    new_end_time: string;   // ISO 8601 HH:00:00
+  };
+  type RescheduleRequestMulti = {
+    booking_id: number;
+    items: RescheduleItem[]; // tramos contiguos por hora
+  };
+  type RescheduleRequest = RescheduleRequestSingle | RescheduleRequestMulti;
+  type RescheduleResponse = {
+    success: boolean;
+    message: string;
+    data?: {
+      booking_id: number;
+      old_start_time: string;
+      old_end_time: string;
+      new_start_time: string;
+      new_end_time: string;
+      teacher_name?: string;
+      updated_at?: string;
+      can_reschedule_again?: boolean;
+    };
+  };
+
+  const rescheduleBooking = async (payload: RescheduleRequest): Promise<{ success: boolean; data?: RescheduleResponse; message: string }> => {
+    try {
+      const token = getAccessToken();
+      if (!token) throw new Error('No hay token de acceso. Inicia sesión nuevamente.');
+
+      const response = await client.put<RescheduleResponse>(
+        `/bookings/reagendar-booking/`,
+        payload,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const data = response.data;
+      return {
+        success: !!data?.success,
+        data,
+        message: data?.message ?? 'Reserva reagendada exitosamente',
+      };
+    } catch (err) {
+      const axErr = err as AxiosError<{ detail?: string }>;
+      const message = axErr.response?.data?.detail || axErr.message || 'Error al reagendar la reserva';
+      return { success: false, message };
+    }
+  };
+
   return { 
     getMyNextClasses, 
     getMyAllClasses, 
@@ -240,6 +295,7 @@ export const useBookingApi = () => {
     getBookingDetail, 
     createBooking, 
     verifyBooking, 
-    quoteBooking 
+    quoteBooking,
+    rescheduleBooking,
   };
 };

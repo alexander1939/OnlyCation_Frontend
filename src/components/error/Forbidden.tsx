@@ -10,7 +10,6 @@ const Forbidden: React.FC = () => (
       'Si crees que es un error, inicia sesión con otra cuenta o vuelve al inicio.'
     }
     imageSrc="/zorro_back_home.png"
-    linkTo="/"
     linkAriaLabel="Volver al inicio"
   />
 );

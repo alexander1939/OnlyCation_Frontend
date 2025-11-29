@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import '../../styles/not-found.css';
+import { useAuthToken } from '../../hooks/auth/useAuthToken';
 
 interface ErrorPageProps {
   code: string | number;
@@ -16,9 +17,12 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
   title,
   message,
   imageSrc = '/zorro_back_home.png',
-  linkTo = '/',
+  linkTo,
   linkAriaLabel = 'Volver al inicio',
 }) => {
+  const { isTeacher, isStudent } = useAuthToken();
+  const computedHome = isTeacher() ? '/teacher-home' : isStudent() ? '/student-home' : '/';
+  const target = linkTo || computedHome;
   return (
     <div className="oc-notfound-root">
       <div className="oc-notfound-blobs">
@@ -41,7 +45,7 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
           ))}
         </p>
 
-        <Link to={linkTo} aria-label={linkAriaLabel} className="oc-notfound-link">
+        <Link to={target} aria-label={linkAriaLabel} className="oc-notfound-link">
           <div className="oc-notfound-illustration" role="img" aria-label={title}>
             <img src={imageSrc} alt={title} className="oc-notfound-image" />
           </div>

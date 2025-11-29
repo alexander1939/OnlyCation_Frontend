@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Header from '../../components/ui/Header';
 import Footer from '../../components/ui/Footer';
 import { Link } from 'react-router-dom';
@@ -13,7 +13,11 @@ import DispAgenda from '../../components/DispAgenda';
 import { Play, Star, BadgeDollarSign } from 'lucide-react';
 import '../../styles/docente-general.css';
 import '../../styles/docente-profile.css';
+import '../../styles/prices.css';
 import ScheduleButton from '../../components/booking/ScheduleButton';
+import { PriceAvailabilityProvider, usePriceAvailabilityContext } from '../../context/catalogs/PriceAvailabilityContext';
+import { useNotificationContext } from '../../components/NotificationProvider';
+import ConfirmDialog from '../../components/shared/ConfirmDialog';
 
 type TeacherReview = {
   id: string;
@@ -36,8 +40,11 @@ type TeacherProfile = {
 
 function ProfileContent() {
   const { myDescription, getMyDescription, updateDescription, documents, updating, readDocuments } = useDocumentsContext();
+  const { showSuccess, showError } = useNotificationContext();
   const [isEditing, setIsEditing] = useState(false);
   const [tempDescription, setTempDescription] = useState('');
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
   useEffect(() => {
     readDocuments();
@@ -54,20 +61,29 @@ function ProfileContent() {
     setTempDescription('');
   };
 
-  const handleSave = async () => {
-    const currentDoc = documents[0];
-    if (!currentDoc) {
-      alert('❌ No se encontró el documento');
-      return;
-    }
+  const handleSave = () => {
+    setConfirmOpen(true);
+  };
 
-    const result = await updateDescription(currentDoc.id, tempDescription);
-    if (result.success) {
-      setIsEditing(false);
-      alert('✅ Descripción actualizada exitosamente');
-      await getMyDescription();
-    } else {
-      alert(`❌ Error: ${result.message}`);
+  const confirmUpdateDescription = async () => {
+    setConfirmLoading(true);
+    try {
+      const currentDoc = documents[0];
+      if (!currentDoc) {
+        showError('No se encontró el documento');
+        return;
+      }
+      const result = await updateDescription(currentDoc.id, tempDescription);
+      if (result.success) {
+        setIsEditing(false);
+        showSuccess('Descripción actualizada exitosamente');
+        await getMyDescription();
+      } else {
+        showError(result.message || 'Error al actualizar la descripción');
+      }
+    } finally {
+      setConfirmLoading(false);
+      setConfirmOpen(false);
     }
   };
 
@@ -159,6 +175,16 @@ function ProfileContent() {
       ) : (
         <p className="bio-text">{myDescription || 'Sin descripción disponible'}</p>
       )}
+      <ConfirmDialog
+        isOpen={confirmOpen}
+        title="Confirmar actualización"
+        description="¿Deseas actualizar tu descripción de perfil?"
+        confirmText="Sí, actualizar"
+        cancelText="Cancelar"
+        onConfirm={confirmUpdateDescription}
+        onCancel={() => setConfirmOpen(false)}
+        loading={confirmLoading}
+      />
     </div>
   );
 }
@@ -313,6 +339,210 @@ function VideoModal({ show, onClose }: { show: boolean, onClose: () => void }) {
   );
 }
 
+function PriceEditSection() {
+  const { myPrice, getMyPrice, updatePrice, updating } = usePricesContext();
+  const { priceRanges, loading: loadingAvail, error: availError, reload } = usePriceAvailabilityContext();
+  const { showSuccess, showError, showWarning } = useNotificationContext();
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [priceRangeId, setPriceRangeId] = useState<string>('');
+  const [selectedPrice, setSelectedPrice] = useState<number>(0);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+
+  useEffect(() => { getMyPrice(); }, [getMyPrice]);
+  useEffect(() => { if (!priceRanges?.length) void reload(); }, [priceRanges?.length, reload]);
+
+  const selectedRange = useMemo(() => priceRanges.find(r => String(r.id) === String(priceRangeId)), [priceRanges, priceRangeId]);
+  const minPrice = selectedRange?.minimum_price ?? selectedRange?.min_price ?? 0;
+  const maxPrice = selectedRange?.maximum_price ?? selectedRange?.max_price ?? 0;
+
+  // Inicializar al entrar en modo edición o cuando cambian rangos/precio actual
+  useEffect(() => {
+    if (!isEditing) return;
+    if (!priceRanges?.length) return;
+    let initial = priceRanges[0];
+    const found = priceRanges.find(r => {
+      const min = r.minimum_price ?? r.min_price ?? 0;
+      const max = r.maximum_price ?? r.max_price ?? min;
+      const val = myPrice ?? 0;
+      return val >= min && val <= max;
+    });
+    if (found) initial = found;
+    setPriceRangeId(String(initial.id));
+    const imin = initial.minimum_price ?? initial.min_price ?? 0;
+    const imax = initial.maximum_price ?? initial.max_price ?? imin;
+    const val = myPrice ?? imin;
+    setSelectedPrice(Math.max(imin, Math.min(imax || imin, val)));
+  }, [isEditing, priceRanges, myPrice]);
+
+  const extraHour = useMemo(() => Number((selectedPrice / 2).toFixed(2)), [selectedPrice]);
+
+  const handleSaveClick = () => {
+    if (!priceRangeId) {
+      showWarning('Selecciona un rango de precios');
+      return;
+    }
+    setConfirmOpen(true);
+  };
+
+  const confirmUpdatePrice = async () => {
+    setConfirmLoading(true);
+    try {
+      const res = await updatePrice({ price_range_id: Number(priceRangeId), selected_prices: Number(selectedPrice) });
+      if (res.success) {
+        showSuccess('✅ Precio actualizado exitosamente');
+        setIsEditing(false);
+        await getMyPrice();
+      } else {
+        showError(res.message || '❌ Error al actualizar el precio');
+      }
+    } finally {
+      setConfirmLoading(false);
+      setConfirmOpen(false);
+    }
+  };
+
+  return (
+    <div className="bio-card">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+        <h2 className="section-heading" style={{ margin: 0 }}>Precio por hora</h2>
+        {isEditing ? (
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              onClick={handleSaveClick}
+              disabled={updating}
+              style={{
+                background: '#10b981',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '6px 12px',
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              💾 Guardar
+            </button>
+            <button
+              onClick={() => setIsEditing(false)}
+              disabled={updating}
+              style={{
+                background: '#6b7280',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '6px 12px',
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              ❌ Cancelar
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setIsEditing(true)}
+            style={{
+              background: '#10b981',
+              border: 'none',
+              borderRadius: '50%',
+              width: '44px',
+              height: '44px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              fontSize: '18px',
+              boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)'
+            }}
+            title="Editar precio"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.1)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.5)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(16, 185, 129, 0.3)';
+            }}
+          >
+            ✏️
+          </button>
+        )}
+      </div>
+
+      {!isEditing ? (
+        <div style={{ display: 'flex', gap: 12, alignItems: 'baseline' }}>
+          <div className="stat" style={{ margin: 0 }}>
+            <BadgeDollarSign color="#68B2C9" width={20} height={20} />
+            <span className="stat-value">${myPrice ?? '—'}</span>
+            <span className="stat-label">/ hora</span>
+          </div>
+          {availError && <span className="text-red-600 text-sm">{availError}</span>}
+        </div>
+      ) : (
+        <div className="price-form" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div className="price-grid">
+            <div>
+              <label className="price-label">Rango de Precios</label>
+              <select
+                className="price-input"
+                value={priceRangeId}
+                onChange={(e) => setPriceRangeId(e.target.value)}
+                disabled={loadingAvail || !!availError}
+              >
+                <option value="">{loadingAvail ? 'Cargando...' : 'Selecciona un rango'}</option>
+                {priceRanges.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.label || r.name || `${r.minimum_price ?? r.min_price ?? ''} - ${r.maximum_price ?? r.max_price ?? ''}`}
+                  </option>
+                ))}
+              </select>
+              {availError && <div className="price-alert price-alert--error" style={{ marginTop: '0.25rem' }}>{availError}</div>}
+            </div>
+            <div>
+              <label className="price-label">Precio por hora extra (auto)</label>
+              <input type="number" className="price-input" value={extraHour} readOnly />
+            </div>
+          </div>
+
+          <div className="price-grid">
+            <div className="price-col-2">
+              <label className="price-label">Precio Seleccionado</label>
+              <div>
+                <input
+                  type="range"
+                  min={minPrice}
+                  max={Math.max(minPrice, maxPrice)}
+                  step={10}
+                  value={selectedPrice}
+                  onChange={(e) => setSelectedPrice(Number(e.target.value))}
+                  className="price-range"
+                  disabled={!selectedRange}
+                />
+                <div className="price-subtitle" style={{ marginTop: '0.25rem' }}>
+                  Valor seleccionado: ${selectedPrice}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      <ConfirmDialog
+        isOpen={confirmOpen}
+        title="Confirmar actualización"
+        description="¿Deseas actualizar tu precio por hora? Recuerda que solo puedes cambiarlo cada 30 días."
+        confirmText="Sí, actualizar"
+        cancelText="Cancelar"
+        onConfirm={confirmUpdatePrice}
+        onCancel={() => setConfirmOpen(false)}
+        loading={confirmLoading}
+      />
+    </div>
+  );
+}
+
 export default function DocenteProfile() {
   const { user } = useAuthContext();
   const fullName = user ? `${user.first_name} ${user.last_name}` : 'Docente';
@@ -426,110 +656,114 @@ export default function DocenteProfile() {
         <PreferencesProvider>
           <DocumentsProvider>
             <PricesProvider>
-              <div className="min-h-screen flex flex-col page-container">
-                <Header />
-                <main className="flex-1 main-spacing">
-                  <section className="docente-container">
+              <PriceAvailabilityProvider>
+                <div className="min-h-screen flex flex-col page-container">
+                  <Header />
+                  <main className="flex-1 main-spacing">
+                    <section className="docente-container">
 
-                    <div className="profile-grid">
+                      <div className="profile-grid">
+                        <div>
+                          <VideoHero onPlayClick={() => setShowVideo(true)} />
+                        </div>
+
+                        <div>
+                          <div className="profile-info-card">
+                            <div className="profile-title-row">
+                              <h1 className="profile-title">{fullName}</h1>
+                            </div>
+                            <div className="profile-meta-chips">
+                              <EducationalLevelChip />
+                              <ExpertiseAreaChip />
+                            </div>
+
+                            <div className="profile-stats">
+                              <RatingDisplay />
+                              <PriceDisplay />
+                            </div>
+
+                            <div className="profile-actions-row">
+                              <Link to="/teacher/personal-data" className="profile-action primary">Editar datos personales</Link>
+                              <Link to="/teacher/documents" className="profile-action secondary">Gestionar documentos</Link>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <hr className="separator-mint" />
+
+                      <ProfileContent />
+
+                      <hr className="separator-mint" />
+
+                      <PriceEditSection />
+
+                      <div style={{ marginTop: 16 }}>
+                        <h2 className="section-heading">Disponibilidad Semanal</h2>
+                        <p className="section-sub">Para reservar, selecciona una hora disponible en la agenda.</p>
+
+                        <div className="avail-card" style={{ marginTop: 12 }}>
+                          <WeeklyAgendaProvider>
+                            <DispAgenda />
+                            <ScheduleButton 
+                              teacher={{ 
+                                name: fullName, 
+                                subject: profile.subject, 
+                                level: profile.level, 
+                                hourlyRate: profile.hourlyRate,
+                                rating: profile.rating
+                              }} 
+                            />
+                          </WeeklyAgendaProvider>
+                        </div>
+
+                        <div className="legend">
+                          <div className="legend-item">
+                            <span className="legend-dot" style={{ background: '#8ED4BE', border: '1px solid #8ED4BE' }} />
+                            <span className="legend-text">Disponible</span>
+                          </div>
+                          <div className="legend-item">
+                            <span className="legend-dot" style={{ background: '#FF9978', border: '1px solid #FF9978' }} />
+                            <span className="legend-text">Reservado</span>
+                          </div>
+                          <div className="legend-item">
+                            <span className="legend-dot" style={{ background: '#FAF9F5', border: '1px solid #E0E0E0' }} />
+                            <span className="legend-text">No disponible</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <hr className="separator-yellow" />
+
                       <div>
-                        <VideoHero onPlayClick={() => setShowVideo(true)} />
-                      </div>
-
-                      <div>
-                        <div className="profile-info-card">
-                          <div className="profile-title-row">
-                            <h1 className="profile-title">{fullName}</h1>
-                          </div>
-                          <div className="profile-meta-chips">
-                            <EducationalLevelChip />
-                            <ExpertiseAreaChip />
-                          </div>
-
-                          <div className="profile-stats">
-                            <RatingDisplay />
-                            <PriceDisplay />
-                          </div>
-
-                          <div className="profile-actions-row">
-                            <Link to="/teacher/personal-data" className="profile-action primary">Editar datos personales</Link>
-                            <Link to="/teacher/documents" className="profile-action secondary">Gestionar documentos</Link>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <hr className="separator-mint" />
-
-                    <ProfileContent />
-
-                    <hr className="separator-mint" />
-
-                    <div style={{ marginTop: 16 }}>
-                      <h2 className="section-heading">Disponibilidad Semanal</h2>
-                      <p className="section-sub">Para reservar, selecciona una hora disponible en la agenda.</p>
-
-                      <div className="avail-card" style={{ marginTop: 12 }}>
-                        <WeeklyAgendaProvider>
-                          <DispAgenda />
-                          <ScheduleButton 
-                            teacher={{ 
-                              name: fullName, 
-                              subject: profile.subject, 
-                              level: profile.level, 
-                              hourlyRate: profile.hourlyRate,
-                              rating: profile.rating
-                            }} 
-                          />
-                        </WeeklyAgendaProvider>
-                      </div>
-
-                      <div className="legend">
-                        <div className="legend-item">
-                          <span className="legend-dot" style={{ background: '#8ED4BE', border: '1px solid #8ED4BE' }} />
-                          <span className="legend-text">Disponible</span>
-                        </div>
-                        <div className="legend-item">
-                          <span className="legend-dot" style={{ background: '#FF9978', border: '1px solid #FF9978' }} />
-                          <span className="legend-text">Reservado</span>
-                        </div>
-                        <div className="legend-item">
-                          <span className="legend-dot" style={{ background: '#FAF9F5', border: '1px solid #E0E0E0' }} />
-                          <span className="legend-text">No disponible</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <hr className="separator-yellow" />
-
-                    <div>
-                      <h2 className="section-heading">Reseñas de Alumnos</h2>
-                      <div className="reviews-grid" style={{ marginTop: 12 }}>
-                        {profile.reviews.map((r) => (
-                          <article key={r.id} className="review-card">
-                            <div className="review-top">
-                              <div className="review-user">
-                                <img alt={`Avatar de ${r.author}`} className="review-avatar" src={r.avatarUrl} />
-                                <div>
-                                  <p className="review-name">{r.author}</p>
-                                  <p className="review-date">{r.date}</p>
+                        <h2 className="section-heading">Reseñas de Alumnos</h2>
+                        <div className="reviews-grid" style={{ marginTop: 12 }}>
+                          {profile.reviews.map((r) => (
+                            <article key={r.id} className="review-card">
+                              <div className="review-top">
+                                <div className="review-user">
+                                  <img alt={`Avatar de ${r.author}`} className="review-avatar" src={r.avatarUrl} />
+                                  <div>
+                                    <p className="review-name">{r.author}</p>
+                                    <p className="review-date">{r.date}</p>
+                                  </div>
+                                </div>
+                                <div className="review-pill">
+                                  <Star width={16} height={16} color="#c78f00" fill="#c78f00" />
+                                  <span>{r.rating.toFixed(1)}</span>
                                 </div>
                               </div>
-                              <div className="review-pill">
-                                <Star width={16} height={16} color="#c78f00" fill="#c78f00" />
-                                <span>{r.rating.toFixed(1)}</span>
-                              </div>
-                            </div>
-                            <p className="review-text">{r.comment}</p>
-                          </article>
-                        ))}
+                              <p className="review-text">{r.comment}</p>
+                            </article>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  </section>
-                </main>
-                <Footer />
-                <VideoModal show={showVideo} onClose={() => setShowVideo(false)} />
-              </div>
+                    </section>
+                  </main>
+                  <Footer />
+                  <VideoModal show={showVideo} onClose={() => setShowVideo(false)} />
+                </div>
+              </PriceAvailabilityProvider>
             </PricesProvider>
           </DocumentsProvider>
         </PreferencesProvider>

@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import type { ConfirmationHistoryItem } from '../../context/confirmations';
 import '../../styles/booking-modal.css';
+import ConfirmDialog from './ConfirmDialog';
+import { useNotificationContext } from '../NotificationProvider';
 
 export type ConfirmAttendanceModalProps = {
   isOpen: boolean;
@@ -18,12 +20,11 @@ const ALLOWED_MIME_TYPES = ['image/png', 'image/jpeg'];
 const ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg'];
 
 const sanitizeDescription = (value: string) => {
-  // Solo letras en español y espacios. Elimina números, símbolos, etiquetas <>, etc.
-  // Permite acentos y diéresis: áéíóúü y Ñ/ñ
+  // Permitir letras (con acentos), números, espacios y '?'. Bloquear símbolos y tags.
   const cleaned = value
-    .replace(/[^ a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\n]/g, '') // solo letras y espacios (y saltos de línea opcional)
-    .replace(/[<>]/g, '') // fuera tags
-    .replace(/\s+/g, ' ') // colapsar espacios
+    .replace(/[^ a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\?\n]/g, '') // letras, números, espacios, '?' y saltos de línea opcional
+    .replace(/[<>]/g, '')
+    .replace(/\s+/g, ' ')
     .trimStart();
   return cleaned;
 };
@@ -32,6 +33,9 @@ export default function ConfirmAttendanceModal({ isOpen, onClose, role, item, lo
   const [description, setDescription] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [descError, setDescError] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const { showError } = useNotificationContext();
 
   useEffect(() => {
     if (isOpen) {
@@ -49,6 +53,7 @@ export default function ConfirmAttendanceModal({ isOpen, onClose, role, item, lo
       setDescription('');
       setFile(null);
       setFileError(null);
+      setDescError(null);
     }
   }, [isOpen]);
 
@@ -61,14 +66,27 @@ export default function ConfirmAttendanceModal({ isOpen, onClose, role, item, lo
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file) return;
-    await onSubmit({ description, file });
+    const trimmed = description.trim();
+    // Validaciones de campos requeridos
+    if (!trimmed) {
+      setDescError('La descripción es obligatoria');
+      showError('La descripción es obligatoria');
+      return;
+    }
+    if (!file) {
+      setFileError('Debes adjuntar una evidencia (PNG o JPG)');
+      showError('Debes adjuntar una evidencia (PNG o JPG)');
+      return;
+    }
+    // Abrir confirmación antes de enviar
+    setConfirmOpen(true);
   };
 
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const raw = e.target.value;
     const clean = sanitizeDescription(raw);
     setDescription(clean);
+    if (descError && clean.trim().length > 0) setDescError(null);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,7 +123,8 @@ export default function ConfirmAttendanceModal({ isOpen, onClose, role, item, lo
     return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: true });
   };
 
-  const submitDisabled = loading || disabledByWindow || !file || !!fileError || description.trim().length === 0;
+  // Permitir clic para mostrar errores; no deshabilitar por faltantes de campos
+  const submitDisabled = loading || disabledByWindow;
 
   return (
     <div className="booking-modal-overlay" onClick={onClose}>
@@ -159,22 +178,25 @@ export default function ConfirmAttendanceModal({ isOpen, onClose, role, item, lo
           <form onSubmit={handleSubmit} className="booking-modal-section">
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <label style={{ color: '#294954', fontWeight: 600 }}>
-                Descripción (solo letras)
+                Descripción (solo letras y números)
                 <textarea
                   value={description}
                   onChange={handleDescriptionChange}
-                  placeholder={role === 'teacher' ? 'Describe brevemente la clase impartida (solo letras)' : 'Describe brevemente tu asistencia (solo letras)'}
+                  placeholder={role === 'teacher' ? 'Describe brevemente la clase impartida (letras, números y ?)' : 'Describe brevemente tu asistencia (letras, números y ?)'}
                   style={{
                     width: '100%',
                     minHeight: 90,
-                    border: '1px solid #e5e7eb',
+                    border: `1px solid ${descError ? '#ef4444' : '#e5e7eb'}`,
                     borderRadius: 8,
                     padding: 12,
                     marginTop: 6,
                   }}
-                  required
+                  aria-invalid={!!descError}
                 />
-                <small style={{ color: '#6b7280', display: 'block', marginTop: 6 }}>Permitido: letras en español y espacios. No se permiten números ni símbolos (&lt; &gt; / = etc.).</small>
+                <small style={{ color: '#6b7280', display: 'block', marginTop: 6 }}></small>
+                {descError && (
+                  <small style={{ color: '#ef4444', display: 'block', marginTop: 6 }}>{descError}</small>
+                )}
               </label>
 
               <label style={{ color: '#294954', fontWeight: 600 }}>
@@ -183,8 +205,8 @@ export default function ConfirmAttendanceModal({ isOpen, onClose, role, item, lo
                   type="file"
                   accept={ALLOWED_EXTENSIONS.join(',')}
                   onChange={handleFileChange}
-                  style={{ marginTop: 6 }}
-                  required
+                  style={{ marginTop: 6, border: `1px solid ${fileError ? '#ef4444' : 'transparent'}`, borderRadius: 6, padding: 6 }}
+                  aria-invalid={!!fileError}
                 />
                 <small style={{ color: '#6b7280', display: 'block', marginTop: 6 }}>Formatos permitidos: PNG o JPG. Tamaño máximo: {MAX_FILE_SIZE_MB}MB.</small>
               </label>
@@ -205,6 +227,20 @@ export default function ConfirmAttendanceModal({ isOpen, onClose, role, item, lo
           </form>
         </div>
       </div>
+      <ConfirmDialog
+        isOpen={confirmOpen}
+        title="Confirmar envío"
+        description="¿Deseas enviar tu confirmación de asistencia?"
+        confirmText="Sí, enviar"
+        cancelText="Cancelar"
+        onConfirm={async () => {
+          if (!file) return;
+          await onSubmit({ description: description.trim(), file });
+          setConfirmOpen(false);
+        }}
+        onCancel={() => setConfirmOpen(false)}
+        loading={loading}
+      />
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import type { BookingDetailData } from '../../context/booking';
 import '../../styles/booking-modal.css';
+import { useAuthContext } from '../../context/auth';
+import { useRescheduleContext } from '../../context/booking/RescheduleContext';
 
 type BookingDetailModalProps = {
   isOpen: boolean;
@@ -11,6 +13,8 @@ type BookingDetailModalProps = {
 };
 
 export default function BookingDetailModal({ isOpen, onClose, bookingDetail, loading, error }: BookingDetailModalProps) {
+  const { user } = useAuthContext();
+  const { openRescheduleModal } = useRescheduleContext();
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -60,9 +64,27 @@ export default function BookingDetailModal({ isOpen, onClose, bookingDetail, loa
     return diffInMinutes > 30;
   };
 
+  const isReschedulableStatus = (status: string): boolean => {
+    // Permitir reagendar para estados futuros habituales
+    return ['approved', 'active', 'pending'].includes((status || '').toLowerCase());
+  };
+
   const handleReschedule = () => {
-    // TODO: Implementar lógica de reagendamiento
-    alert('Funcionalidad de reagendar en desarrollo');
+    if (!bookingDetail) return;
+    // Calcular horas requeridas (mismo bloque que la reserva original)
+    const start = new Date(bookingDetail.start_time).getTime();
+    const end = new Date(bookingDetail.end_time).getTime();
+    const diffHours = Math.max(1, Math.round((end - start) / (1000 * 60 * 60)));
+    const payload = {
+      bookingId: bookingDetail.booking_id,
+      teacherId: bookingDetail.teacher.id,
+      currentStart: bookingDetail.start_time,
+      currentEnd: bookingDetail.end_time,
+      requiredHours: diffHours,
+    };
+    // Cerrar el modal de detalles y luego abrir el de reagendar en el siguiente tick
+    onClose();
+    setTimeout(() => openRescheduleModal(payload), 0);
   };
 
   return (
@@ -141,9 +163,6 @@ export default function BookingDetailModal({ isOpen, onClose, bookingDetail, loa
                   <p className="booking-detail-participant-name">
                     {bookingDetail.teacher.first_name} {bookingDetail.teacher.last_name}
                   </p>
-                  <span className={`booking-detail-confirmation ${bookingDetail.confirmation_teacher ? 'booking-detail-confirmation-confirmed' : 'booking-detail-confirmation-pending'}`}>
-                    {bookingDetail.confirmation_teacher ? '✅ Confirmado' : '⏳ Pendiente'}
-                  </span>
                 </div>
 
                 {/* Estudiante */}
@@ -157,25 +176,8 @@ export default function BookingDetailModal({ isOpen, onClose, bookingDetail, loa
                   <p className="booking-detail-participant-name">
                     {bookingDetail.student.first_name} {bookingDetail.student.last_name}
                   </p>
-                  <span className={`booking-detail-confirmation ${bookingDetail.confirmation_student ? 'booking-detail-confirmation-confirmed' : 'booking-detail-confirmation-pending'}`}>
-                    {bookingDetail.confirmation_student ? '✅ Confirmado' : '⏳ Pendiente'}
-                  </span>
                 </div>
               </div>
-
-              {/* Link */}
-              {bookingDetail.class_link && (
-                <div className="booking-detail-link booking-modal-section">
-                  <h4>🔗 Link de Clase</h4>
-                  <a 
-                    href={bookingDetail.class_link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {bookingDetail.class_link}
-                  </a>
-                </div>
-              )}
 
               {/* Total */}
               <div className="booking-detail-payment booking-modal-section">
@@ -185,8 +187,8 @@ export default function BookingDetailModal({ isOpen, onClose, bookingDetail, loa
                 </p>
               </div>
 
-              {/* Botón de Reagendar - Solo si falta más de 30 min */}
-              {canReschedule(bookingDetail.start_time) && bookingDetail.status === 'approved' && (
+              {/* Botón de Reagendar - Solo alumno y si falta >30min y estado permite reagendar */}
+              {user?.role === 'student' && canReschedule(bookingDetail.start_time) && isReschedulableStatus(bookingDetail.status) && (
                 <div className="booking-detail-reschedule booking-modal-section">
                   <div className="booking-reschedule-content">
                     <div className="booking-reschedule-info">

@@ -21,7 +21,7 @@ const SubjectList: React.FC<SubjectListProps> = ({ role = "student", onPriceClic
         title="Precios"
         description="Establece y ajusta las tarifas de tus servicios de asesoría y clases."
         linkText="Definir precios"
-        route="/profile/price"
+        route="/teacher/profile"
         icon={Tag}
         iconColor="#9333ea"
         iconBg="#f3e8ff"

@@ -1,8 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useOptionalTeacherConfirmationsContext, useOptionalStudentConfirmationsContext } from '../../context/confirmations';
 import { useOptionalConfirmationDetailContext } from '../../context/confirmations';
 import ConfirmationDetailModal from './ConfirmationDetailModal';
+import '../../styles/confirmations.css';
+import HintBadge from '../ui/HintBadge';
+import { Calendar as CalendarIcon, CalendarDays, FileText, Hourglass, CheckCircle, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
 
 type ConfirmationViewProps = {
   role?: string;
@@ -20,6 +23,22 @@ export default function ConfirmationView({ role }: ConfirmationViewProps) {
   const [dateInput, setDateInput] = useState(''); // Admite YYYY-MM-DD o DD/MM/YYYY
   const [lastQuery, setLastQuery] = useState('');
   const [detailOpen, setDetailOpen] = useState(false);
+  const datePickerRef = useRef<HTMLInputElement | null>(null);
+  const fieldRef = useRef<HTMLDivElement | null>(null);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const today = new Date();
+  const parseInputToDate = (value: string) => {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return new Date(value + 'T00:00:00');
+    const m = value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (m) {
+      const [, dd, mm, yyyy] = m;
+      return new Date(`${yyyy}-${mm}-${dd}T00:00:00`);
+    }
+    return null;
+  };
+  const selectedDate = parseInputToDate(dateInput) || null;
+  const [viewYear, setViewYear] = useState<number>((selectedDate || today).getFullYear());
+  const [viewMonth, setViewMonth] = useState<number>((selectedDate || today).getMonth()); // 0-11
 
   // Estados para 'byDate'
   const dateLoading = useMemo(() => (isTeacher ? teacherCtx?.dateLoading : studentCtx?.dateLoading) || false, [isTeacher, teacherCtx?.dateLoading, studentCtx?.dateLoading]);
@@ -39,6 +58,13 @@ export default function ConfirmationView({ role }: ConfirmationViewProps) {
   const loading = mode === 'byDate' ? dateLoading : allLoading;
   const error = mode === 'byDate' ? dateError : allError;
   const items = mode === 'byDate' ? dateItems : allItems;
+
+  // Ordenar visualmente: primero las con ventana abierta (confirmable_now)
+  const sortedItems = useMemo(() => {
+    const copy = Array.isArray(items) ? [...items] : [];
+    copy.sort((a: any, b: any) => Number(b?.confirmable_now) - Number(a?.confirmable_now));
+    return copy;
+  }, [items]);
 
   // Cargar listado paginado al entrar
   useEffect(() => {
@@ -110,71 +136,176 @@ export default function ConfirmationView({ role }: ConfirmationViewProps) {
     return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: true });
   };
 
+  const openCalendar = () => {
+    setShowCalendar((v) => !v);
+    // sincronizar vista con selección o hoy
+    const base = selectedDate || today;
+    setViewYear(base.getFullYear());
+    setViewMonth(base.getMonth());
+  };
+
+  useEffect(() => {
+    const onDocClick = (e: MouseEvent) => {
+      if (!showCalendar) return;
+      const target = e.target as Node;
+      if (fieldRef.current && !fieldRef.current.contains(target)) setShowCalendar(false);
+    };
+    const onEsc = (e: KeyboardEvent) => { if (e.key === 'Escape') setShowCalendar(false); };
+    document.addEventListener('mousedown', onDocClick);
+    document.addEventListener('keydown', onEsc);
+    return () => {
+      document.removeEventListener('mousedown', onDocClick);
+      document.removeEventListener('keydown', onEsc);
+    };
+  }, [showCalendar]);
+
+  const daysOfWeek = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+  const getMonthMatrix = (year: number, month: number) => {
+    const first = new Date(year, month, 1);
+    const startDay = (first.getDay() + 6) % 7; // L=0 .. D=6
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const prevDays = startDay;
+    const totalCells = Math.ceil((prevDays + daysInMonth) / 7) * 7;
+    const cells: Array<{ date: Date | null; inMonth: boolean } > = [];
+    for (let i = 0; i < totalCells; i++) {
+      const dayNum = i - prevDays + 1;
+      if (dayNum < 1 || dayNum > daysInMonth) {
+        cells.push({ date: null, inMonth: false });
+      } else {
+        cells.push({ date: new Date(year, month, dayNum), inMonth: true });
+      }
+    }
+    return cells;
+  };
+  const monthLabel = new Date(viewYear, viewMonth, 1).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+  const isSameDay = (a: Date, b: Date) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  const toISO = (d: Date) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const selectDay = (d: Date) => {
+    setDateInput(toISO(d));
+    setShowCalendar(false);
+  };
+  const prevMonth = () => {
+    const m = viewMonth - 1;
+    if (m < 0) { setViewMonth(11); setViewYear(viewYear - 1); } else setViewMonth(m);
+  };
+  const nextMonth = () => {
+    const m = viewMonth + 1;
+    if (m > 11) { setViewMonth(0); setViewYear(viewYear + 1); } else setViewMonth(m);
+  };
+
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#FAF9F5' }}>
-      <div className="max-w-4xl mx-auto px-6 py-10">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-slate-800">Confirmaciones</h1>
-          <Link to={isTeacher ? '/teacher/my_next_booking' : '/student/my_next_booking'} className="view-all-btn-header">↩️ Volver</Link>
+    <div className="confirmations-page">
+      <div className="confirmations-container">
+        <div className="confirmations-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+          <h1>Confirmaciones</h1>
         </div>
-        <p className="text-slate-600 mb-6">
+        <div className="confirmations-back-row">
+          <HintBadge text="Regresar a reservas" intervalMs={2147483647}>
+            <Link to={isTeacher ? '/teacher/my_next_booking' : '/student/my_next_booking'} className="view-all-btn-header" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              <ArrowLeft size={16} />
+              <span>Volver</span>
+            </Link>
+          </HintBadge>
+        </div>
+        <p style={{ color: '#6B7280', marginBottom: 24 }}>
           Busca y filtra tus confirmaciones por fecha. Formatos válidos: <b>YYYY-MM-DD</b> o <b>DD/MM/YYYY</b>.
         </p>
 
         {/* Filtro por fecha */}
-        <div className="rounded-2xl border bg-white p-6 shadow-sm text-slate-700 mb-6">
-          <form onSubmit={handleSearch} className="flex flex-col gap-3">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div className="col-span-1">
-                <label className="block text-sm font-semibold text-slate-700 mb-1">Fecha (YYYY-MM-DD)</label>
-                <input
-                  type="date"
-                  value={/^\d{4}-\d{2}-\d{2}$/.test(dateInput) ? dateInput : ''}
-                  onChange={(e) => setDateInput(e.target.value)}
-                  className="w-full border rounded-md px-3 py-2"
-                />
-              </div>
-              <div className="col-span-1 md:col-span-2">
-                <label className="block text-sm font-semibold text-slate-700 mb-1">O escribe fecha (DD/MM/YYYY)</label>
-                <input
-                  type="text"
-                  placeholder="p. ej. 11/11/2025"
-                  value={/^[^\d]{0}$/.test(dateInput) ? '' : dateInput}
-                  onChange={(e) => setDateInput(e.target.value)}
-                  className="w-full border rounded-md px-3 py-2"
-                />
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <button type="submit" className="btn-unirse" disabled={!dateInput || loading}>
+        <div className="confirmations-filter" style={{ padding: 24, marginBottom: 24, color: '#374151' }}>
+          <form onSubmit={handleSearch} className="confirmations-form" style={{ display: 'grid', gap: 12 }}>
+            <label className="block">Buscar confirmación por fecha</label>
+            <div className="confirmations-field" ref={fieldRef}>
+              <span className="input-icon" aria-hidden>
+                <CalendarIcon size={16} />
+              </span>
+              <input
+                type="text"
+                inputMode="numeric"
+                placeholder="DD/MM/AAAA o YYYY-MM-DD"
+                value={dateInput}
+                onChange={(e) => setDateInput(e.target.value)}
+                className="confirmations-input has-icon"
+              />
+              <HintBadge text="Abrir calendario" intervalMs={2147483647}>
+                <button type="button" className="confirmations-picker-btn" onClick={openCalendar} aria-label="Abrir calendario">
+                  <CalendarDays size={18} />
+                </button>
+              </HintBadge>
+              <button type="submit" className="confirmations-search-btn" disabled={!dateInput || loading}>
                 {loading ? 'Buscando…' : 'Buscar por fecha'}
               </button>
+              <input
+                ref={datePickerRef}
+                type="date"
+                value={/^\d{4}-\d{2}-\d{2}$/.test(dateInput) ? dateInput : ''}
+                onChange={(e) => setDateInput(e.target.value)}
+                className="confirmations-native-date"
+                aria-hidden
+                tabIndex={-1}
+              />
+              {showCalendar && (
+                <div className="confirmations-calendar-popover" role="dialog" aria-label="Selector de fecha">
+                  <div className="calendar-header">
+                    <button type="button" className="cal-nav" onClick={prevMonth} aria-label="Mes anterior">
+                      <ChevronLeft size={16} />
+                    </button>
+                    <div className="cal-title">{monthLabel}</div>
+                    <button type="button" className="cal-nav" onClick={nextMonth} aria-label="Mes siguiente">
+                      <ChevronRight size={16} />
+                    </button>
+                  </div>
+                  <div className="calendar-grid">
+                    {daysOfWeek.map((d) => (
+                      <div key={d} className="cal-dow">{d}</div>
+                    ))}
+                    {getMonthMatrix(viewYear, viewMonth).map((cell, idx) => {
+                      if (!cell.inMonth || !cell.date) return <div key={idx} className="cal-day cal-day--empty" />;
+                      const d = cell.date;
+                      const isToday = isSameDay(d, today);
+                      const isSelected = selectedDate ? isSameDay(d, selectedDate) : false;
+                      return (
+                        <button
+                          type="button"
+                          key={idx}
+                          className={`cal-day ${isToday ? 'is-today' : ''} ${isSelected ? 'is-selected' : ''}`}
+                          onClick={() => selectDay(d)}
+                        >
+                          {d.getDate()}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+            <p className="confirmations-help">Ingresa la fecha o selecciona desde el calendario.</p>
+            <div className="confirmations-actions" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <button type="button" className="btn-ver-detalles" onClick={handleClearFilter} disabled={mode === 'all' && !lastQuery}>
                 Limpiar filtro
               </button>
               {lastQuery && (
-                <span className="text-sm text-slate-500">Consulta: {lastQuery}</span>
+                <span style={{ fontSize: 12, color: '#6B7280' }}>Consulta: {lastQuery}</span>
               )}
             </div>
           </form>
-
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mt-4 text-red-600">{error}</div>
+            <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', color: '#DC2626', borderRadius: 10, padding: 12, marginTop: 16 }}>{error}</div>
           )}
         </div>
 
         {/* Resultados */}
-        <div className="rounded-2xl border bg-white p-6 shadow-sm text-slate-700">
-          <h2 className="text-lg font-bold text-slate-800 mb-3">{mode === 'byDate' ? 'Resultados por fecha' : 'Todas las confirmaciones'}</h2>
-          {loading && <p className="text-slate-600">Cargando…</p>}
+        <div className="confirmations-results" style={{ padding: 24, color: '#374151' }}>
+          <h2 style={{ marginTop: 0, marginBottom: 12, color: '#294954', fontWeight: 700 }}>{mode === 'byDate' ? 'Resultados por fecha' : 'Todas las confirmaciones'}</h2>
+          {loading && <p style={{ color: '#6B7280' }}>Cargando…</p>}
           {!loading && items.length === 0 && (
-            <p className="text-slate-600">{mode === 'byDate' ? 'No hay confirmaciones para la fecha consultada.' : 'No hay confirmaciones registradas.'}</p>
+            <p style={{ color: '#6B7280' }}>{mode === 'byDate' ? 'No hay confirmaciones para la fecha consultada.' : 'No hay confirmaciones registradas.'}</p>
           )}
           {!loading && items.length > 0 && (
-            <div className="asesorias-list">
-              {items.map((it) => (
+            <div className="confirmations-list asesorias-list">
+              {sortedItems.map((it) => (
                 <div key={it.id} className="clase-asistida-item">
-                  <div className="clase-asistida-icon">🗓️</div>
+                  <div className="clase-asistida-icon"><CalendarDays size={20} /></div>
                   <div className="clase-asistida-content">
                     <div className="clase-asistida-materia">Reserva #{it.payment_booking_id}</div>
                     <div className="clase-asistida-datetime">
@@ -186,7 +317,7 @@ export default function ConfirmationView({ role }: ConfirmationViewProps) {
                           className={`confirmacion-badge ${it.has_assessment_by_student ? 'confirmada' : 'pendiente'}`}
                           title={it.has_assessment_by_student ? 'El alumno ya contestó la evaluación' : 'El alumno no ha contestado la evaluación'}
                         >
-                          <span>🧾</span>
+                          <FileText size={16} />
                           {isTeacher
                             ? (it.has_assessment_by_student ? 'Evaluación del alumno' : 'Sin evaluación del alumno')
                             : (it.has_assessment_by_student ? 'Tu evaluación enviada' : 'Tu evaluación pendiente')}
@@ -196,36 +327,42 @@ export default function ConfirmationView({ role }: ConfirmationViewProps) {
                   </div>
                   {it.confirmable_now ? (
                     <div className="confirmacion-badge pendiente">
-                      <span>⏳</span>
+                      <Hourglass size={16} />
                       Ventana abierta
                     </div>
                   ) : (
                     <div className="confirmacion-badge confirmada">
-                      <span>📌</span>
+                      <CheckCircle size={16} />
                       Registrada/No disponible
                     </div>
                   )}
                   <div>
+                    <HintBadge text="Ver detalles de la reserva" intervalMs={2147483647}>
                     <button className="btn-ver-detalles" onClick={() => openDetail(it.id)}>
                       Ver detalle
                     </button>
+                    </HintBadge>
                   </div>
                 </div>
               ))}
             </div>
           )}
           {mode === 'all' && (
-            <div className="flex items-center justify-between mt-4">
-              <div className="text-sm text-slate-500">
+            <div className="confirmations-pagination" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ fontSize: 14, color: '#6B7280' }}>
                 Página: {Math.floor((pageOffset || 0) / (pageLimit || 10)) + 1} · Mostrando {items.length} de {total}
               </div>
-              <div className="flex items-center gap-2">
-                <button className="btn-ver-detalles" onClick={handlePrevPage} disabled={loading || (pageOffset || 0) <= 0}>
-                  ← Anterior
-                </button>
-                <button className="btn-unirse" onClick={handleNextPage} disabled={loading || !hasMore}>
-                  Siguiente →
-                </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <HintBadge text="Página anterior" intervalMs={2147483647}>
+                  <button className="btn-ver-detalles" onClick={handlePrevPage} disabled={loading || (pageOffset || 0) <= 0}>
+                    ← Anterior
+                  </button>
+                </HintBadge>
+                <HintBadge text="Siguiente página" intervalMs={2147483647}>
+                  <button className="btn-unirse" onClick={handleNextPage} disabled={loading || !hasMore}>
+                    Siguiente →
+                  </button>
+                </HintBadge>
               </div>
             </div>
           )}

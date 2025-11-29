@@ -2,6 +2,10 @@ export interface VideoSaveRequest {
   url_or_id: string;
 }
 
+export interface VideoUpdateRequest {
+  url_or_id: string;
+}
+
 export interface VideoData {
   id: number;
   youtube_video_id: string;
@@ -20,4 +24,17 @@ export interface VideoSaveResponse {
   success: boolean;
   message: string;
   data: VideoData | null;
+}
+
+export interface VideoUpdateResponse {
+  success: boolean;
+  message: string;
+  data: VideoData | null;
+}
+
+export interface VideoListResponse {
+  success: boolean;
+  message: string;
+  data: VideoData[];
+  total: number;
 }

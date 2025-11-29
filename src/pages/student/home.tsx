@@ -6,10 +6,12 @@ import SubjectsCatalog from "../../components/subjects/SubjectsCatalog";
 import { Footer } from "../../components";
 import { useLoginApi } from "../../hooks/auth/useLoginApi";
 import WelcomeAlert from "../../components/WelcomeAlert";
-import { CalendarDays, User2, GraduationCap } from "lucide-react";
+import { CalendarDays, User2, GraduationCap} from "lucide-react";
 import { MyNextClassesProvider, useMyNextClassesContext } from "../../context/booking";
 import { useTeachersApi, type Teacher } from "../../hooks/teachers/useTeachersApi";
 import "../../styles/student-home-redesign.css";
+import { TeachersProvider } from "../../context/teachers/TeachersContext";
+import { RecommendedTeachers } from "../../components/comptHome/RecommendedTeachers"
 
 
 // Tarjeta de Próxima Reserva (consume contexto existente de booking)
@@ -153,7 +155,7 @@ const StudentHome: React.FC = () => {
           </div>
         </section>
 
-        {/* Profesores Recomendados (simple) */}
+        {/* Profesores Recomendados (dinámico, hasta 3) */}
         <section>
           <h2 className="shv2-section-title">Profesores Recomendados</h2>
           <div className="shv2-recos">

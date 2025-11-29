@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import ProfileDropdown from '../ProfileDropdown';
 import { useChatContext } from '../../context/chat';
+import { useBookingApi } from '../../hooks/booking/useBookingApi';
+import { useConfirmationsApi } from '../../hooks/confirmations/useConfirmationsApi';
 
 type StudentHeaderProps = {
   user: any;
@@ -14,6 +16,17 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileExpanded, setIsProfileExpanded] = useState(false);
   const [isDesktop, setIsDesktop] = useState<boolean>(typeof window !== 'undefined' ? window.innerWidth >= 1024 : false);
+
+  // Counters (alumno)
+  const { getMyNextClasses } = useBookingApi();
+  const { getStudentHistoryRecent } = useConfirmationsApi();
+  const [bookingsCount, setBookingsCount] = useState(0);
+  const [confirmationsCount, setConfirmationsCount] = useState(0);
+  const COUNTS_KEY = 'student_nav_counts';
+  const MIN_INTERVAL_MS = 300_000; // 5 minutos
+  const VIS_DEBOUNCE_MS = 800;
+  const lastFetchRef = React.useRef<number>(0);
+  const debounceRef = React.useRef<number | null>(null);
 
   const { getUnreadCount, fetchChats } = useChatContext();
   const unreadTotal = getUnreadCount();
@@ -33,18 +46,35 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
     }
   }, [fetchChats]);
 
-  const userInitials = user 
+  const userInitials = user
     ? `${user.first_name?.[0] ?? ''}${user.last_name?.[0] ?? ''}`.toUpperCase() || 'U'
     : '';
 
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    };
+
+    if (isProfileOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isProfileOpen]);
+
   const menuItems = [
     { to: '/catalog/teachers', label: 'Docentes' },
-    { to: '/student/chat', label: 'Chat' },
-    { to: '/student/my_next_booking', label: 'Reservas' },
-    { to: '/student/confirmation', label: 'Confirmación' },
+    { to: '/student/my_next_booking', label: 'Reservas y confirmaciones' },
+    { to: '/student/chat', label: 'Chat', badgeCount: unreadTotal },
   ];
 
-  const NavItem: React.FC<{ to: string; label: string; mobile?: boolean; badgeCount?: number }> = ({ to, label, mobile = false, badgeCount }) => {
+  const NavItem: React.FC<{ to: string; label: string; mobile?: boolean; rsvCount?: number; confCount?: number; badgeCount?: number }> = ({ to, label, mobile = false, rsvCount, confCount, badgeCount }) => {
     const isActive = location.pathname === to;
     const [hover, setHover] = useState(false);
 
@@ -56,7 +86,7 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
       color: isActive ? '#68B2C9' : '#294954',
       fontFamily: 'Inter, sans-serif',
       padding: mobile ? '14px 20px' : '8px 12px',
-      borderRadius: mobile ? '12px' : 0,
+      borderRadius: mobile ? '12px' : '12px',
       textAlign: mobile ? 'left' : 'left',
       display: 'block',
       width: mobile ? '100%' : undefined,
@@ -87,6 +117,32 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
       borderRadius: '50%'
     };
 
+    const renderBadge = (count: number, bg: string = '#F59E0B', visible: boolean = true) => {
+      const text = count > 99 ? '99+' : String(count);
+      return (
+        <span
+          style={{
+            display: 'inline-block',
+            minWidth: 18,
+            padding: '0 6px',
+            height: 18,
+            lineHeight: '18px',
+            fontSize: 11,
+            fontWeight: 700,
+            color: '#FFFFFF',
+            background: bg,
+            borderRadius: 999,
+            textAlign: 'center',
+            opacity: visible ? 1 : 0,
+            transition: 'opacity 180ms ease',
+            pointerEvents: 'none',
+          }}
+        >
+          {text}
+        </span>
+      );
+    };
+
     return (
       <Link
         to={to}
@@ -96,25 +152,37 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
       >
         {mobile && isActive && <span style={{ marginRight: '8px', fontSize: '18px' }}>•</span>}
         <span style={{ position: 'relative', zIndex: 10, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-          {label}
-          {!!badgeCount && badgeCount > 0 && (
-            <span
-              style={{
-                display: 'inline-block',
-                minWidth: 18,
-                padding: '0 6px',
-                height: 18,
-                lineHeight: '18px',
-                fontSize: 11,
-                fontWeight: 700,
-                color: '#FFFFFF',
-                background: '#F59E0B',
-                borderRadius: 999,
-                textAlign: 'center',
-              }}
-            >
-              {badgeCount}
+          {label === 'Reservas y confirmaciones' ? (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <span>Reservas</span>
+              {renderBadge(rsvCount ?? 0, '#F59E0B', !!(rsvCount && rsvCount > 0))}
+              <span style={{ opacity: 0.8, margin: '0 2px' }}>y</span>
+              <span>Confirmaciones</span>
+              {renderBadge(confCount ?? 0, '#F59E0B', !!(confCount && confCount > 0))}
             </span>
+          ) : (
+            <>
+              {label}
+              {!!badgeCount && badgeCount > 0 && (
+                <span
+                  style={{
+                    display: 'inline-block',
+                    minWidth: 18,
+                    padding: '0 6px',
+                    height: 18,
+                    lineHeight: '18px',
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: '#FFFFFF',
+                    background: '#F59E0B',
+                    borderRadius: 999,
+                    textAlign: 'center',
+                  }}
+                >
+                  {badgeCount}
+                </span>
+              )}
+            </>
           )}
         </span>
         {!mobile && <span style={underlineStyle} />}
@@ -125,8 +193,8 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
 
   return (
     <>
-      <header 
-        className="fixed top-0 left-0 right-0 z-[70] w-full" 
+      <header
+        className="fixed top-0 left-0 right-0 z-[70] w-full"
         style={{
           fontFamily: 'Roboto, sans-serif',
           backgroundColor: 'transparent',
@@ -159,15 +227,17 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
                     key={item.label}
                     to={item.to}
                     label={item.label}
-                    badgeCount={item.label === 'Chat' ? unreadTotal : undefined}
+                    rsvCount={bookingsCount}
+                    confCount={confirmationsCount}
+                    badgeCount={item.badgeCount}
                   />
                 ))}
               </nav>
             )}
 
             {isDesktop && (
-              <div className="relative ml-8">
-                <button 
+              <div className="relative ml-8" ref={dropdownRef}>
+                <button
                   className="rounded-full flex items-center justify-center transition-all duration-300 overflow-hidden"
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                   style={{
@@ -201,10 +271,10 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="flex flex-col justify-center items-center"
-                style={{ 
-                  border: 'none', 
-                  background: 'transparent', 
-                  cursor: 'pointer', 
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer',
                   position: 'relative',
                   width: '44px',
                   height: '44px',
@@ -244,15 +314,8 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
         </div>
       </header>
 
-      {isDesktop && isProfileOpen && (
-        <div 
-          className="fixed inset-0 z-30" 
-          onClick={() => setIsProfileOpen(false)}
-        />
-      )}
-
       {!isDesktop && (
-        <div 
+        <div
           style={{
             position: 'fixed',
             top: '92px',
@@ -276,7 +339,14 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
           <nav className="flex flex-col" style={{ gap: '0', maxWidth: '600px', margin: '0 auto' }}>
             {menuItems.map((item, index) => (
               <div key={item.label}>
-                <NavItem to={item.to} label={item.label} mobile badgeCount={item.label === 'Chat' ? unreadTotal : undefined} />
+                <NavItem
+                  to={item.to}
+                  label={item.label}
+                  mobile
+                  rsvCount={bookingsCount}
+                  confCount={confirmationsCount}
+                  badgeCount={item.badgeCount}
+                />
                 {index < menuItems.length - 1 && (
                   <div style={{ height: '1px', backgroundColor: 'rgba(104, 178, 201, 0.15)', margin: '0 20px' }} />
                 )}
@@ -341,7 +411,7 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
                     Datos Personales
                   </Link>
 
-                  <button 
+                  <button
                     onClick={() => { setIsMenuOpen(false); onLogout(); }}
                     style={{
                       position: 'relative',

@@ -46,6 +46,30 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
     }
   }, [fetchChats]);
 
+<<<<<<< HEAD
+  const userInitials = user
+    ? `${user.first_name?.[0] ?? ''}${user.last_name?.[0] ?? ''}`.toUpperCase() || 'U'
+    : '';
+
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    };
+
+    if (isProfileOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isProfileOpen]);
+
+=======
   // Helpers de cache
   const readCountsFromStorage = () => {
     try {
@@ -150,6 +174,7 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
     : '';
 
   // SOLO una opción: Reservas y confirmaciones
+>>>>>>> main
   const menuItems = [
     { to: '/catalog/teachers', label: 'Docentes' },
     { to: '/student/my_next_booking', label: 'Reservas y confirmaciones' },
@@ -168,7 +193,7 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
       color: isActive ? '#68B2C9' : '#294954',
       fontFamily: 'Inter, sans-serif',
       padding: mobile ? '14px 20px' : '8px 12px',
-      borderRadius: mobile ? '12px' : 0,
+      borderRadius: mobile ? '12px' : '12px',
       textAlign: mobile ? 'left' : 'left',
       display: 'block',
       width: mobile ? '100%' : undefined,
@@ -275,8 +300,8 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
 
   return (
     <>
-      <header 
-        className="fixed top-0 left-0 right-0 z-[70] w-full" 
+      <header
+        className="fixed top-0 left-0 right-0 z-[70] w-full"
         style={{
           fontFamily: 'Roboto, sans-serif',
           backgroundColor: 'transparent',
@@ -318,8 +343,8 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
             )}
 
             {isDesktop && (
-              <div className="relative ml-8">
-                <button 
+              <div className="relative ml-8" ref={dropdownRef}>
+                <button
                   className="rounded-full flex items-center justify-center transition-all duration-300 overflow-hidden"
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                   style={{
@@ -353,10 +378,10 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="flex flex-col justify-center items-center"
-                style={{ 
-                  border: 'none', 
-                  background: 'transparent', 
-                  cursor: 'pointer', 
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer',
                   position: 'relative',
                   width: '44px',
                   height: '44px',
@@ -396,15 +421,8 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
         </div>
       </header>
 
-      {isDesktop && isProfileOpen && (
-        <div 
-          className="fixed inset-0 z-30" 
-          onClick={() => setIsProfileOpen(false)}
-        />
-      )}
-
       {!isDesktop && (
-        <div 
+        <div
           style={{
             position: 'fixed',
             top: '92px',
@@ -500,7 +518,7 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
                     Datos Personales
                   </Link>
 
-                  <button 
+                  <button
                     onClick={() => { setIsMenuOpen(false); onLogout(); }}
                     style={{
                       position: 'relative',

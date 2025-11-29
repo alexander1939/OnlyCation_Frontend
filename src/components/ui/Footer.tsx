@@ -58,7 +58,7 @@ const Footer: React.FC = () => {
             <div className="flex space-x-4">
               {[
                 { name: 'Email', src: '/email_icon.png' },
-                { name: 'YouTube', src: '/youtube_icon.png' }
+                { name: 'YouTube', src: '/logo.png' }
               ].map((social, index) => (
                 <a
                   key={index}
@@ -271,7 +271,7 @@ const Footer: React.FC = () => {
               className="text-sm font-medium"
               style={{ color: 'rgba(255, 255, 255, 0.5)' }}
             >
-              © 2024 OnlyCation. Todos los derechos reservados.
+              2024 OnlyCation. Todos los derechos reservados.
             </p>
             <div className="flex space-x-8">
               {[

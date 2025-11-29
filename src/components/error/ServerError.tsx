@@ -10,7 +10,6 @@ const ServerError: React.FC = () => (
       'Intenta nuevamente en unos momentos o vuelve al inicio.'
     }
     imageSrc="/zorro_back_home.png"
-    linkTo="/"
     linkAriaLabel="Volver al inicio"
   />
 );

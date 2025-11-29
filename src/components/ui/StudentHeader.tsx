@@ -60,7 +60,7 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
       textAlign: mobile ? 'left' : 'left',
       display: 'block',
       width: mobile ? '100%' : undefined,
-      backgroundColor: mobile ? (hover || isActive ? 'rgba(104, 178, 201, 0.12)' : 'transparent') : 'transparent',
+      backgroundColor: mobile ? (isActive ? 'rgba(104, 178, 201, 0.12)' : 'transparent') : 'transparent',
       border: 'none',
       transition: 'all 200ms ease'
     };
@@ -90,8 +90,8 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
     return (
       <Link
         to={to}
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
+        onMouseEnter={!mobile ? () => setHover(true) : undefined}
+        onMouseLeave={!mobile ? () => setHover(false) : undefined}
         style={linkStyle}
       >
         {mobile && isActive && <span style={{ marginRight: '8px', fontSize: '18px' }}>•</span>}
@@ -139,7 +139,7 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
             alignItems: 'center',
             backgroundColor: '#FFFFFF',
             borderRadius: '50px',
-            padding: isDesktop ? '8px 24px' : '12px 22px',
+            padding: isDesktop ? '8px 24px' : '14px 24px',
             gap: '32px',
             boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
             width: isDesktop ? 'auto' : 'calc(100% - 32px)',
@@ -148,7 +148,7 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
             justifyContent: 'space-between'
           }}>
             <Link to="/student-home" className="flex items-center space-x-2" style={{ textDecoration: 'none' }}>
-              <img src="/logo.png" alt="OnlyCation Logo" className="w-[60px] h-[60px]" style={{ objectFit: 'contain', width: isDesktop ? 60 : 52, height: isDesktop ? 60 : 52 }} />
+              <img src="/logo.png" alt="OnlyCation Logo" className="w-[60px] h-[60px]" style={{ objectFit: 'contain', width: isDesktop ? 60 : 56, height: isDesktop ? 60 : 56 }} />
               <span className="font-semibold text-lg" style={{ color: '#294954', fontFamily: 'Inter, sans-serif', fontSize: isDesktop ? '18px' : '17px' }}>OnlyCation</span>
             </Link>
 
@@ -252,7 +252,7 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
       )}
 
       {!isDesktop && (
-        <div
+        <div 
           style={{
             position: 'fixed',
             top: '92px',
@@ -263,9 +263,9 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
             backgroundColor: '#FAF9F5',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
             borderRadius: '0 0 20px 20px',
-            padding: isMenuOpen ? '20px' : '0',
+            padding: '20px',
             maxHeight: isMenuOpen ? '80vh' : '0',
-            overflow: isMenuOpen ? 'auto' : 'hidden',
+            overflowY: isMenuOpen ? 'auto' : 'hidden',
             opacity: isMenuOpen ? 1 : 0,
             transition: 'all 300ms ease',
             pointerEvents: isMenuOpen ? 'auto' : 'none',

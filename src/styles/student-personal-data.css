@@ -1,0 +1,154 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800&display=swap');
+
+.student-data-v1 {
+  background: #FAF9F5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: Roboto, sans-serif;
+}
+
+.student-data-v1 * { font-family: Roboto, sans-serif; }
+
+.sdp-container {
+  flex: 1;
+  padding: 7.5rem 20px 2rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.sdp-wrap {
+  background: linear-gradient(135deg, rgba(122, 204, 255, 0.28), rgba(130, 231, 199, 0.28));
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 20px 40px rgba(41,73,84,0.12);
+}
+
+.sdp-card {
+  background: #fff;
+  border: 1px solid rgba(104,178,201,0.18);
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(41,73,84,0.10);
+}
+
+.sdp-header {
+  padding: 18px 16px;
+  border-bottom: 1px solid rgba(104,178,201,0.18);
+  background: linear-gradient(90deg, rgba(14,165,233,0.08), rgba(52,211,153,0.08));
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+.sdp-title { margin: 0; color: #0f172a; font-weight: 800; font-size: clamp(1.2rem, 2vw, 1.5rem); }
+.sdp-subtitle { margin: 6px 0 0; color: #475569; font-weight: 600; }
+
+.sdp-body { padding: 18px 16px; }
+
+.sdp-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+@media (min-width: 640px) { .sdp-form-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.sdp-field { display: flex; flex-direction: column; gap: 6px; }
+.sdp-label { color: #0f172a; font-weight: 700; font-size: 0.9rem; }
+.sdp-input {
+  appearance: none;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(104,178,201,0.35);
+  background: #fff;
+  color: #0f172a;
+  font-weight: 600;
+  outline: none;
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+.sdp-input:focus { box-shadow: 0 0 0 4px rgba(104,178,201,0.2); border-color: #68B2C9; }
+
+.sdp-info {
+  grid-column: span 2;
+  background: rgba(104,178,201,0.10);
+  border: 1px dashed rgba(104,178,201,0.4);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: #294954;
+  font-weight: 700;
+}
+
+.sdp-actions {
+  grid-column: span 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.sdp-actions-left,
+.sdp-actions-right {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 639px) {
+  .sdp-actions { flex-direction: column; align-items: stretch; }
+  .sdp-actions-left,
+  .sdp-actions-right { width: 100%; }
+  .sdp-actions-left > *,
+  .sdp-actions-right > * { flex: 1 1 auto; }
+}
+
+/* Buttons (scoped to this page) */
+.sdp-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  font-weight: 800;
+  font-size: 0.98rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease, background-color .12s ease, color .12s ease, border-color .12s ease;
+  text-decoration: none;
+}
+.sdp-btn:focus { outline: none; box-shadow: 0 0 0 4px rgba(104,178,201,0.25); }
+.sdp-btn:active { transform: translateY(1px); }
+.sdp-btn[disabled] { opacity: .6; cursor: not-allowed; }
+
+.sdp-btn--primary {
+  background: #8ED4BE; /* mint-green OnlyCation */
+  color: #ffffff;
+  border-color: #64a893;
+  box-shadow: 0 6px 14px rgba(142,212,190,0.35);
+}
+.sdp-btn--primary:hover { background: #579984; box-shadow: 0 10px 22px rgba(142,212,190,0.45); transform: translateY(-1px); }
+.sdp-btn--primary:active { transform: translateY(0); }
+
+.sdp-btn--secondary {
+  background: #ffffff;
+  color: #294954;
+  border-color: rgba(142,212,190,0.6);
+  box-shadow: 0 4px 10px rgba(41,73,84,0.08);
+}
+.sdp-btn--secondary:hover { background: rgba(142,212,190,0.22); border-color: #8ED4BE; box-shadow: 0 8px 18px rgba(41,73,84,0.12); transform: translateY(-1px); }
+.sdp-btn--secondary:active { transform: translateY(0); }
+
+.sdp-btn--outline {
+  background: #ffffff;
+  color: #294954;
+  border-color: rgba(104,178,201,0.6);
+}
+.sdp-btn--outline:hover { background: rgba(104,178,201,0.2); border-color: #68B2C9; box-shadow: 0 6px 14px rgba(104,178,201,0.25); transform: translateY(-1px); }
+.sdp-btn--outline:active { transform: translateY(0); }
+
+@media (max-width: 639px) {
+  .sdp-btn { width: 100%; }
+}

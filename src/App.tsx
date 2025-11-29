@@ -5,6 +5,7 @@ import { WalletProvider } from './context/wallet/WalletContext';
 import AppRouter from './app/router';
 import { useNetworkStatus } from './hooks/useNetworkStatus';
 import { NotificationProvider } from './components/NotificationProvider';
+import { RescheduleProvider } from './context/booking/RescheduleContext';
 
 function App() {
   console.log(' App: Componente montado');
@@ -18,7 +19,9 @@ function App() {
       <RegisterAuthProvider>
         <ChatProvider>
           <WalletProvider>
-            <AppRouter />
+            <RescheduleProvider>
+              <AppRouter />
+            </RescheduleProvider>
           </WalletProvider>
         </ChatProvider>
       </RegisterAuthProvider>

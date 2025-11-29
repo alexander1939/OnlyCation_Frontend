@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import ProfileDropdown from '../ProfileDropdown';
 import { useChatContext } from '../../context/chat';
+import { useBookingApi } from '../../hooks/booking/useBookingApi';
+import { useConfirmationsApi } from '../../hooks/confirmations/useConfirmationsApi';
 
 type TeacherHeaderProps = {
   user: any;
@@ -19,6 +21,37 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
   const unreadTotal = getUnreadCount();
   const hasFetchedRef = React.useRef(false);
 
+  // Counts for bookings and confirmations
+  const { getMyNextClasses } = useBookingApi();
+  const { getTeacherHistoryRecent } = useConfirmationsApi();
+  const [bookingsCount, setBookingsCount] = useState(0);
+  const [confirmationsCount, setConfirmationsCount] = useState(0);
+
+  // Shared-cache and throttling for counts
+  const COUNTS_KEY = 'teacher_nav_counts';
+  const MIN_INTERVAL_MS = 300_000; // at most once every 5 minutes
+  const VIS_DEBOUNCE_MS = 800;  // collapse rapid visibility events
+  const lastFetchRef = React.useRef<number>(0);
+  const debounceRef = React.useRef<number | null>(null);
+
+  const readCountsFromStorage = () => {
+    try {
+      const raw = localStorage.getItem(COUNTS_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (typeof parsed?.ts !== 'number') return null;
+      return parsed as { ts: number; bookings: number; confirmations: number };
+    } catch {
+      return null;
+    }
+  };
+
+  const writeCountsToStorage = (bookings: number, confirmations: number) => {
+    try {
+      localStorage.setItem(COUNTS_KEY, JSON.stringify({ ts: Date.now(), bookings, confirmations }));
+    } catch {}
+  };
+
   React.useEffect(() => {
     const onResize = () => setIsDesktop(window.innerWidth >= 1024);
     window.addEventListener('resize', onResize);
@@ -29,9 +62,112 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
   React.useEffect(() => {
     if (!hasFetchedRef.current) {
       hasFetchedRef.current = true;
-      fetchChats();
+      // Defer chat previews to idle to avoid competing with route paints
+      const run = () => { fetchChats(); };
+      if ('requestIdleCallback' in window) {
+        (window as any).requestIdleCallback(run, { timeout: 600 });
+      } else {
+        setTimeout(run, 200);
+      }
     }
   }, [fetchChats]);
+
+  // Load counters once and on window focus, with throttling and shared cache across tabs
+  React.useEffect(() => {
+    let mounted = true;
+
+    const fetchCounts = async () => {
+      try {
+        const [resBookings, recent] = await Promise.all([
+          getMyNextClasses(1, 0),
+          getTeacherHistoryRecent(),
+        ]);
+
+        let newBookings = bookingsCount;
+        let newConfirmations = confirmationsCount;
+
+        if (mounted && resBookings?.success && resBookings.data) {
+          const total = (resBookings.data as any).total ?? (Array.isArray(resBookings.data.data) ? resBookings.data.data.length : 0);
+          newBookings = Number(total) || 0;
+        }
+        if (mounted && recent?.success && recent.data) {
+          const count = Array.isArray(recent.data.items)
+            ? recent.data.items.filter((it: any) => it?.confirmable_now && ((it?.seconds_left ?? 0) > 0)).length
+            : 0;
+          newConfirmations = count;
+        }
+
+        if (!mounted) return;
+        setBookingsCount((prev) => (prev !== newBookings ? newBookings : prev));
+        setConfirmationsCount((prev) => (prev !== newConfirmations ? newConfirmations : prev));
+        writeCountsToStorage(newBookings, newConfirmations);
+        lastFetchRef.current = Date.now();
+      } catch {}
+    };
+
+    // On mount: use fresh cache if available, otherwise fetch
+    const cached = readCountsFromStorage();
+    const now = Date.now();
+    if (cached && (now - cached.ts) < MIN_INTERVAL_MS) {
+      const cb = Number(cached.bookings) || 0;
+      const cc = Number(cached.confirmations) || 0;
+      setBookingsCount((prev) => (prev !== cb ? cb : prev));
+      setConfirmationsCount((prev) => (prev !== cc ? cc : prev));
+    } else {
+      // Defer initial network work to idle for smoother first paint
+      const run = () => { void fetchCounts(); };
+      if ('requestIdleCallback' in window) {
+        (window as any).requestIdleCallback(run, { timeout: 1000 });
+      } else {
+        setTimeout(run, 300);
+      }
+    }
+
+    const onVisChange = () => {
+      if (document.visibilityState !== 'visible') return;
+      if (debounceRef.current) window.clearTimeout(debounceRef.current);
+      debounceRef.current = window.setTimeout(() => {
+        const cached = readCountsFromStorage();
+        const now = Date.now();
+        if (cached && (now - cached.ts) < MIN_INTERVAL_MS) {
+          const cb = Number(cached.bookings) || 0;
+          const cc = Number(cached.confirmations) || 0;
+          setBookingsCount((prev) => (prev !== cb ? cb : prev));
+          setConfirmationsCount((prev) => (prev !== cc ? cc : prev));
+          return;
+        }
+        if (now - (lastFetchRef.current || 0) < MIN_INTERVAL_MS) {
+          return; // too soon since last fetch in this tab
+        }
+        void fetchCounts();
+      }, VIS_DEBOUNCE_MS);
+    };
+
+    document.addEventListener('visibilitychange', onVisChange);
+
+    // Sync across tabs: update UI when another tab writes fresh counts
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === COUNTS_KEY && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (typeof parsed?.ts === 'number') {
+            const cb = Number(parsed.bookings) || 0;
+            const cc = Number(parsed.confirmations) || 0;
+            setBookingsCount((prev) => (prev !== cb ? cb : prev));
+            setConfirmationsCount((prev) => (prev !== cc ? cc : prev));
+          }
+        } catch {}
+      }
+    };
+    window.addEventListener('storage', onStorage);
+
+    return () => {
+      mounted = false;
+      if (debounceRef.current) window.clearTimeout(debounceRef.current);
+      document.removeEventListener('visibilitychange', onVisChange);
+      window.removeEventListener('storage', onStorage);
+    };
+  }, []);
 
   const userInitials = user 
     ? `${user.first_name?.[0] ?? ''}${user.last_name?.[0] ?? ''}`.toUpperCase() || 'U'
@@ -39,13 +175,11 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
 
   const menuItems = [
     { to: '/teacher/availability', label: 'Agenda' },
-    { to: '/teacher/my_next_booking', label: 'Reservas' },
+    { to: '/teacher/my_next_booking', label: 'Reservas y confirmaciones' },
     { to: '/teacher/chat', label: 'Chat' },
-    { to: '/teacher/subscription', label: 'Suscripción' },
-    { to: '/teacher/confirmation', label: 'Confirmación' },
   ];
 
-  const NavItem: React.FC<{ to: string; label: string; mobile?: boolean; badgeCount?: number }> = ({ to, label, mobile = false, badgeCount }) => {
+  const NavItem: React.FC<{ to: string; label: string; mobile?: boolean; badgeCount?: number; rsvCount?: number; confCount?: number }> = ({ to, label, mobile = false, badgeCount, rsvCount, confCount }) => {
     const isActive = location.pathname === to;
     const [hover, setHover] = useState(false);
 
@@ -88,6 +222,32 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
       borderRadius: '50%'
     };
 
+    const renderBadge = (count: number, bg: string = '#F59E0B', visible: boolean = true) => {
+      const text = count > 99 ? '99+' : String(count);
+      return (
+        <span
+          style={{
+            display: 'inline-block',
+            width: 28, // fixed width to avoid layout shift (fits up to '99+')
+            padding: '0 6px',
+            height: 18,
+            lineHeight: '18px',
+            fontSize: 11,
+            fontWeight: 700,
+            color: '#FFFFFF',
+            background: bg,
+            borderRadius: 999,
+            textAlign: 'center',
+            opacity: visible ? 1 : 0,
+            transition: 'opacity 180ms ease',
+            pointerEvents: 'none',
+          }}
+        >
+          {text}
+        </span>
+      );
+    };
+
     return (
       <Link
         to={to}
@@ -97,25 +257,19 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
       >
         {mobile && isActive && <span style={{ marginRight: '8px', fontSize: '18px' }}>•</span>}
         <span style={{ position: 'relative', zIndex: 10, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-          {label}
-          {!!badgeCount && badgeCount > 0 && (
-            <span
-              style={{
-                display: 'inline-block',
-                minWidth: 18,
-                padding: '0 6px',
-                height: 18,
-                lineHeight: '18px',
-                fontSize: 11,
-                fontWeight: 700,
-                color: '#FFFFFF',
-                background: '#F59E0B',
-                borderRadius: 999,
-                textAlign: 'center',
-              }}
-            >
-              {badgeCount}
+          {label === 'Reservas y confirmaciones' ? (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <span>Reservas</span>
+              {renderBadge(rsvCount ?? 0, '#F59E0B', !!(rsvCount && rsvCount > 0))}
+              <span style={{ opacity: 0.8, margin: '0 2px' }}>y</span>
+              <span>Confirmaciones</span>
+              {renderBadge(confCount ?? 0, '#F59E0B', !!(confCount && confCount > 0))}
             </span>
+          ) : (
+            <>
+              {label}
+              {renderBadge(badgeCount ?? 0, '#F59E0B', !!(badgeCount && badgeCount > 0))}
+            </>
           )}
         </span>
         {!mobile && <span style={underlineStyle} />}
@@ -130,8 +284,11 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
         className="fixed top-0 left-0 right-0 z-[70] w-full" 
         style={{
           fontFamily: 'Roboto, sans-serif',
-          backgroundColor: 'transparent',
-          padding: '16px 0'
+          backgroundColor: '#FAF9F5', // opaque to mask route content repaint
+          padding: '16px 0',
+          willChange: 'transform, opacity',
+          transform: 'translateZ(0)',
+          backfaceVisibility: 'hidden'
         }}
       >
         <div className="w-full px-4" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -161,6 +318,8 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
                     to={item.to}
                     label={item.label}
                     badgeCount={item.label === 'Chat' ? unreadTotal : undefined}
+                    rsvCount={item.label === 'Reservas y confirmaciones' ? bookingsCount : undefined}
+                    confCount={item.label === 'Reservas y confirmaciones' ? confirmationsCount : undefined}
                   />
                 ))}
               </nav>
@@ -277,7 +436,14 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
           <nav className="flex flex-col" style={{ gap: '0', maxWidth: '600px', margin: '0 auto' }}>
             {menuItems.map((item, index) => (
               <div key={item.label}>
-                <NavItem to={item.to} label={item.label} mobile badgeCount={item.label === 'Chat' ? unreadTotal : undefined} />
+                <NavItem
+                  to={item.to}
+                  label={item.label}
+                  mobile
+                  badgeCount={item.label === 'Chat' ? unreadTotal : undefined}
+                  rsvCount={item.label === 'Reservas y confirmaciones' ? bookingsCount : undefined}
+                  confCount={item.label === 'Reservas y confirmaciones' ? confirmationsCount : undefined}
+                />
                 {index < menuItems.length - 1 && (
                   <div style={{ height: '1px', backgroundColor: 'rgba(104, 178, 201, 0.15)', margin: '0 20px' }} />
                 )}

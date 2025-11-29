@@ -45,7 +45,7 @@ import { TeachersProvider } from '../context/teachers/TeachersContext';
 import Terms from '../pages/legal/Terms';
 import Privacy from '../pages/legal/Privacy';
 import ActivateAccountCard from '../components/comptHome/activate-account';
-import Chat from '../components/comptHome/chat';
+import ChatPage from '../pages/chat/my_chat';
 import PublicTeacherProfile from '../pages/teachers/PublicTeacherProfile';
 import { PublicTeacherProfileProvider } from '../context/teachers/PublicTeacherProfileContext';
 import { PublicAssessmentsProvider } from '../context/assessments/PublicAssessmentsContext';
@@ -318,7 +318,7 @@ const router = createBrowserRouter([
     path: '/teacher/chat',
     element: (
       <PrivateRoute roles={["teacher"]}>
-        <Chat />
+        <ChatPage />
       </PrivateRoute>
     ),
   },
@@ -326,7 +326,7 @@ const router = createBrowserRouter([
     path: '/student/chat',
     element: (
       <PrivateRoute roles={["student"]}>
-        <Chat />
+        <ChatPage />
       </PrivateRoute>
     ),
   },

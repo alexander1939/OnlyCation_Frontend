@@ -1,6 +1,7 @@
 // src/pages/teacher/TeacherHome.tsx
 import React, { useEffect, useState } from "react";
 import { useLoginContext } from "../../context/auth";
+import { useWallet } from "../../context/wallet/WalletContext";
 import WelcomeAlert from "../../components/WelcomeAlert";
 import Header from "../../components/ui/Header";
 import KnowledgeCenter from "../../components/comptHome/KnowledgeCenter";
@@ -15,7 +16,7 @@ import Footer from "../../components/ui/Footer";
 
 const TeacherHome: React.FC = () => {
   const { user } = useLoginContext();
-
+  const { fetchWalletBalance } = useWallet();
   const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
@@ -131,15 +132,23 @@ const TeacherHome: React.FC = () => {
             />
           </div>
           <div style={{ height: "100%" }}>
-            <DashboardCard
-              title="Cartera"
-              description="Consulta tus pagos y transacciones recientes."
-              linkText="Ver mi cartera"
-              route="/pagos"
-              icon={CreditCard}
-              iconColor="#16A34A"
-              iconBg="#DCFCE7"
-            />
+            <div 
+              onClick={async (e) => {
+                e.preventDefault();
+                await fetchWalletBalance();
+              }}
+              style={{ height: '100%', cursor: 'pointer' }}
+            >
+              <DashboardCard
+                title="Cartera"
+                description="Consulta tus pagos y transacciones recientes."
+                linkText="Ver mi cartera"
+                route="#"
+                icon={CreditCard}
+                iconColor="#16A34A"
+                iconBg="#DCFCE7"
+              />
+            </div>
           </div>
           <div style={{ height: "100%" }}>
             <AdaptiveList role="teacher" />

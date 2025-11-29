@@ -1,554 +1,613 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { useAuthContext } from "../../context/auth";
+import { useChatContext } from "../../context/chat";
 import Header from "../ui/Header";
 import Footer from "../ui/Footer";
+import { useNotificationContext } from "../NotificationProvider";
+import ConfirmDialog from "../shared/ConfirmDialog";
+
+// --- Local Hooks & Components ---
+
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 900);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 900);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return isMobile;
+};
+
+const CardWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div className="bg-white rounded-2xl shadow-sm overflow-hidden w-full max-w-7xl mx-auto">
+    {children}
+  </div>
+);
+
+const FullscreenWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "#FAF9F5",
+      display: "flex",
+      alignItems: "stretch",
+      justifyContent: "stretch",
+      boxSizing: "border-box",
+      fontFamily:
+        "'Roboto', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji'",
+    }}
+  >
+    {children}
+  </div>
+);
+
+// Helper para obtener iniciales
+const getInitials = (name: string): string => {
+  if (!name) return "?";
+  const parts = name.trim().split(" ");
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return parts[0].substring(0, 2).toUpperCase();
+};
+
+// --- Main Component ---
 
 interface ChatLayoutProps {
   fullScreen?: boolean;
-  backgroundColor?: string;
 }
 
-const Chat: React.FC<ChatLayoutProps> = ({
-  fullScreen = false,
-  backgroundColor = "#FFFFFF",
-}) => {
-  const [isMobile, setIsMobile] = useState(false);
-  const [activeConversationId, setActiveConversationId] = useState<number | null>(null);
+const Chat: React.FC<ChatLayoutProps> = ({ fullScreen = false }) => {
+  const { user } = useAuthContext();
+  const {
+    chats,
+    messages,
+    selectedChatId,
+    loading,
+    loadingMessages,
+    sendingMessage,
+    fetchChats,
+    selectChat,
+    sendMessage,
+    deleteMessage
+  } = useChatContext();
 
-  useEffect(() => {
-    const updateIsMobile = () => {
-      if (typeof window === "undefined") return;
-      const mobile = window.innerWidth <= 900;
-      setIsMobile(mobile);
-
-      if (!mobile && activeConversationId === null) {
-        setActiveConversationId(4);
-      }
-    };
-
-    updateIsMobile();
-    if (typeof window !== "undefined") {
-      window.addEventListener("resize", updateIsMobile);
-      return () => window.removeEventListener("resize", updateIsMobile);
-    }
-  }, [activeConversationId]);
-
-  const CardWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-    <div
-      style={{
-        backgroundColor,
-        borderRadius: "0.75rem", // un poco más cuadrado
-        padding: "1rem",         // menos padding para que el contenido se vea más grande
-        boxShadow: "0 8px 20px rgba(41,73,84,0.12)",
-        height: "100%",
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
-        fontFamily:
-          "'Roboto', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji'",
-      }}
-    >
-      {children}
-    </div>
-  );
-
-  const FullscreenWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "#FAF9F5",
-        display: "flex",
-        alignItems: "stretch",
-        justifyContent: "stretch",
-        boxSizing: "border-box",
-        fontFamily:
-          "'Roboto', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji'",
-      }}
-    >
-      {children}
-    </div>
-  );
-
-  const conversations = [
-    {
-      id: 1,
-      initials: "JG",
-      name: "Javier Gomez",
-      lastMessage: "Perfecto, nos vemos entonces.",
-      unread: 0,
-      active: false,
-    },
-    {
-      id: 2,
-      initials: "LF",
-      name: "Laura Fernández",
-      lastMessage: "He subido la tarea de la semana 3.",
-      unread: 0,
-      active: false,
-    },
-    {
-      id: 3,
-      initials: "CR",
-      name: "Carlos Rodríguez",
-      lastMessage: "¿Podrías revisar mi última entrega?",
-      unread: 0,
-      active: false,
-    },
-    {
-      id: 4,
-      initials: "AG",
-      name: "Ana García",
-      lastMessage: "Hola, ¿podemos revisar el horario...",
-      unread: 1,
-      active: true,
-    },
-  ];
-
-  const initialMessages = [
-    {
-      id: 1,
-      author: "Ana Garcia",
-      sender: "other" as const,
-      time: "10:31 AM",
-      text: "Hola, ¿podemos revisar el horario de la próxima semana?",
-    },
-    {
-      id: 2,
-      author: "Tú",
-      sender: "me" as const,
-      time: "10:31 AM",
-      text: "Claro, Ana. Lo revisamos ahora mismo.",
-    },
-    {
-      id: 3,
-      author: "Ana Garcia",
-      sender: "other" as const,
-      time: "10:32 AM",
-      text: "Genial. Tengo una duda sobre la clase del miércoles. ¿Podríamos moverla al jueves?",
-    },
-  ];
-
+  const isMobile = useIsMobile();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
-  const [chatMessages, setChatMessages] = useState(initialMessages);
+  const [searchQuery, setSearchQuery] = useState("");
+  const hasFetchedChats = useRef(false);
+  const [hoveredMessageId, setHoveredMessageId] = useState<number | null>(null);
+  const { showSuccess, showError } = useNotificationContext();
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [messageToDelete, setMessageToDelete] = useState<number | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
+  // Cargar chats al montar (solo una vez)
+  useEffect(() => {
+    if (user && !hasFetchedChats.current) {
+      hasFetchedChats.current = true;
+      fetchChats();
+    }
+  }, [user]); // Solo depende de user, no de fetchChats
+
+  // Scroll al final cuando llegan mensajes nuevos
   useEffect(() => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
-  }, [chatMessages, activeConversationId]);
+  }, [messages]);
 
-  const handleSendMessage = () => {
+  // Manejar envío de mensaje
+  const handleSendMessage = async () => {
     const raw = inputRef.current?.value ?? "";
     const trimmed = raw.trim();
-    if (!trimmed) return;
+    if (!trimmed || !selectedChatId) return;
 
-    const nextId = chatMessages.length > 0 ? chatMessages[chatMessages.length - 1].id + 1 : 1;
-    const now = new Date();
-    const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
-    const userMessage = {
-      id: nextId,
-      author: "Tú",
-      sender: "me" as const,
-      time,
-      text: trimmed,
-    };
-
-    const autoReply = {
-      id: nextId + 1,
-      author: "Ana Garcia",
-      sender: "other" as const,
-      time,
-      text: "Hola, ¿cómo está?",
-    };
-
-    setChatMessages((prev) => [...prev, userMessage, autoReply]);
-    if (inputRef.current) {
+    const success = await sendMessage(trimmed);
+    if (success && inputRef.current) {
       inputRef.current.value = "";
     }
   };
 
-  const showOnlyListOnMobile = isMobile && activeConversationId === null;
-  const showOnlyChatOnMobile = isMobile && activeConversationId !== null;
+  // Manejar eliminación de mensaje
+  const handleAskDeleteMessage = (messageId: number) => {
+    setMessageToDelete(messageId);
+    setConfirmOpen(true);
+  };
 
+  const handleConfirmDelete = async () => {
+    if (!messageToDelete) return;
+    setDeleting(true);
+    const res = await deleteMessage(messageToDelete);
+    setDeleting(false);
+    setConfirmOpen(false);
+    setMessageToDelete(null);
+    if (res?.success) {
+      showSuccess('Mensaje eliminado');
+    } else {
+      showError(res?.message || 'No se pudo eliminar el mensaje');
+    }
+  };
+
+  const handleCancelDelete = () => {
+    if (deleting) return;
+    setConfirmOpen(false);
+    setMessageToDelete(null);
+  };
+
+  // Helper para obtener nombre del participante
+  const getParticipantName = (chat: any) => {
+    // El backend envía participant.full_name con el nombre del otro usuario
+    if (chat.participant?.full_name) return chat.participant.full_name;
+
+    // Fallback si el backend no envía participant
+    if (user?.role === 'student' && chat.teacher_id) {
+      return `Profesor ${chat.teacher_id}`;
+    }
+
+    if (user?.role === 'teacher' && chat.student_id) {
+      return `Estudiante ${chat.student_id}`;
+    }
+
+    return "Usuario";
+  };
+
+  // Filtrar chats por búsqueda
+  const filteredChats = chats.filter(chat => {
+    const participantName = getParticipantName(chat);
+    return participantName.toLowerCase().includes(searchQuery.toLowerCase());
+  });
+
+  // Obtener el chat seleccionado
+  const selectedChat = chats.find(c => (c.chat_id || c.id) === selectedChatId);
+
+  // Contenido del chat
   const ChatContent = (
     <div
       className="chat-layout-wrapper"
-      style={{ display: "flex", flex: 1, minHeight: 0 }}
+      style={{ display: "flex", flex: 1, minHeight: 0, height: isMobile ? "100vh" : "600px" }}
     >
-      {/* Columna izquierda: lista de conversaciones */}
-      {!showOnlyChatOnMobile && (
-        <div
-          style={{
-            width: isMobile ? "100%" : 290,
-            borderRight: isMobile ? "none" : "1px solid rgba(41,73,84,0.12)",
-            background: "#FFFFFF",
-            display: "flex",
-            flexDirection: "column",
-            // en móvil llenamos la pantalla, en escritorio ocupamos solo el alto disponible del contenedor
-            height: isMobile ? "100vh" : "100%",
-          }}
-        >
-        <div
-          style={{
-            padding: "1rem 1.2rem 0.75rem",
-            borderBottom: "1px solid rgba(41,73,84,0.08)",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            fontSize: 14,
-            color: "#294954",
-            fontWeight: 600,
-          }}
-        >
-          <span>Conversaciones Activas</span>
-        </div>
-
-        <div style={{ padding: "0.75rem 0.9rem 0.4rem" }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "0.4rem 0.55rem",
-              background: "#FAF9F5",
-              borderRadius: 999,
-            }}
-          >
-            <input
-              placeholder="Buscar chats..."
-              style={{
-                fontSize: 13,
-                color: "#294954",
-                flex: 1,
-                border: "none",
-                outline: "none",
-                background: "transparent",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
+      {/* Lista de conversaciones (izquierda) */}
+      <div
+        style={{
+          width: isMobile ? "100%" : 320,
+          borderRight: isMobile ? "none" : "1px solid #E2E8F0",
+          display: "flex",
+          flexDirection: "column",
+          background: "#FFFFFF",
+        }}
+      >
+        {/* Header de conversaciones */}
+        <div style={{ padding: "1.2rem 1rem", borderBottom: "1px solid #E2E8F0" }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: '0.6rem' }}>
+            <h2 style={{ fontSize: 18, fontWeight: 700, color: "#294954", margin: 0 }}>
+              Conversaciones Activas
+            </h2>
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  setRefreshing(true);
+                  await fetchChats();
+                  showSuccess('Conversaciones actualizadas');
+                } catch (e) {
+                  showError('No se pudieron actualizar las conversaciones');
+                } finally {
+                  setRefreshing(false);
+                }
               }}
-            />
-          </div>
-        </div>
-
-        <div
-          style={{
-            flex: 1,
-            overflowY: "auto",
-            padding: "0 0.4rem 0.6rem 0.4rem",
-          }}
-        >
-          {conversations.map((conv) => {
-            const isActive = activeConversationId === conv.id;
-            return (
-              <div
-                key={conv.id}
-                onClick={() => setActiveConversationId(conv.id)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  padding: "0.55rem 0.65rem",
-                  margin: "0.15rem 0.25rem",
-                  borderRadius: 12,
-                  background: isActive ? "#294954" : "transparent",
-                  color: isActive ? "#FAF9F5" : "#294954",
-                  cursor: "pointer",
-                }}
-              >
-              <div
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 999,
-                  background: isActive ? "#8ED4BE" : "#FAF9F5",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginRight: 10,
-                  fontSize: 14,
-                  fontWeight: 600,
-                }}
-              >
-                {conv.initials}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 600,
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {conv.name}
-                </div>
-                <div
-                  style={{
-                    fontSize: 12,
-                    color: isActive ? "#FFDE97" : "#64748B",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {conv.lastMessage}
-                </div>
-              </div>
-              {conv.unread > 0 && (
-                <div
-                  style={{
-                    minWidth: 22,
-                    height: 22,
-                    borderRadius: 999,
-                    background: "#FFDE97",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 12,
-                    color: "#294954",
-                    fontWeight: 600,
-                  }}
-                >
-                  {conv.unread}
-                </div>
-              )}
-            </div>
-          );
-          })}
-        </div>
-
-      </div>
-      )}
-
-      {/* Panel derecho: conversación */}
-      {!showOnlyListOnMobile && (
-        <div
-          style={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            background: "#FAF9F5",
-            // en móvil pantalla completa, en escritorio solo el alto disponible del contenedor
-            height: isMobile ? "100vh" : "100%",
-          }}
-        >
-        {/* Encabezado */}
-        <div
-          style={{
-            padding: "0.9rem 1.3rem",
-            borderBottom: "1px solid rgba(41,73,84,0.08)",
-            background: "#FFFFFF",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            {isMobile && (
-              <button
-                type="button"
-                onClick={() => setActiveConversationId(null)}
-                style={{
-                  border: "none",
-                  background: "transparent",
-                  cursor: "pointer",
-                  marginRight: 6,
-                  fontSize: 20,
-                }}
-              >
-                ←
-              </button>
-            )}
-            <div
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 999,
-                background: "#294954",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#FAF9F5",
-                fontWeight: 700,
-                fontSize: 15,
-              }}
+              disabled={refreshing}
+              className="btn-ver-detalles"
+              style={{ minWidth: 112, height: 32, padding: '0 10px' }}
+              title="Actualizar conversaciones"
             >
-              AG
-            </div>
-            <div>
-              <div
-                style={{
-                  fontSize: 15,
-                  fontWeight: 600,
-                  color: "#294954",
-                }}
-              >
-                Ana Garcia
-              </div>
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "#8ED4BE",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                }}
-              >
-                <span
-                  style={{
-                    width: 7,
-                    height: 7,
-                    borderRadius: 999,
-                    background: "#8ED4BE",
-                  }}
-                />
-                Online
-              </div>
-            </div>
+              {refreshing ? 'Actualizando…' : 'Actualizar'}
+            </button>
           </div>
+          <input
+            type="text"
+            placeholder="Buscar chats..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "0.5rem 0.75rem",
+              border: "1px solid #E2E8F0",
+              borderRadius: 8,
+              fontSize: 13,
+              outline: "none",
+            }}
+          />
         </div>
 
-        {/* Mensajes */}
-        <div
-          ref={messagesContainerRef}
-          style={{
-            // altura fija más grande para que el área del chat sea más larga hacia abajo
-            height: "60vh",
-            padding: "1.2rem 1.0rem 0.9rem",
-            overflowY: "auto",      // scroll solo en la conversación
-            display: "flex",
-            flexDirection: "column",
-            gap: 10,
-          }}
-        >
-          {chatMessages.map((msg) => {
-            const isMe = msg.sender === "me";
-            return (
-              <div key={msg.id} style={{ display: "flex", flexDirection: "column" }}>
-                {!isMe && (
-                  <div
-                    style={{
-                      fontSize: 11,
-                      color: "#94A3B8",
-                      marginBottom: 4,
-                    }}
-                  >
-                    {msg.author}
-                  </div>
-                )}
+        {/* Lista de chats */}
+        <div style={{ flex: 1, overflowY: "auto" }}>
+          {loading ? (
+            <div style={{ padding: "2rem", textAlign: "center", color: "#94A3B8" }}>
+              Cargando chats...
+            </div>
+          ) : filteredChats.length === 0 ? (
+            <div style={{ padding: "2rem", textAlign: "center", color: "#94A3B8" }}>
+              No hay conversaciones
+            </div>
+          ) : (
+            filteredChats.map((chat) => {
+              const chatId = chat.chat_id || chat.id;
+              const isSelected = chatId === selectedChatId;
+              const participantName = getParticipantName(chat);
+              const initials = getInitials(participantName);
+              const lastMessage = chat.last_message?.content || "Sin mensajes";
+              // Solo mostrar badge si NO está seleccionado y hay mensajes sin leer
+              const hasUnread = !isSelected && (chat.unread_count || 0) > 0;
+
+              return (
                 <div
+                  key={chatId}
+                  onClick={() => {
+                    if (chatId) {
+                      selectChat(chatId);
+                    }
+                  }}
                   style={{
-                    display: "flex",
-                    justifyContent: isMe ? "flex-end" : "flex-start",
+                    padding: "0.9rem 1rem",
+                    borderBottom: "1px solid #F1F5F9",
+                    cursor: "pointer",
+                    background: isSelected ? "#294954" : "transparent",
+                    transition: "background 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isSelected) e.currentTarget.style.background = "#F8FAFC";
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isSelected) e.currentTarget.style.background = "transparent";
                   }}
                 >
-                  <div
-                    style={{
-                      maxWidth: "70%",
-                      background: isMe ? "#8ED4BE" : "#FFFFFF",
-                      color: isMe ? "#294954" : "#294954",
-                      borderRadius: 18,
-                      padding: "0.55rem 0.9rem",
-                      boxShadow: isMe
-                        ? "0 2px 6px rgba(0,0,0,0.12)"
-                        : "0 1px 3px rgba(15,23,42,0.12)",
-                    }}
-                  >
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                    {/* Avatar */}
                     <div
                       style={{
-                        fontSize: 13,
-                        lineHeight: 1.45,
+                        width: 44,
+                        height: 44,
+                        borderRadius: "50%",
+                        background: isSelected ? "#8ED4BE" : "#E2E8F0",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 14,
+                        fontWeight: 600,
+                        color: isSelected ? "#FFFFFF" : "#64748B",
+                        flexShrink: 0,
                       }}
                     >
-                      {msg.text}
+                      {chat.participant?.avatar_url ? (
+                        <img
+                          src={chat.participant.avatar_url}
+                          alt={participantName}
+                          style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }}
+                        />
+                      ) : (
+                        initials
+                      )}
+                    </div>
+
+                    {/* Info */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
+                        <div
+                          style={{
+                            fontSize: 14,
+                            fontWeight: 600,
+                            color: isSelected ? "#FFFFFF" : "#294954",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {participantName}
+                        </div>
+                        {hasUnread && (
+                          <div
+                            style={{
+                              background: "#F59E0B",
+                              color: "#FFFFFF",
+                              fontSize: 11,
+                              fontWeight: 700,
+                              borderRadius: 999,
+                              padding: "2px 6px",
+                              minWidth: 18,
+                              textAlign: "center",
+                            }}
+                          >
+                            {chat.unread_count}
+                          </div>
+                        )}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 12,
+                          color: isSelected ? "#E2E8F0" : "#64748B",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {lastMessage}
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div
-                  style={{
-                    fontSize: 10,
-                    color: "#94A3B8",
-                    marginTop: 3,
-                    alignSelf: isMe ? "flex-end" : "flex-start",
-                  }}
-                >
-                  {msg.time} {isMe ? "Tú" : ""}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Input de mensaje */}
-        <div
-          style={{
-            padding: "0.8rem 1.0rem 1.0rem",
-            borderTop: "1px solid rgba(41,73,84,0.08)",
-            background: "#FFFFFF",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              background: "#F8FAFC",
-              borderRadius: 999,
-              padding: "0.4rem 0.5rem 0.4rem 1rem",
-              border: "1px solid #E2E8F0",
-            }}
-          >
-            <input
-              placeholder="Escribe un mensaje..."
-              ref={inputRef}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleSendMessage();
-                }
-              }}
-              style={{
-                flex: 1,
-                border: "none",
-                outline: "none",
-                background: "transparent",
-                fontSize: 13,
-                color: "#294954",
-              }}
-            />
-            <button
-              type="button"
-              onClick={handleSendMessage}
-              style={{
-                border: "none",
-                outline: "none",
-                width: 36,
-                height: 36,
-                borderRadius: 999,
-                background: "#8ED4BE",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                boxShadow: "0 4px 10px rgba(56,189,248,0.45)",
-              }}
-            >
-              <span
-                style={{
-                  borderLeft: "10px solid #ffffff",
-                  borderTop: "6px solid transparent",
-                  borderBottom: "6px solid transparent",
-                  marginLeft: 3,
-                }}
-              />
-            </button>
-          </div>
+              );
+            })
+          )}
         </div>
       </div>
-      )}
+
+      {/* Panel de mensajes (derecha) */}
+      <div
+        style={{
+          flex: 1,
+          display: isMobile && !selectedChatId ? "none" : "flex",
+          flexDirection: "column",
+          background: "#FAF9F5",
+        }}
+      >
+        {!selectedChatId ? (
+          <div
+            style={{
+              flex: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#94A3B8",
+              fontSize: 14,
+            }}
+          >
+            Selecciona una conversación para comenzar
+          </div>
+        ) : (
+          <>
+            {/* Header del chat */}
+            <div
+              style={{
+                padding: "0.9rem 1.3rem",
+                borderBottom: "1px solid #E2E8F0",
+                background: "#FFFFFF",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.75rem",
+              }}
+            >
+              <div
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: "50%",
+                  background: "#8ED4BE",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: "#FFFFFF",
+                }}
+              >
+                {selectedChat?.participant?.avatar_url ? (
+                  <img
+                    src={selectedChat.participant.avatar_url}
+                    alt={getParticipantName(selectedChat)}
+                    style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }}
+                  />
+                ) : (
+                  getInitials(getParticipantName(selectedChat))
+                )}
+              </div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: "#294954" }}>
+                {getParticipantName(selectedChat)}
+              </div>
+            </div>
+
+            {/* Área de mensajes */}
+            <div
+              ref={messagesContainerRef}
+              style={{
+                flex: 1,
+                padding: "1.2rem 1.0rem 0.9rem",
+                overflowY: "auto",
+                display: "flex",
+                flexDirection: "column",
+                gap: 10,
+              }}
+            >
+              {loadingMessages ? (
+                <div className="text-center text-gray-500 text-sm mt-4">
+                  Cargando mensajes...
+                </div>
+              ) : messages.length === 0 ? (
+                <div className="text-center text-gray-500 text-sm mt-4">
+                  No hay mensajes. ¡Inicia la conversación!
+                </div>
+              ) : (
+                messages.map((msg) => {
+                  const userId = user?.id ? Number(user.id) : null;
+                  const senderId = Number(msg.sender_id);
+                  const isMe = userId !== null && senderId === userId;
+                  const senderName = isMe ? "Tú" : getParticipantName(selectedChat);
+
+                  return (
+                    <div
+                      key={msg.id}
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: isMe ? "flex-end" : "flex-start",
+                        marginBottom: "0.75rem",
+                      }}
+                      onMouseEnter={() => setHoveredMessageId(msg.id)}
+                      onMouseLeave={() => setHoveredMessageId(null)}
+                    >
+                      {/* Nombre del remitente */}
+                      <div
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 600,
+                          color: isMe ? "#8ED4BE" : "#64748B",
+                          marginBottom: 4,
+                          paddingLeft: isMe ? 0 : "0.5rem",
+                          paddingRight: isMe ? "0.5rem" : 0,
+                        }}
+                      >
+                        {senderName}
+                      </div>
+
+                      {/* Burbuja del mensaje con botón de eliminar */}
+                      <div style={{ position: "relative", maxWidth: "70%" }}>
+                        <div
+                          style={{
+                            background: isMe ? "#8ED4BE" : "#FFFFFF",
+                            color: "#294954",
+                            borderRadius: isMe ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
+                            padding: "0.65rem 1rem",
+                            boxShadow: isMe
+                              ? "0 2px 6px rgba(142, 212, 190, 0.3)"
+                              : "0 1px 4px rgba(15,23,42,0.15)",
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontSize: 14,
+                              lineHeight: 1.5,
+                              wordBreak: "break-word",
+                            }}
+                          >
+                            {msg.content}
+                          </div>
+                        </div>
+
+                        {/* Botón de eliminar (solo para mensajes propios) */}
+                        {isMe && hoveredMessageId === msg.id && (
+                          <button
+                            onClick={() => handleAskDeleteMessage(msg.id)}
+                            style={{
+                              position: "absolute",
+                              top: -8,
+                              right: -8,
+                              width: 24,
+                              height: 24,
+                              borderRadius: "50%",
+                              background: "#EF4444",
+                              color: "#FFFFFF",
+                              border: "2px solid #FFFFFF",
+                              cursor: "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontSize: 12,
+                              fontWeight: 600,
+                              boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                            }}
+                            title="Eliminar mensaje"
+                          >
+                            ×
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Timestamp */}
+                      <div
+                        style={{
+                          fontSize: 10,
+                          color: "#94A3B8",
+                          marginTop: 4,
+                          paddingLeft: isMe ? 0 : "0.5rem",
+                          paddingRight: isMe ? "0.5rem" : 0,
+                        }}
+                      >
+                        {new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Input de mensaje */}
+            <div
+              style={{
+                padding: "0.8rem 1.0rem 1.0rem",
+                borderTop: "1px solid #E2E8F0",
+                background: "#FFFFFF",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  background: "#F8FAFC",
+                  borderRadius: 999,
+                  padding: "0.4rem 0.5rem 0.4rem 1rem",
+                  border: "1px solid #E2E8F0",
+                }}
+              >
+                <input
+                  placeholder="Escribe un mensaje..."
+                  ref={inputRef}
+                  disabled={sendingMessage}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }
+                  }}
+                  style={{
+                    flex: 1,
+                    border: "none",
+                    outline: "none",
+                    background: "transparent",
+                    fontSize: 13,
+                    color: "#294954",
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={handleSendMessage}
+                  disabled={sendingMessage}
+                  style={{
+                    border: "none",
+                    outline: "none",
+                    width: 36,
+                    height: 36,
+                    borderRadius: 999,
+                    background: sendingMessage ? "#E2E8F0" : "#8ED4BE",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: sendingMessage ? "not-allowed" : "pointer",
+                    boxShadow: sendingMessage ? "none" : "0 4px 10px rgba(142,212,190,0.45)",
+                  }}
+                >
+                  <span
+                    style={{
+                      borderLeft: `10px solid ${sendingMessage ? "#94A3B8" : "#ffffff"}`,
+                      borderTop: "6px solid transparent",
+                      borderBottom: "6px solid transparent",
+                      marginLeft: 3,
+                    }}
+                  />
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
 
       <style>{`
         @media (max-width: 900px) {
@@ -561,7 +620,21 @@ const Chat: React.FC<ChatLayoutProps> = ({
   );
 
   if (fullScreen) {
-    return <FullscreenWrapper>{ChatContent}</FullscreenWrapper>;
+    return (
+      <>
+        <FullscreenWrapper>{ChatContent}</FullscreenWrapper>
+        <ConfirmDialog
+          isOpen={confirmOpen}
+          title="Eliminar mensaje"
+          description="Esta acción no se puede deshacer. ¿Deseas eliminar este mensaje?"
+          confirmText="Eliminar"
+          cancelText="Cancelar"
+          loading={deleting}
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+        />
+      </>
+    );
   }
 
   return (
@@ -569,7 +642,7 @@ const Chat: React.FC<ChatLayoutProps> = ({
       style={{
         display: "flex",
         flexDirection: "column",
-        minHeight: "100vh",   // permite que la página crezca y se pueda scrollear hasta el footer
+        minHeight: "100vh",
         background: "#FAF9F5",
       }}
     >
@@ -579,7 +652,6 @@ const Chat: React.FC<ChatLayoutProps> = ({
         style={{
           flex: 1,
           display: "flex",
-          // espacio justo debajo del header y un pequeño espacio antes del footer
           padding: "6rem 0 1rem",
           boxSizing: "border-box",
           width: "100%",
@@ -589,6 +661,16 @@ const Chat: React.FC<ChatLayoutProps> = ({
       </div>
 
       <Footer />
+      <ConfirmDialog
+        isOpen={confirmOpen}
+        title="Eliminar mensaje"
+        description="Esta acción no se puede deshacer. ¿Deseas eliminar este mensaje?"
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        loading={deleting}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </div>
   );
 };

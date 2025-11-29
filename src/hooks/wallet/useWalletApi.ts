@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
 import axios, { AxiosError } from 'axios';
-import type { WalletCreateRequest, WalletCreateResponse } from '../../context/wallet/types';
+import type { WalletCreateRequest, WalletCreateResponse, WalletBalanceResponse } from '../../context/wallet/types';
 import { useAuthToken } from '../auth/useAuthToken';
 
 const API_URL = import.meta.env.VITE_API_URL as string;
 
-export const useAgendaApi = () => {
+export const useWalletApi = () => {
   const { getAccessToken } = useAuthToken();
 
   const client = useMemo(() => {
@@ -41,5 +41,30 @@ export const useAgendaApi = () => {
     }
   };
 
-  return { createWallet };
+  const getWalletBalance = async (): Promise<{
+    success: boolean;
+    data?: WalletBalanceResponse;
+    message: string;
+  }> => {
+    try {
+      const token = getAccessToken();
+      if (!token) throw new Error('No hay token de acceso. Inicia sesión nuevamente.');
+
+      const response = await client.get<WalletBalanceResponse>('/wallet/balance/', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      return {
+        success: true,
+        data: response.data,
+        message: 'Balance obtenido correctamente',
+      };
+    } catch (err) {
+      const axErr = err as AxiosError<{ detail?: string }>;
+      const message = axErr.response?.data?.detail || axErr.message || 'Error al obtener el balance';
+      return { success: false, message };
+    }
+  };
+
+  return { createWallet, getWalletBalance };
 };

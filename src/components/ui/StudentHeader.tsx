@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import ProfileDropdown from '../ProfileDropdown';
+import { useChatContext } from '../../context/chat';
 
 type StudentHeaderProps = {
   user: any;
@@ -14,13 +15,24 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
   const [isProfileExpanded, setIsProfileExpanded] = useState(false);
   const [isDesktop, setIsDesktop] = useState<boolean>(typeof window !== 'undefined' ? window.innerWidth >= 1024 : false);
 
+  const { getUnreadCount, fetchChats } = useChatContext();
+  const unreadTotal = getUnreadCount();
+  const hasFetchedRef = React.useRef(false);
+
   React.useEffect(() => {
     const onResize = () => setIsDesktop(window.innerWidth >= 1024);
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  
+  // Cargar previews una sola vez para tener contador total
+  React.useEffect(() => {
+    if (!hasFetchedRef.current) {
+      hasFetchedRef.current = true;
+      fetchChats();
+    }
+  }, [fetchChats]);
+
   const userInitials = user 
     ? `${user.first_name?.[0] ?? ''}${user.last_name?.[0] ?? ''}`.toUpperCase() || 'U'
     : '';
@@ -32,7 +44,7 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
     { to: '/student/confirmation', label: 'Confirmación' },
   ];
 
-  const NavItem: React.FC<{ to: string; label: string; mobile?: boolean }> = ({ to, label, mobile = false }) => {
+  const NavItem: React.FC<{ to: string; label: string; mobile?: boolean; badgeCount?: number }> = ({ to, label, mobile = false, badgeCount }) => {
     const isActive = location.pathname === to;
     const [hover, setHover] = useState(false);
 
@@ -83,7 +95,28 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
         style={linkStyle}
       >
         {mobile && isActive && <span style={{ marginRight: '8px', fontSize: '18px' }}>•</span>}
-        <span style={{ position: 'relative', zIndex: 10 }}>{label}</span>
+        <span style={{ position: 'relative', zIndex: 10, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          {label}
+          {!!badgeCount && badgeCount > 0 && (
+            <span
+              style={{
+                display: 'inline-block',
+                minWidth: 18,
+                padding: '0 6px',
+                height: 18,
+                lineHeight: '18px',
+                fontSize: 11,
+                fontWeight: 700,
+                color: '#FFFFFF',
+                background: '#F59E0B',
+                borderRadius: 999,
+                textAlign: 'center',
+              }}
+            >
+              {badgeCount}
+            </span>
+          )}
+        </span>
         {!mobile && <span style={underlineStyle} />}
         {!mobile && isActive && <span style={activeDotStyle} />}
       </Link>
@@ -122,7 +155,12 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
             {isDesktop && (
               <nav className="flex items-center" style={{ gap: '48px' }}>
                 {menuItems.map((item) => (
-                  <NavItem key={item.label} to={item.to} label={item.label} />
+                  <NavItem
+                    key={item.label}
+                    to={item.to}
+                    label={item.label}
+                    badgeCount={item.label === 'Chat' ? unreadTotal : undefined}
+                  />
                 ))}
               </nav>
             )}
@@ -238,7 +276,7 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
           <nav className="flex flex-col" style={{ gap: '0', maxWidth: '600px', margin: '0 auto' }}>
             {menuItems.map((item, index) => (
               <div key={item.label}>
-                <NavItem to={item.to} label={item.label} mobile />
+                <NavItem to={item.to} label={item.label} mobile badgeCount={item.label === 'Chat' ? unreadTotal : undefined} />
                 {index < menuItems.length - 1 && (
                   <div style={{ height: '1px', backgroundColor: 'rgba(104, 178, 201, 0.15)', margin: '0 20px' }} />
                 )}

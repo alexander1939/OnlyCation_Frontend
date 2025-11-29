@@ -380,7 +380,7 @@ export default function BookingView({
                       </div>
                       <div className="proxima-info-item">
                         <span className="proxima-info-icon">{nextClass.modality === 'In-person' ? '📍' : '🔗'}</span>
-                        <span>{nextClass.modality === 'In-person' ? 'Enlace de Jitmeed' : 'Enlace de Jitmeed'}</span>
+                        <span>{nextClass.modality === 'In-person' ? 'Enlace de Jitsimeet' : 'Enlace de Jitsimeet'}</span>
                       </div>
                     </div>
                     <div className="proxima-actions">

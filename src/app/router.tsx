@@ -291,6 +291,16 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: '/teacher/documents',
+    element: (
+      <PrivateRoute roles={["teacher"]}>
+        <DocumentsProvider>
+          <DocenteDocumentos />
+        </DocumentsProvider>
+      </PrivateRoute>
+    ),
+  },
+  {
     path: '/teacher/confirmation',
     element: (
       <PrivateRoute roles={["teacher"]}>

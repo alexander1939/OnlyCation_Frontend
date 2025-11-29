@@ -1,14 +1,9 @@
 import Header from '../../components/ui/Header';
 import Footer from '../../components/ui/Footer';
-<<<<<<< HEAD
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/auth';
 import { useUpdateProfile } from '../../hooks/auth/useUpdateProfile';
 import { useState } from 'react';
-=======
-import { Link } from 'react-router-dom';
-import { useAuthContext } from '../../context/auth';
->>>>>>> main
 import '../../styles/student-personal-data.css';
 
 export default function EstudianteDatosPersonales() {
@@ -76,7 +71,6 @@ export default function EstudianteDatosPersonales() {
               <p className="sdp-subtitle">Actualiza tu información básica</p>
             </div>
             <div className="sdp-body">
-<<<<<<< HEAD
               {/* Mensajes de éxito y error */}
               {successMessage && (
                 <div style={{
@@ -130,30 +124,12 @@ export default function EstudianteDatosPersonales() {
                   <input className="sdp-input" type="email" disabled aria-readonly placeholder="correo@ejemplo.com" defaultValue={user?.email ?? ''} />
                 </label>
 
-=======
-              <form className="sdp-form-grid" onSubmit={(e) => e.preventDefault()}>
-                <label className="sdp-field">
-                  <span className="sdp-label">Nombre</span>
-                  <input className="sdp-input" placeholder="Nombre" defaultValue={user?.first_name ?? ''} />
-                </label>
-                <label className="sdp-field">
-                  <span className="sdp-label">Apellidos</span>
-                  <input className="sdp-input" placeholder="Apellidos" defaultValue={user?.last_name ?? ''} />
-                </label>
-
-                <label className="sdp-field">
-                  <span className="sdp-label">Correo (no editable)</span>
-                  <input className="sdp-input" type="email" disabled aria-readonly placeholder="correo@ejemplo.com" defaultValue={user?.email ?? ''} />
-                </label>
-
->>>>>>> main
                 <div className="sdp-info">
                   Solo puedes editar tu nombre y apellidos. Para cambiar tu contraseña utiliza el botón "Cambiar contraseña".
                 </div>
 
                 <div className="sdp-actions">
                   <div className="sdp-actions-left">
-<<<<<<< HEAD
                     <button
                       type="submit"
                       className="sdp-btn sdp-btn--primary"
@@ -162,10 +138,6 @@ export default function EstudianteDatosPersonales() {
                       {loading ? 'Guardando...' : 'Guardar cambios'}
                     </button>
                     <Link to="/student-home" className="sdp-btn sdp-btn--secondary" role="button">Cancelar</Link>
-=======
-                    <button type="submit" className="sdp-btn sdp-btn--primary">Guardar cambios</button>
-                    <Link to="/estudiante/general" className="sdp-btn sdp-btn--secondary" role="button">Cancelar</Link>
->>>>>>> main
                   </div>
                   <div className="sdp-actions-right">
                     <Link to="/auth/change-password" className="sdp-btn sdp-btn--outline" role="button">Cambiar contraseña</Link>

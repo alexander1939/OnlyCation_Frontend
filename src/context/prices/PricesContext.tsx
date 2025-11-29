@@ -1,12 +1,13 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
-import type { PricesContextType, PriceCreateRequest, PriceMeta } from './types';
+import type { PricesContextType, PriceCreateRequest, PriceMeta, PriceUpdateRequest } from './types';
 import { usePricesApi } from '../../hooks/prices/usePricesApi';
 
 const PricesContext = createContext<PricesContextType | undefined>(undefined);
 
 export const PricesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { createPrice: apiCreate, getMyPrice: apiGetMyPrice } = usePricesApi();
+  const { createPrice: apiCreate, getMyPrice: apiGetMyPrice, updatePrice: apiUpdatePrice } = usePricesApi();
   const [creating, setCreating] = useState(false);
+  const [updating, setUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastCreated, setLastCreated] = useState<PriceMeta | null>(null);
   const [myPrice, setMyPrice] = useState<number | null>(null);
@@ -43,12 +44,35 @@ export const PricesProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }, [apiGetMyPrice]);
 
+  const updatePrice = useCallback(async (payload: PriceUpdateRequest) => {
+    setUpdating(true);
+    setError(null);
+    try {
+      const res = await apiUpdatePrice(payload);
+      if (res?.success && res.data) {
+        // Actualizar precio actual desde la respuesta
+        setMyPrice(res.data.selected_prices);
+        return { success: true, message: res.message || 'Precio actualizado exitosamente' };
+      } else {
+        const message = res?.message || 'No se pudo actualizar el precio';
+        setError(message);
+        return { success: false, message };
+      }
+    } catch (e: any) {
+      const message = e?.message || 'Error desconocido';
+      setError(message);
+      return { success: false, message };
+    } finally {
+      setUpdating(false);
+    }
+  }, [apiUpdatePrice]);
+
   const resetStatus = useCallback(() => {
     setError(null);
     setLastCreated(null);
   }, []);
 
-  const value = useMemo(() => ({ creating, error, lastCreated, myPrice, createPrice, getMyPrice, resetStatus }), [creating, error, lastCreated, myPrice, createPrice, getMyPrice, resetStatus]);
+  const value = useMemo(() => ({ creating, updating, error, lastCreated, myPrice, createPrice, getMyPrice, updatePrice, resetStatus }), [creating, updating, error, lastCreated, myPrice, createPrice, getMyPrice, updatePrice, resetStatus]);
 
   return (
     <PricesContext.Provider value={value}>

@@ -307,10 +307,17 @@ export default function BookingView({
   const hasMoreCompletadas = completedClasses.length > MAX_ITEMS;
 
   const handleJoinClass = (classLink?: string) => {
-    if (classLink) {
-      window.open(classLink, '_blank');
-    } else {
-      alert('El enlace de la clase no está disponible aún');
+    if (!classLink) {
+      showError('Enlace de la clase no disponible.');
+      return;
+    }
+    try {
+      const w = window.open(classLink, '_blank', 'noopener,noreferrer');
+      if (!w) {
+        showError('No se pudo abrir la llamada. Habilita ventanas emergentes e intenta nuevamente.');
+      }
+    } catch (e) {
+      showError('Ocurrió un error al abrir la llamada.');
     }
   };
 
@@ -373,7 +380,7 @@ export default function BookingView({
                       </div>
                       <div className="proxima-info-item">
                         <span className="proxima-info-icon">{nextClass.modality === 'In-person' ? '📍' : '🔗'}</span>
-                        <span>{nextClass.modality === 'In-person' ? 'Enlace de Zoom' : 'Enlace de Zoom'}</span>
+                        <span>{nextClass.modality === 'In-person' ? 'Enlace de Jitsimeet' : 'Enlace de Jitsimeet'}</span>
                       </div>
                     </div>
                     <div className="proxima-actions">
@@ -493,19 +500,7 @@ export default function BookingView({
                                 Finalizó: {formatDate(it.booking_end)}, {formatTime(it.booking_end)} · Tiempo restante: {formatSecondsLeft(it.seconds_left)}
                               </div>
                             </div>
-                            {typeof it.has_assessment_by_student === 'boolean' && (
-                              <div style={{ marginTop: 6 }}>
-                                <div
-                                  className={`confirmacion-badge ${it.has_assessment_by_student ? 'confirmada' : 'pendiente'}`}
-                                  title={it.has_assessment_by_student ? 'El alumno ya contestó la evaluación' : 'El alumno no ha contestado la evaluación'}
-                                >
-                                  <span>🧾</span>
-                                  {user?.role === 'teacher'
-                                    ? (it.has_assessment_by_student ? 'Evaluación del alumno' : 'Sin evaluación del alumno')
-                                    : (it.has_assessment_by_student ? 'Tu evaluación enviada' : 'Tu evaluación pendiente')}
-                                </div>
-                              </div>
-                            )}
+                            {/* Oculto: badge de evaluación del alumno junto a 'Confirmar ahora' */}
                             <button
                               className="btn-confirmar-asistencia"
                               onClick={() => openConfirmModal(it)}

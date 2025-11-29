@@ -8,6 +8,7 @@ import { useLoginApi } from "../../hooks/auth/useLoginApi";
 import WelcomeAlert from "../../components/WelcomeAlert";
 import { CalendarDays, User2, GraduationCap} from "lucide-react";
 import { MyNextClassesProvider, useMyNextClassesContext } from "../../context/booking";
+import { useTeachersApi, type Teacher } from "../../hooks/teachers/useTeachersApi";
 import "../../styles/student-home-redesign.css";
 import { TeachersProvider } from "../../context/teachers/TeachersContext";
 import { RecommendedTeachers } from "../../components/comptHome/RecommendedTeachers"
@@ -68,6 +69,10 @@ const NextBookingCard: React.FC = () => {
 const StudentHome: React.FC = () => {
   const { user } = useLoginApi();
   const [showWelcome, setShowWelcome] = useState(false);
+  const { searchTeachers } = useTeachersApi();
+  const [recommendedTeachers, setRecommendedTeachers] = useState<Teacher[]>([]);
+  const [loadingRecommended, setLoadingRecommended] = useState<boolean>(false);
+  const [errorRecommended, setErrorRecommended] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -77,6 +82,28 @@ const StudentHome: React.FC = () => {
         sessionStorage.removeItem("showWelcome");
       }
     } catch {}
+  }, []);
+
+  useEffect(() => {
+    const fetchRecommended = async () => {
+      try {
+        setLoadingRecommended(true);
+        setErrorRecommended(null);
+        const res = await searchTeachers({
+          min_rating: 4,
+          page: 1,
+          page_size: 3,
+        });
+        const data = res.data || [];
+        setRecommendedTeachers(data.slice(0, 3));
+      } catch (e) {
+        setErrorRecommended("No fue posible cargar profesores recomendados");
+      } finally {
+        setLoadingRecommended(false);
+      }
+    };
+
+    fetchRecommended();
   }, []);
 
   return (
@@ -131,9 +158,46 @@ const StudentHome: React.FC = () => {
         {/* Profesores Recomendados (dinámico, hasta 3) */}
         <section>
           <h2 className="shv2-section-title">Profesores Recomendados</h2>
-          <TeachersProvider>
-            <RecommendedTeachers />
-          </TeachersProvider>
+          <div className="shv2-recos">
+            {loadingRecommended && (
+              <div className="shv2-reco-card">
+                <div style={{ flex: 1 }}>
+                  <div className="shv2-reco-name">Cargando profesores recomendados...</div>
+                </div>
+              </div>
+            )}
+            {!loadingRecommended && errorRecommended && (
+              <div className="shv2-reco-card">
+                <div style={{ flex: 1 }}>
+                  <div className="shv2-reco-name">{errorRecommended}</div>
+                </div>
+              </div>
+            )}
+            {!loadingRecommended && !errorRecommended && recommendedTeachers.length === 0 && (
+              <div className="shv2-reco-card">
+                <div style={{ flex: 1 }}>
+                  <div className="shv2-reco-name">No hay profesores recomendados disponibles por ahora</div>
+                </div>
+              </div>
+            )}
+            {!loadingRecommended && !errorRecommended && recommendedTeachers.map((t) => {
+              const initials = `${t.first_name?.[0] || ''}${t.last_name?.[0] || ''}`.toUpperCase();
+              const ratingLabel = typeof t.average_rating === 'number'
+                ? `★ ★ ★ ★ ★ (${t.average_rating.toFixed(1)})`
+                : 'Sin calificaciones';
+
+              return (
+                <div key={t.user_id || t.teacher_id || `${t.first_name}-${t.last_name}`} className="shv2-reco-card">
+                  <div className="shv2-avatar">{initials}</div>
+                  <div style={{ flex: 1 }}>
+                    <div className="shv2-reco-name">{t.first_name} {t.last_name}</div>
+                    <div className="shv2-reco-sub">{t.subject || t.expertise_area || 'Docente'}</div>
+                    <div className="shv2-stars">{ratingLabel}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </section>
       </main>
 

@@ -7,6 +7,7 @@ export const RecommendedTeachers: React.FC = () => {
   const { teachers, loading, getTeachers } = useTeachersContext();
   const requestedRef = useRef(false);
   const [playing, setPlaying] = useState<Record<string, boolean>>({});
+  const [brokenThumbs, setBrokenThumbs] = useState<Record<string, boolean>>({});
 
   const extractYouTubeId = (url?: string): string | null => {
     if (!url) return null;
@@ -85,8 +86,14 @@ export const RecommendedTeachers: React.FC = () => {
                 />
               ) : (
                 <>
-                  {thumb ? (
-                    <img src={thumb} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  {thumb && !brokenThumbs[idStr] ? (
+                    <img
+                      src={thumb}
+                      alt={name}
+                      loading="lazy"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                      onError={() => setBrokenThumbs((m) => ({ ...m, [idStr]: true }))}
+                    />
                   ) : (
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontWeight: 700, fontSize: 12 }}>Video</div>
                   )}

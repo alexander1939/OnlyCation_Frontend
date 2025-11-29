@@ -4,9 +4,13 @@ import { useDocumentsContext } from '../../context/documents';
 import Header from '../../components/ui/Header';
 import Footer from '../../components/ui/Footer';
 import '../../styles/docente-documentos.css';
+import { useNotificationContext } from '../../components/NotificationProvider';
+
 
 export default function DocenteDocumentos() {
   const { user } = useAuthContext();
+  const { showSuccess, showError, showWarning } = useNotificationContext();
+
   const { 
     documents, 
     loading, 
@@ -94,10 +98,10 @@ export default function DocenteDocumentos() {
     
     if (!hasErrors) {
       setEditingField(null);
-      alert('✅ Todos los campos actualizados exitosamente');
+      showSuccess('✅ Todos los campos actualizados exitosamente');
       await readDocuments();
     } else {
-      alert('⚠️ Algunos campos no se actualizaron correctamente');
+      showError('⚠️ Algunos campos no se actualizaron correctamente');
     }
   };
 
@@ -106,10 +110,10 @@ export default function DocenteDocumentos() {
     const result = await updateRfc(currentDoc.id, tempValues.rfc);
     if (result.success) {
       setEditingField(null);
-      alert('✅ RFC actualizado exitosamente');
+      showSuccess('✅ RFC actualizado exitosamente');
       await readDocuments();
     } else {
-      alert(`❌ Error: ${result.message}`);
+      showError(`❌ Error: ${result.message}`);
     }
   };
 
@@ -118,10 +122,10 @@ export default function DocenteDocumentos() {
     const result = await updateDescription(currentDoc.id, tempValues.description);
     if (result.success) {
       setEditingField(null);
-      alert('✅ Descripción actualizada exitosamente');
+      showSuccess('✅ Descripción actualizada exitosamente');
       await readDocuments();
     } else {
-      alert(`❌ Error: ${result.message}`);
+      showError(`❌ Error: ${result.message}`);
     }
   };
 
@@ -130,10 +134,10 @@ export default function DocenteDocumentos() {
     const result = await updateExpertiseArea(currentDoc.id, tempValues.expertise_area);
     if (result.success) {
       setEditingField(null);
-      alert('✅ Área de especialidad actualizada exitosamente');
+      showSuccess('✅ Área de especialidad actualizada exitosamente');
       await readDocuments();
     } else {
-      alert(`❌ Error: ${result.message}`);
+      showError(`❌ Error: ${result.message}`);
     }
   };
 
@@ -143,10 +147,10 @@ export default function DocenteDocumentos() {
     if (result.success) {
       setEditingField(null);
       setTempValues(prev => ({ ...prev, certificate: null }));
-      alert('✅ Certificado actualizado exitosamente');
+      showSuccess('✅ Certificado actualizado exitosamente');
       await readDocuments();
     } else {
-      alert(`❌ Error: ${result.message}`);
+      showError(`❌ Error: ${result.message}`);
     }
   };
 
@@ -156,10 +160,10 @@ export default function DocenteDocumentos() {
     if (result.success) {
       setEditingField(null);
       setTempValues(prev => ({ ...prev, curriculum: null }));
-      alert('✅ Curriculum actualizado exitosamente');
+      showSuccess('✅ Curriculum actualizado exitosamente');
       await readDocuments();
     } else {
-      alert(`❌ Error: ${result.message}`);
+      showError(`❌ Error: ${result.message}`);
     }
   };
 
@@ -175,7 +179,7 @@ export default function DocenteDocumentos() {
     setDownloading(null);
     
     if (!result.success) {
-      alert(`❌ Error al descargar: ${result.message}`);
+      showError(`❌ Error al descargar: ${result.message}`);
     }
   };
 

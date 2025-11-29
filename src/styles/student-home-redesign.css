@@ -131,22 +131,65 @@
 .shv2-reco-card {
   background: #ffffff;
   border: 1px solid rgba(104,178,201,0.18);
-  border-radius: 16px;
-  padding: 12px 14px;
-  box-shadow: 0 4px 12px rgba(41,73,84,0.08);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 6px 16px rgba(41,73,84,0.1);
   display: flex;
-  gap: 12px;
-  align-items: center;
+  gap: 14px;
+  align-items: stretch;
+  flex-direction: column;
 }
+@media (min-width: 640px) {
+  .shv2-reco-card { flex-direction: row; align-items: center; }
+}
+
 .shv2-avatar {
   width: 48px; height: 48px; border-radius: 999px;
   background: #e6f4ff; color: #0f172a;
   display: flex; align-items: center; justify-content: center;
   font-weight: 800;
 }
-.shv2-reco-name { font-weight: 800; color: #0f172a; }
+
+.shv2-reco-name { font-weight: 800; color: #0f172a; font-size: 1.05rem; line-height: 1.2; }
 .shv2-reco-sub { color: #475569; font-weight: 600; font-size: 0.9rem; }
 .shv2-stars { color: #22c55e; font-weight: 800; font-size: 0.9rem; }
+
+.shv2-reco-media {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #eef2f7;
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border: 1px solid rgba(104,178,201,0.18);
+  box-shadow: 0 2px 8px rgba(41,73,84,0.08);
+}
+@media (min-width: 640px) {
+  .shv2-reco-media { width: 220px; flex-shrink: 0; }
+}
+
+.shv2-reco-info { display: flex; flex-direction: column; gap: 8px; }
+.shv2-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.shv2-pill {
+  padding: 6px 10px;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.78rem;
+  border: 1px solid transparent;
+}
+.pill-sky { color: #0f172a; background: rgba(104,178,201,0.12); border-color: rgba(104,178,201,0.35); }
+.pill-mint { color: #0f172a; background: rgba(142,212,190,0.18); border-color: rgba(142,212,190,0.35); }
+
+.shv2-rating-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(34,197,94,0.1);
+  color: #166534;
+  font-weight: 800;
+  font-size: 0.82rem;
+  border: 1px solid rgba(34,197,94,0.25);
+}
 
 /* Use SubjectsCatalog carousel inside StudentHome: hide filters/tabs/title/buttons */
 .student-home-v2 .subjects-catalog { background: transparent !important; padding: 0 !important; }

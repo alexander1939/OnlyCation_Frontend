@@ -23,6 +23,16 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   backgroundColor = 'white',
 }) => {
   const navigate = useNavigate();
+  const overlayRef = React.useRef<HTMLDivElement | null>(null);
+
+  const hexToRgb = (hex: string) => {
+    const m = hex.trim().replace('#','');
+    const full = m.length === 3 ? m.split('').map(c => c + c).join('') : m;
+    const num = parseInt(full, 16);
+    const r = (num >> 16) & 255; const g = (num >> 8) & 255; const b = num & 255;
+    return { r, g, b };
+  };
+  const { r, g, b } = hexToRgb(iconColor);
 
   return (
     <div
@@ -37,17 +47,32 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
+        position: 'relative',
       }}
       onClick={() => navigate(route)}
       onMouseEnter={(e) => {
         e.currentTarget.style.boxShadow = '0 6px 14px rgba(0,0,0,0.1)';
         e.currentTarget.style.transform = 'translateY(-2px)';
+        if (overlayRef.current) overlayRef.current.style.opacity = '1';
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.05)';
         e.currentTarget.style.transform = 'translateY(0)';
+        if (overlayRef.current) overlayRef.current.style.opacity = '0';
       }}
     >
+      <div
+        ref={overlayRef}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          borderRadius: '1rem',
+          background: `radial-gradient(180px 180px at 95% 5%, rgba(${r},${g},${b},0.18) 0%, rgba(${r},${g},${b},0.10) 45%, transparent 60%)`,
+          opacity: 0,
+          transition: 'opacity 200ms ease',
+          pointerEvents: 'none'
+        }}
+      />
       {/* Icono circular */}
       <div
         style={{

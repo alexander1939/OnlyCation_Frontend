@@ -1,5 +1,6 @@
 import React from "react";
 import { GraduationCap, BookOpen, LibraryBig, Tag } from "lucide-react";
+import PriceCard from "./PriceCard";
 
 interface SubjectListProps {
   role?: "student" | "teacher"; // 👈 definimos el tipo de usuario
@@ -16,88 +17,15 @@ const SubjectList: React.FC<SubjectListProps> = ({ role = "student", onPriceClic
   // Si es teacher, renderiza la tarjeta de precios
   if (role === "teacher") {
     return (
-      <div
-        style={{
-          backgroundColor: "#fff",
-          borderRadius: "0.75rem",
-          padding: "1.25rem",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-          fontFamily: "'Roboto', sans-serif",
-          width: "100%",
-          height: "100%",
-          display: 'flex',
-          flexDirection: 'column',
-          transition: "all 0.2s ease",
-          cursor: "pointer",
-        }}
-        onClick={() => onPriceClick && onPriceClick()}
-        onMouseEnter={(e) =>
-          ((e.currentTarget.style.backgroundColor = "#f9fafb"),
-          (e.currentTarget.style.transform = "scale(1.02)"))
-        }
-        onMouseLeave={(e) =>
-          ((e.currentTarget.style.backgroundColor = "#fff"),
-          (e.currentTarget.style.transform = "scale(1)"))
-        }
-      >
-        <div
-          style={{
-            backgroundColor: "#f3e8ff",
-            borderRadius: "50%",
-            width: "40px",
-            height: "40px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: "0.8rem",
-          }}
-        >
-          <Tag size={20} color="#9333ea" />
-        </div>
-
-        <h3
-          style={{
-            fontWeight: 600,
-            color: "#1e293b",
-            marginBottom: "0.3rem",
-            fontSize: "1rem",
-          }}
-        >
-          Precios
-        </h3>
-
-        <p
-          style={{
-            color: "#475569",
-            fontSize: "0.9rem",
-            marginBottom: "0.75rem",
-            lineHeight: "1.4",
-          }}
-        >
-          Establece y ajusta las tarifas de tus servicios de asesoría y clases.
-        </p>
-
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onPriceClick && onPriceClick();
-          }}
-          style={{
-            color: "#2563eb",
-            fontWeight: 500,
-            fontSize: "0.9rem",
-            textDecoration: "none",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.3rem",
-            marginTop: 'auto',
-          }}
-        >
-          Definir precios →
-        </a>
-      </div>
+      <PriceCard
+        title="Precios"
+        description="Establece y ajusta las tarifas de tus servicios de asesoría y clases."
+        linkText="Definir precios"
+        route="/profile/price"
+        icon={Tag}
+        iconColor="#9333ea"
+        iconBg="#f3e8ff"
+      />
     );
   }
 

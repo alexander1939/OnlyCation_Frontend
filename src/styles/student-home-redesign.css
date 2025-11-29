@@ -1,0 +1,158 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800&display=swap');
+/* Isolated styles for Student Home V2 */
+.student-home-v2 {
+  background-color: #FAF9F5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: Roboto, sans-serif;
+}
+
+/* Enforce Roboto across all elements within the StudentHome scope */
+.student-home-v2 * {
+  font-family: Roboto, sans-serif;
+}
+
+.shv2-container {
+  flex: 1;
+  padding: 7.5rem 20px 2rem; /* space for fixed header */
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Top hero wrap with gradient background */
+.shv2-hero-wrap {
+  background: linear-gradient(135deg, rgba(122, 204, 255, 0.35), rgba(130, 231, 199, 0.35));
+  border-radius: 18px;
+  padding: 22px 18px 24px;
+  box-shadow: 0 20px 40px rgba(41,73,84,0.12);
+}
+
+/* Hero */
+.shv2-hero h1 {
+  margin: 0;
+  font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+  font-weight: 800;
+  color: #0f172a;
+  font-family: Roboto, sans-serif;
+}
+.shv2-hero p {
+  margin: 6px 0 16px;
+  color: #334155;
+  font-size: clamp(0.95rem, 1.4vw, 1.05rem);
+}
+
+/* Summary cards */
+.shv2-summary {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-top: 12px;
+}
+@media (min-width: 640px) {
+  .shv2-summary { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .shv2-summary { grid-template-columns: repeat(3, 1fr); }
+}
+
+.shv2-card {
+  background: #ffffff;
+  border: 1px solid rgba(104,178,201,0.18);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 6px 16px rgba(41,73,84,0.08);
+  transition: transform .2s ease, box-shadow .2s ease;
+  position: relative;
+}
+.shv2-card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(41,73,84,0.12); }
+
+/* Circular icon badge on cards (top-right) */
+.shv2-card-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  background: #E6F4FA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(41,73,84,0.12);
+}
+
+.shv2-card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: #0f172a;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+.shv2-card-sub {
+  color: #475569;
+  font-weight: 600;
+}
+.shv2-link { color: #1d9ad6; font-weight: 700; text-decoration: none; }
+.shv2-link:hover { text-decoration: underline; }
+
+/* Sections */
+.shv2-section-title {
+  margin: 26px 0 10px;
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-weight: 800;
+  color: #0f172a;
+}
+.shv2-section-title::after {
+  content: '';
+  display: block;
+  width: 170px;
+  height: 6px;
+  margin-top: 6px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #0ea5e9, #34d399);
+}
+
+/* Recommended teachers (simple cards) */
+.shv2-recos {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 640px) {
+  .shv2-recos { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .shv2-recos { grid-template-columns: repeat(3, 1fr); }
+}
+
+.shv2-reco-card {
+  background: #ffffff;
+  border: 1px solid rgba(104,178,201,0.18);
+  border-radius: 16px;
+  padding: 12px 14px;
+  box-shadow: 0 4px 12px rgba(41,73,84,0.08);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.shv2-avatar {
+  width: 48px; height: 48px; border-radius: 999px;
+  background: #e6f4ff; color: #0f172a;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800;
+}
+.shv2-reco-name { font-weight: 800; color: #0f172a; }
+.shv2-reco-sub { color: #475569; font-weight: 600; font-size: 0.9rem; }
+.shv2-stars { color: #22c55e; font-weight: 800; font-size: 0.9rem; }
+
+/* Use SubjectsCatalog carousel inside StudentHome: hide filters/tabs/title/buttons */
+.student-home-v2 .subjects-catalog { background: transparent !important; padding: 0 !important; }
+.student-home-v2 .subjects-catalog .sc-title,
+.student-home-v2 .subjects-catalog .sc-subtitle,
+.student-home-v2 .subjects-catalog .sc-search,
+.student-home-v2 .subjects-catalog .sc-tabs,
+.student-home-v2 .subjects-catalog .sc-grid,
+.student-home-v2 .subjects-catalog .sc-primary-btn { display: none !important; }

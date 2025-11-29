@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useLoginContext } from "../../context/auth/LoginContext";
 import { useLoginApi } from "../../hooks/auth/useLoginApi"; // ✅ Importa el hook de la lógica
 import LoginForm from "./LoginForm";
@@ -86,6 +86,9 @@ const Login: React.FC = () => {
             </div>
 
             <div className="login-card-right">
+              <div className="back-home">
+                <Link to="/" className="back-home-link">← Volver al inicio</Link>
+              </div>
               <div className="login-icon mb-6">
                 <img src="/usuario.png" alt="Icono Login" />
               </div>

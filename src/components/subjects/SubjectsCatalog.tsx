@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { BookOpen, Calculator, FlaskConical, Languages, Code, GraduationCap, Cpu, TrendingUp, Globe } from 'lucide-react';
 import '../../styles/subjects-catalog.css';
 
 type Level = 'Preparatoria' | 'Universidad' | 'Posgrado';
@@ -32,10 +33,54 @@ const SUBJECTS: SubjectItem[] = [
   { id: 'fin-pos', name: 'Finanzas Avanzadas', level: 'Posgrado', icon: '💹' },
 ];
 
+// Map subject names to icon + colors (fallback to GraduationCap)
+const getSubjectVisual = (name: string) => {
+  const n = name.toLowerCase();
+  // Matemáticas
+  if (/(álgebra|algebra|cálculo|calculo|mate)/.test(n)) {
+    return { Icon: Calculator, color: '#1d9ad6', bg: 'rgba(29,154,214,0.12)' };
+  }
+  // Ciencias
+  if (/(quím|quim|fís|fis|biolog|quimica|física|biología)/.test(n)) {
+    return { Icon: FlaskConical, color: '#0ea5e9', bg: 'rgba(14,165,233,0.12)' };
+  }
+  // Programación / IA
+  if (/(program|código|codigo|comput|sistemas|machine|learning|ia|inteligencia)/.test(n)) {
+    return { Icon: Code, color: '#7c3aed', bg: 'rgba(124,58,237,0.12)' };
+  }
+  // Economía / Finanzas
+  if (/(econ|finan|micro|macro|contab|finanzas)/.test(n)) {
+    return { Icon: TrendingUp, color: '#16a34a', bg: 'rgba(22,163,74,0.12)' };
+  }
+  // Idiomas
+  if (/(inglés|ingles|idioma|language|francés|frances|alemán|aleman)/.test(n)) {
+    return { Icon: Languages, color: '#2563eb', bg: 'rgba(37,99,235,0.12)' };
+  }
+  // Historia / Humanidades / Literatura
+  if (/(historia|literat|filos|human)/.test(n)) {
+    return { Icon: BookOpen, color: '#0f766e', bg: 'rgba(15,118,110,0.12)' };
+  }
+  // Geografía / Globales
+  if (/(geo|mundo|global)/.test(n)) {
+    return { Icon: Globe, color: '#059669', bg: 'rgba(5,150,105,0.12)' };
+  }
+  return { Icon: GraduationCap, color: '#475569', bg: 'rgba(71,85,105,0.12)' };
+};
+
 const SubjectsCatalog: React.FC = () => {
   const [activeLevel, setActiveLevel] = useState<Level>('Preparatoria');
   const [query, setQuery] = useState('');
   const [expanded, setExpanded] = useState(false);
+  // Carousel state/refs
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const frameRef = useRef<number | null>(null);
+  const prevTsRef = useRef<number | null>(null);
+  const posRef = useRef<number>(0); // current translateX
+  const halfWidthRef = useRef<number>(0);
+  const [dragging, setDragging] = useState(false);
+  const startXRef = useRef<number>(0);
+  const startPosRef = useRef<number>(0);
+  const dragMovedRef = useRef<boolean>(false);
   
   const handleSelect = (s: SubjectItem) => {
     const params = new URLSearchParams({ subject: s.id, level: s.level });
@@ -53,6 +98,86 @@ const SubjectsCatalog: React.FC = () => {
     // duplicamos para loop infinito
     return [...base, ...base];
   }, [filtered]);
+
+  // Measure half width for wrap-around
+  const measure = () => {
+    const el = trackRef.current;
+    if (!el) return;
+    const total = el.scrollWidth;
+    halfWidthRef.current = total / 2;
+  };
+
+  useEffect(() => {
+    measure();
+    const onResize = () => measure();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [carouselItems.length, expanded]);
+
+  // Apply transform
+  const apply = () => {
+    const el = trackRef.current;
+    if (!el) return;
+    el.style.transform = `translateX(${posRef.current}px)`;
+  };
+
+  // Wrap position to create infinite loop
+  const wrap = () => {
+    const half = halfWidthRef.current;
+    if (!half) return;
+    while (posRef.current <= -half) posRef.current += half;
+    while (posRef.current > 0) posRef.current -= half;
+  };
+
+  // Auto-scroll when not dragging and not expanded
+  useEffect(() => {
+    const speed = 40; // px/seg
+    const step = (ts: number) => {
+      if (prevTsRef.current == null) prevTsRef.current = ts;
+      const dt = (ts - prevTsRef.current) / 1000;
+      prevTsRef.current = ts;
+      if (!dragging && !expanded && carouselItems.length > 0) {
+        posRef.current -= speed * dt;
+        wrap();
+        apply();
+      }
+      frameRef.current = requestAnimationFrame(step);
+    };
+    frameRef.current = requestAnimationFrame(step);
+    return () => {
+      if (frameRef.current) cancelAnimationFrame(frameRef.current);
+      frameRef.current = null;
+      prevTsRef.current = null;
+    };
+  }, [dragging, expanded, carouselItems.length]);
+
+  const onPointerDown: React.PointerEventHandler<HTMLDivElement> = (e) => {
+    if (expanded || carouselItems.length === 0) return;
+    setDragging(true);
+    dragMovedRef.current = false;
+    startXRef.current = e.clientX;
+    startPosRef.current = posRef.current;
+  };
+
+  const onPointerMove: React.PointerEventHandler<HTMLDivElement> = (e) => {
+    if (!dragging) return;
+    const dx = e.clientX - startXRef.current;
+    if (Math.abs(dx) > 5) dragMovedRef.current = true;
+    posRef.current = startPosRef.current + dx;
+    wrap();
+    apply();
+  };
+
+  const endDrag = (e?: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragging) return;
+    setDragging(false);
+    prevTsRef.current = null; // suaviza reanudación
+    try { if (e) (e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId); } catch {}
+  };
+
+  const onPointerCancel: React.PointerEventHandler<HTMLDivElement> = (e) => {
+    endDrag(e);
+  };
 
   return (
     <section className="py-[60px] px-4 sm:px-[50px] bg-soft-white subjects-catalog">
@@ -89,14 +214,22 @@ const SubjectsCatalog: React.FC = () => {
 
         {!expanded ? (
           <div className="mt-6 sc-carousel-container">
-            <div className={`sc-carousel-track ${carouselItems.length ? '' : 'sc-carousel-empty'}`}>
+            <div
+              ref={trackRef}
+              className={`sc-carousel-track ${carouselItems.length ? '' : 'sc-carousel-empty'} ${dragging ? 'dragging' : ''}`}
+              onPointerDown={onPointerDown}
+              onPointerMove={onPointerMove}
+              onPointerUp={endDrag}
+              onPointerLeave={endDrag}
+              onPointerCancel={onPointerCancel}
+            >
               {carouselItems.map((s, idx) => (
                 <div
                   key={`${s.id}-${idx}`}
                   role="button"
                   tabIndex={0}
                   className="sc-card sc-card--carousel"
-                  onClick={() => handleSelect(s)}
+                  onClick={() => { if (!dragMovedRef.current) handleSelect(s); }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
@@ -106,7 +239,11 @@ const SubjectsCatalog: React.FC = () => {
                   aria-label={`Abrir profesores para ${s.name} en ${s.level}`}
                 >
                   <div className="sc-card-media">
-                    <span className="sc-icon">{s.icon}</span>
+                    {(() => { const { Icon, color, bg } = getSubjectVisual(s.name); return (
+                      <div style={{ width: 56, height: 56, borderRadius: 12, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Icon color={color} size={28} />
+                      </div>
+                    ); })()}
                   </div>
                   <div className="p-4 sc-card-body">
                     <div className="sc-card-title truncate">{s.name}</div>
@@ -137,7 +274,11 @@ const SubjectsCatalog: React.FC = () => {
                 aria-label={`Abrir profesores para ${s.name} en ${s.level}`}
               >
                 <div className="sc-card-media">
-                  <span className="sc-icon">{s.icon}</span>
+                  {(() => { const { Icon, color, bg } = getSubjectVisual(s.name); return (
+                    <div style={{ width: 56, height: 56, borderRadius: 12, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Icon color={color} size={28} />
+                    </div>
+                  ); })()}
                 </div>
                 <div className="p-4 sc-card-body">
                   <div className="sc-card-title truncate">{s.name}</div>

@@ -1,6 +1,15 @@
 import { useMemo } from 'react';
 import axios, { AxiosError } from 'axios';
-import type { MyNextClassesResponse, BookingDetailResponse, BookingCreateRequest, BookingCreateResponse, VerifyBookingResponse } from '../../context/booking/types';
+import type { 
+  MyNextClassesResponse, 
+  BookingDetailResponse, 
+  BookingCreateRequest, 
+  BookingCreateResponse, 
+  VerifyBookingResponse, 
+  BookingQuoteRequestSingle, 
+  BookingQuoteRequestMulti, 
+  BookingQuoteResponse 
+} from '../../context/booking/types';
 import { useAuthToken } from '../auth/useAuthToken';
 
 const API_URL = import.meta.env.VITE_API_URL as string;
@@ -192,5 +201,45 @@ export const useBookingApi = () => {
     }
   };
 
-  return { getMyNextClasses, getMyAllClasses, searchMyClasses, getBookingDetail, createBooking, verifyBooking };
+  const quoteBooking = async (payload: BookingQuoteRequestSingle | BookingQuoteRequestMulti): Promise<{
+    success: boolean;
+    data?: BookingQuoteResponse;
+    message: string;
+  }> => {
+    try {
+      const token = getAccessToken();
+      if (!token) throw new Error('No hay token de acceso. Inicia sesión nuevamente.');
+
+      try { console.log('[BookingApi][DEBUG] POST /bookings/cotizar-booking/ payload:', payload); } catch {}
+
+      const response = await client.post<BookingQuoteResponse>(
+        `/bookings/cotizar-booking/`,
+        payload,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      try { console.log('[BookingApi][DEBUG] quoteBooking response:', response.data); } catch {}
+
+      const data = response.data;
+      return {
+        success: !!data?.success,
+        data,
+        message: data?.message ?? 'Cotización obtenida correctamente',
+      };
+    } catch (err) {
+      const axErr = err as AxiosError<{ detail?: string }>;
+      const message = axErr.response?.data?.detail || axErr.message || 'Error al cotizar el booking';
+      return { success: false, message };
+    }
+  };
+
+  return { 
+    getMyNextClasses, 
+    getMyAllClasses, 
+    searchMyClasses, 
+    getBookingDetail, 
+    createBooking, 
+    verifyBooking, 
+    quoteBooking 
+  };
 };

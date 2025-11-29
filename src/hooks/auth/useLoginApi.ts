@@ -7,6 +7,8 @@ import {
   type LoginResponse,
 } from "../../context/auth/LoginContext";
 
+import { jwtDecode } from "jwt-decode";
+
 const API_BASE_URL = import.meta.env.VITE_API_URL?.trim();
 
 if (!API_BASE_URL) {
@@ -70,7 +72,11 @@ export const useLoginApi = () => {
         role,
         status,
         preference_id,
-      } = data.data;
+        id,
+      } = data.data as any; // Cast to any to handle potential extra fields like user_id
+
+      // Handle ID from different possible fields
+      const userId = id || (data.data as any).user_id;
 
       // Guardar en localStorage 🧠
       localStorage.setItem("access_token", access_token);
@@ -83,9 +89,10 @@ export const useLoginApi = () => {
       localStorage.setItem("user_last_name", last_name);
       localStorage.setItem("user_status", status || "");
       localStorage.setItem("user_preference_id", preference_id?.toString() || "");
+      localStorage.setItem("user_id", userId?.toString() || "");
 
       // Actualizar estado global
-      setUser({ email, first_name, last_name, role, status, preference_id });
+      setUser({ email, first_name, last_name, role, status, preference_id, id: userId });
 
       return data;
     } catch (error: any) {
@@ -121,6 +128,7 @@ export const useLoginApi = () => {
       "user_last_name",
       "user_status",
       "user_preference_id",
+      "user_id",
     ].forEach((key) => localStorage.removeItem(key));
 
     setUser(null);
@@ -132,6 +140,24 @@ export const useLoginApi = () => {
     const role = localStorage.getItem("user_role");
     const status = localStorage.getItem("user_status");
     const preference_id = localStorage.getItem("user_preference_id");
+    let id = localStorage.getItem("user_id");
+
+    // Si no hay ID pero hay token, intentar decodificarlo
+    if (!id) {
+      const token = localStorage.getItem("access_token");
+      if (token) {
+        try {
+          const decoded: any = jwtDecode(token);
+          if (decoded.user_id || decoded.id || decoded.sub) {
+            id = (decoded.user_id || decoded.id || decoded.sub).toString();
+            // Guardar para la próxima
+            localStorage.setItem("user_id", id!);
+          }
+        } catch (e) {
+          console.error("[LoginAPI] Error decodificando token:", e);
+        }
+      }
+    }
 
     if (!email || !role) return null;
 
@@ -146,6 +172,7 @@ export const useLoginApi = () => {
         role,
         status,
         preference_id: preference_id ? Number(preference_id) : null,
+        id: id ? Number(id) : undefined,
       };
     }
 
@@ -162,6 +189,7 @@ export const useLoginApi = () => {
         role,
         status,
         preference_id: preference_id ? Number(preference_id) : null,
+        id: id ? Number(id) : undefined,
       };
     }
     return null;

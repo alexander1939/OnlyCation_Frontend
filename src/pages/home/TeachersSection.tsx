@@ -132,13 +132,13 @@ const TeachersSection: React.FC = () => {
   };
 
   return (
-    <section className="px-[20px] mb-[100px]" style={{backgroundColor: '#FAF9F5'}}>
+    <section className="px-[20px] mb-[100px]" style={{backgroundColor: '#FAF9F5', fontFamily: 'Roboto, sans-serif'}}>
       <div className="max-w-[1000px] mx-auto">
         <div className="text-center mb-[60px]">
-          <h2 className="text-[42px] font-bold mb-4" style={{color: '#294954'}}>
+          <h2 className="text-[42px] font-bold mb-4" style={{color: '#294954', fontFamily: 'Roboto, sans-serif'}}>
             Los Mejores Docentes
           </h2>
-          <p className="text-[18px] text-[#718096]">
+          <p className="text-[18px] text-[#718096]" style={{fontFamily: 'Roboto, sans-serif'}}>
             Descubre a nuestros tutores más destacados
           </p>
         </div>
@@ -221,7 +221,8 @@ const TeachersSection: React.FC = () => {
                   borderRadius: '20px', 
                   border: '2px solid #294954',
                   textDecoration: 'none',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  fontFamily: 'Roboto, sans-serif'
                 }} 
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1e3a42'} 
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#294954'}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../ui/Header';
 import Footer from '../ui/Footer';
@@ -7,6 +7,12 @@ import '../../styles/docente-general.css';
 import BookingDetailModal from './BookingDetailModal';
 import '../../styles/booking-view.css';
 import '../../styles/new-booking-view.css';
+import { useOptionalTeacherConfirmationsContext, useOptionalStudentConfirmationsContext } from '../../context/confirmations';
+import ConfirmAttendanceModal from './ConfirmAttendanceModal';
+import type { ConfirmationHistoryItem } from '../../context/confirmations';
+import { useNotificationContext } from '../NotificationProvider';
+import AssessmentModal from './AssessmentModal';
+import { useOptionalStudentAssessmentsContext } from '../../context/assessments/StudentAssessmentsContext';
 
 type BookingViewProps = {
   user: {
@@ -150,6 +156,136 @@ export default function BookingView({
     if (lowerMateria.includes('historia')) return '📚';
     if (lowerMateria.includes('biología')) return '🧬';
     return '📖';
+  };
+
+  // Confirmables ahora (recent) por rol
+  const teacherConfCtx = useOptionalTeacherConfirmationsContext();
+  const studentConfCtx = useOptionalStudentConfirmationsContext();
+  const loadedRecentRef = useRef(false);
+
+  const { showSuccess, showError } = useNotificationContext();
+
+  // Modal confirmación
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [selectedConfirmItem, setSelectedConfirmItem] = useState<ConfirmationHistoryItem | null>(null);
+  const [confirmSubmitting, setConfirmSubmitting] = useState(false);
+  const [confirmError, setConfirmError] = useState<string | null>(null);
+
+  // Modal evaluación (solo alumno)
+  const studentAssessCtx = useOptionalStudentAssessmentsContext();
+  const [assessmentOpen, setAssessmentOpen] = useState(false);
+  const [assessmentPaymentBookingId, setAssessmentPaymentBookingId] = useState<number | string | null>(null);
+  const [assessmentError, setAssessmentError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (loadedRecentRef.current) return;
+    if (user?.role === 'teacher' && teacherConfCtx) {
+      loadedRecentRef.current = true;
+      teacherConfCtx.loadTeacherRecent?.();
+    } else if (user?.role === 'student' && studentConfCtx) {
+      loadedRecentRef.current = true;
+      studentConfCtx.loadStudentRecent?.();
+    }
+  }, [user?.role, teacherConfCtx, studentConfCtx]);
+
+  const recentLoading = useMemo(() => {
+    if (user?.role === 'teacher') return teacherConfCtx?.recentLoading;
+    if (user?.role === 'student') return studentConfCtx?.recentLoading;
+    return false;
+  }, [user?.role, teacherConfCtx?.recentLoading, studentConfCtx?.recentLoading]);
+
+  const recentError = useMemo(() => {
+    if (user?.role === 'teacher') return teacherConfCtx?.recentError || null;
+    if (user?.role === 'student') return studentConfCtx?.recentError || null;
+    return null;
+  }, [user?.role, teacherConfCtx?.recentError, studentConfCtx?.recentError]);
+
+  const recentItems = useMemo(() => {
+    if (user?.role === 'teacher') return teacherConfCtx?.recentItems || [];
+    if (user?.role === 'student') return studentConfCtx?.recentItems || [];
+    return [];
+  }, [user?.role, teacherConfCtx?.recentItems, studentConfCtx?.recentItems]);
+
+  const formatSecondsLeft = (seconds?: number) => {
+    if (!seconds || seconds <= 0) return 'Expirado';
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}m ${s < 10 ? '0' : ''}${s}s`;
+  };
+
+  const openConfirmModal = (item: ConfirmationHistoryItem) => {
+    setSelectedConfirmItem(item);
+    setConfirmError(null);
+    setConfirmModalOpen(true);
+  };
+
+  const closeConfirmModal = () => {
+    setConfirmModalOpen(false);
+    setSelectedConfirmItem(null);
+  };
+
+  const handleSubmitConfirm = async ({ description, file }: { description: string; file: File | Blob }) => {
+    if (!selectedConfirmItem) return;
+    setConfirmSubmitting(true);
+    setConfirmError(null);
+    try {
+      const paymentBookingId = selectedConfirmItem.payment_booking_id;
+      let res: { success: boolean; message?: string } | undefined;
+      // Revalidar ventana justo antes de enviar si es ALUMNO
+      if (user?.role === 'student' && studentConfCtx) {
+        const latest = await studentConfCtx.loadStudentRecent();
+        const latestItem = latest?.data?.items?.find((i) => i.payment_booking_id === paymentBookingId);
+        if (!latestItem || !latestItem.confirmable_now || (latestItem.seconds_left ?? 0) <= 0) {
+          const msg = 'El tiempo de confirmación expiró.';
+          setConfirmError(msg);
+          showError(msg);
+          return;
+        }
+      }
+      if (user?.role === 'teacher' && teacherConfCtx) {
+        res = await teacherConfCtx.submitTeacherConfirmation(paymentBookingId, {
+          confirmation: true,
+          description_teacher: description,
+          evidence_file: file,
+        });
+      } else if (user?.role === 'student' && studentConfCtx) {
+        res = await studentConfCtx.submitStudentConfirmation(paymentBookingId, {
+          confirmation: true,
+          description_student: description,
+          evidence_file: file,
+        });
+      } else {
+        setConfirmError('No hay contexto de confirmación disponible.');
+        return;
+      }
+
+      if (res?.success) {
+        showSuccess('Confirmación enviada');
+        if (user?.role === 'teacher') await teacherConfCtx?.loadTeacherRecent?.();
+        else await studentConfCtx?.loadStudentRecent?.();
+        // Cerrar modal de confirmación primero
+        closeConfirmModal();
+        // Si es alumno y no tiene evaluación previa, abrir modal de evaluación
+        if (user?.role === 'student') {
+          const hasAssessment = selectedConfirmItem.has_assessment_by_student === true;
+          if (!hasAssessment) {
+            setAssessmentPaymentBookingId(paymentBookingId);
+            setAssessmentError(null);
+            setAssessmentOpen(true);
+          }
+        }
+      } else {
+        const msg = res?.message || 'No se pudo enviar la confirmación';
+        setConfirmError(msg);
+        showError(msg);
+      }
+    } catch (e: any) {
+      const msg = e?.message || 'Error al enviar la confirmación';
+      setConfirmError(msg);
+      showError(msg);
+    } finally {
+      setConfirmSubmitting(false);
+    }
   };
 
   // Separar clases por estado (próximas: 'active' y 'approved')
@@ -319,9 +455,80 @@ export default function BookingView({
                 )}
               </div>
 
+                 {/* Botón Ver todas */}
+                 {showViewAllButton && (upcomingClasses.length > 0 || completedClasses.length > 0) && (
+                <div style={{ marginTop: '32px', textAlign: 'center' }}>
+                  <Link to={allBookingsPath} className="view-all-btn-header">
+                    📋 Ver todas las reservas
+                  </Link>
+                </div>
+              )}
+
               {/* CLASES ASISTIDAS */}
               <div className="asesorias-section">
                 <h2 className="asesorias-section-title">Clases Asistidas</h2>
+
+                {/* Confirmables ahora (según rol) */}
+                {(user?.role === 'teacher' || user?.role === 'student') && (
+                  <div className="empty-confirmacion-state" style={{ marginBottom: 16 }}>
+                    <div className="empty-confirmacion-icon">⏱️</div>
+                    <div className="empty-confirmacion-title">Confirmables ahora</div>
+                    {recentLoading && (
+                      <div className="text-gray-600" style={{ padding: '6px 0' }}>Cargando confirmaciones…</div>
+                    )}
+                    {recentError && (
+                      <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-3 text-red-600">{recentError}</div>
+                    )}
+                    {!recentLoading && !recentError && recentItems.length === 0 && (
+                      <div className="empty-confirmacion-desc">No tienes confirmaciones pendientes en este momento.</div>
+                    )}
+                    {!recentLoading && !recentError && recentItems.length > 0 && (
+                      <div className="asesorias-list" style={{ marginTop: 8 }}>
+                        {recentItems.map((it) => (
+                          <div key={it.id} className="clase-asistida-item">
+                            <div className="clase-asistida-icon">📝</div>
+                            <div className="clase-asistida-content">
+                              <div className="clase-asistida-materia">Reserva #{it.payment_booking_id}</div>
+                              <div className="clase-asistida-datetime">
+                                Finalizó: {formatDate(it.booking_end)}, {formatTime(it.booking_end)} · Tiempo restante: {formatSecondsLeft(it.seconds_left)}
+                              </div>
+                            </div>
+                            {typeof it.has_assessment_by_student === 'boolean' && (
+                              <div style={{ marginTop: 6 }}>
+                                <div
+                                  className={`confirmacion-badge ${it.has_assessment_by_student ? 'confirmada' : 'pendiente'}`}
+                                  title={it.has_assessment_by_student ? 'El alumno ya contestó la evaluación' : 'El alumno no ha contestado la evaluación'}
+                                >
+                                  <span>🧾</span>
+                                  {user?.role === 'teacher'
+                                    ? (it.has_assessment_by_student ? 'Evaluación del alumno' : 'Sin evaluación del alumno')
+                                    : (it.has_assessment_by_student ? 'Tu evaluación enviada' : 'Tu evaluación pendiente')}
+                                </div>
+                              </div>
+                            )}
+                            <button
+                              className="btn-confirmar-asistencia"
+                              onClick={() => openConfirmModal(it)}
+                              disabled={!it.confirmable_now || (it.seconds_left ?? 0) <= 0}
+                            >
+                              <span>✓</span>
+                              Confirmar ahora
+                            </button>
+                          </div>
+                        ))}
+                        {/* Link a listado completo de confirmaciones */}
+                        <div style={{ textAlign: 'right', marginTop: 8 }}>
+                          <Link
+                            to={user?.role === 'teacher' ? '/teacher/confirmation' : '/student/confirmation'}
+                            className="view-all-btn-header"
+                          >
+                            📋 Ver todas las reservas
+                          </Link>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
                 {completedClasses.length > 0 ? (
                   <>
                     <div className="asesorias-list">
@@ -373,26 +580,14 @@ export default function BookingView({
                     </div>
                   </>
                 ) : (
-                  <div className="empty-confirmacion-state">
-                    <div className="empty-confirmacion-icon">📋</div>
-                    <p className="empty-confirmacion-title">Todavía no hay reservaciones por confirmar</p>
-                    <p className="empty-confirmacion-desc">
-                      Recuerda que tienes un máximo de 2 horas después de finalizar cada asesoría 
-                      para confirmar tu asistencia, de lo contrario pueden haber consecuencias.
-                    </p>
+                  <div >
+
                   </div>
                 )}
               </div>
 
 
-              {/* Botón Ver todas */}
-              {showViewAllButton && (upcomingClasses.length > 0 || completedClasses.length > 0) && (
-                <div style={{ marginTop: '32px', textAlign: 'center' }}>
-                  <Link to={allBookingsPath} className="view-all-btn-header">
-                    📋 Ver todas las reservas
-                  </Link>
-                </div>
-              )}
+           
             </>
           )}
         </section>
@@ -406,6 +601,47 @@ export default function BookingView({
         bookingDetail={bookingDetail}
         loading={detailLoading}
         error={detailError}
+      />
+
+      {/* Modal Confirmar asistencia (solo para items de recent) */}
+      <ConfirmAttendanceModal
+        isOpen={confirmModalOpen}
+        onClose={closeConfirmModal}
+        role={(user?.role === 'teacher' ? 'teacher' : 'student')}
+        item={selectedConfirmItem}
+        loading={confirmSubmitting}
+        error={confirmError}
+        onSubmit={handleSubmitConfirm}
+      />
+
+      {/* Modal Evaluación (solo alumno) */}
+      <AssessmentModal
+        isOpen={assessmentOpen && user?.role === 'student'}
+        onClose={() => setAssessmentOpen(false)}
+        paymentBookingId={assessmentPaymentBookingId}
+        teacherName={undefined}
+        loading={!!studentAssessCtx?.createLoading}
+        error={assessmentError || studentAssessCtx?.createError || null}
+        onSubmit={async ({ qualification, comment }) => {
+          try {
+            if (!assessmentPaymentBookingId || !studentAssessCtx) return;
+            const res = await studentAssessCtx.createAssessment(assessmentPaymentBookingId, { qualification, comment });
+            if (res.success) {
+              showSuccess('Evaluación enviada');
+              setAssessmentOpen(false);
+              // Opcional: recargar recientes para reflejar bandera de evaluación
+              await studentConfCtx?.loadStudentRecent?.();
+            } else {
+              const msg = res.message || 'No se pudo enviar la evaluación';
+              setAssessmentError(msg);
+              showError(msg);
+            }
+          } catch (e: any) {
+            const msg = e?.message || 'Error al enviar la evaluación';
+            setAssessmentError(msg);
+            showError(msg);
+          }
+        }}
       />
     </div>
   );

@@ -105,3 +105,44 @@ export interface VerifyBookingResponse {
   payment_status: string; // e.g., 'completed'
   data: VerifyBookingResponseData;
 }
+
+// Cotizar Booking (precios desde backend)
+export interface BookingQuoteItem {
+  availability_id: number;
+  start_time: string; // ISO 8601 HH:00
+  end_time: string;   // ISO 8601 HH:00 (mismo día)
+}
+
+export interface BookingQuoteRequestSingle {
+  availability_id: number;
+  start_time: string; // ISO 8601
+  end_time: string;   // ISO 8601
+}
+
+export interface BookingQuoteRequestMulti {
+  items: BookingQuoteItem[];
+}
+
+export interface BookingQuoteBlock {
+  start: string; // ISO 8601
+  end: string;   // ISO 8601
+  hours: number;
+  amount_cents: number;
+  availability_id: number;
+}
+
+export interface BookingQuoteResponseData {
+  mode: 'multi' | 'single';
+  total_amount_mxn: number;
+  total_amount_cents: number;
+  total_hours: number;
+  // Puede llegar como texto o como objeto con regla
+  global_pricing_policy: string | { base_hours: number; rule: string };
+  blocks: BookingQuoteBlock[];
+}
+
+export interface BookingQuoteResponse {
+  success: boolean;
+  message: string;
+  data: BookingQuoteResponseData;
+}

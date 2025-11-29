@@ -24,6 +24,7 @@ export default function DocenteDatosPersonales() {
   const [currentVideoTitle, setCurrentVideoTitle] = useState<string>('');
   const [newVideoTitle, setNewVideoTitle] = useState<string>('');
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const [videoError, setVideoError] = useState<string | null>(null);
   const [videoSuccessMessage, setVideoSuccessMessage] = useState<string | null>(null);
   const [userVideos, setUserVideos] = useState<VideoData[]>([]);
@@ -113,16 +114,45 @@ export default function DocenteDatosPersonales() {
   const handlePersonalDataSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSuccessMessage(null);
+    setValidationError(null);
 
     // Validar que al menos un campo haya cambiado
     if (firstName === user?.first_name && lastName === user?.last_name) {
-      alert('No se detectaron cambios en los datos.');
+      setValidationError('No se detectaron cambios en los datos.');
       return;
     }
 
-    // Validar que al menos un campo esté presente
-    if (!firstName.trim() && !lastName.trim()) {
-      alert('Debes proporcionar al menos un nombre o apellido.');
+    // Validar que ambos campos estén presentes
+    if (!firstName.trim() || !lastName.trim()) {
+      setValidationError('Debes proporcionar tanto el nombre como el apellido.');
+      return;
+    }
+
+    // Validar longitud máxima
+    if (firstName.length > 50 || lastName.length > 50) {
+      setValidationError('El nombre y apellido no pueden exceder los 50 caracteres.');
+      return;
+    }
+
+    // Validar caracteres permitidos (letras, espacios y caracteres especiales comunes)
+    const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/;
+    if (!nameRegex.test(firstName) || !nameRegex.test(lastName)) {
+      setValidationError('El nombre y apellido solo pueden contener letras y espacios.');
+      return;
+    }
+
+    // Validar que no haya más de 2 letras consecutivas repetidas
+    const repeatedCharsRegex = /(.)\1{2,}/;
+    if (repeatedCharsRegex.test(firstName) || repeatedCharsRegex.test(lastName)) {
+      setValidationError('El nombre y apellido no pueden tener más de 2 letras consecutivas iguales.');
+      return;
+    }
+
+    // Validar que no haya secuencias largas de consonantes (más de 4 seguidas)
+    // Esto ayuda a detectar "keyboard smashing" como "ananfaklnlaknklfa"
+    const excessiveConsonantsRegex = /[bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ]{5,}/;
+    if (excessiveConsonantsRegex.test(firstName) || excessiveConsonantsRegex.test(lastName)) {
+      setValidationError('El nombre y apellido contienen secuencias de letras no válidas.');
       return;
     }
 
@@ -235,6 +265,18 @@ export default function DocenteDatosPersonales() {
                 {error}
               </div>
             )}
+            {validationError && (
+              <div style={{
+                padding: '12px',
+                marginBottom: '16px',
+                backgroundColor: '#fff3cd',
+                color: '#856404',
+                borderRadius: '4px',
+                border: '1px solid #ffeeba'
+              }}>
+                {validationError}
+              </div>
+            )}
 
             <form onSubmit={handlePersonalDataSubmit}>
               <div className="form-grid">
@@ -244,8 +286,14 @@ export default function DocenteDatosPersonales() {
                     className="datos-input"
                     placeholder="Nombre"
                     value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value.length <= 50) {
+                        setFirstName(value);
+                      }
+                    }}
                     disabled={loading}
+                    maxLength={50}
                   />
                 </label>
                 <label className="datos-field">
@@ -254,8 +302,14 @@ export default function DocenteDatosPersonales() {
                     className="datos-input"
                     placeholder="Apellido"
                     value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value.length <= 50) {
+                        setLastName(value);
+                      }
+                    }}
                     disabled={loading}
+                    maxLength={50}
                   />
                 </label>
               </div>

@@ -1,23 +1,22 @@
 # ---- Build Stage ----
-    FROM node:20-alpine AS build
+FROM node:20-alpine AS build
 
-    WORKDIR /app
+WORKDIR /app
     
-    COPY package*.json ./
-    RUN npm install 
+COPY package*.json ./
+RUN npm install 
     
-    COPY . .
-    RUN npm run build
+COPY . .
+RUN npm run build
     
-    # ---- Run Stage ----
-    FROM nginx:stable-alpine
+# ---- Run Stage ----
+FROM nginx:stable-alpine
     
-    COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
     
-    # Opcional: Si tienes archivo custom de nginx
-    # COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Opcional: Si tienes archivo custom de nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
     
-    EXPOSE 80 
+EXPOSE 80 
     
-    CMD ["nginx", "-g", "daemon off;"]
-    
+CMD ["nginx", "-g", "daemon off;"]

@@ -98,8 +98,10 @@ export default function NetworkNotification({
       style={{
         position: 'fixed',
         top: `${topPosition}px`,
-        right: '24px',
-        width: '500px',
+        right: '16px',
+        left: '16px',
+        width: 'auto',
+        maxWidth: '500px',
         background: typeStyles.background,
         borderLeft: `3px solid ${typeStyles.borderColor}`,
         borderRadius: '8px',

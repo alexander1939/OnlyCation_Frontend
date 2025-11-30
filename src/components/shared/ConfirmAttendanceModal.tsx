@@ -233,16 +233,12 @@ export default function ConfirmAttendanceModal({ isOpen, onClose, role, item, lo
               }}
             >
               <label style={{ color: '#294954', fontWeight: 600 }}>
-                Descripción (solo letras y números)
+                Descripción
                 <textarea
                   className="confirm-attendance-textarea"
                   value={description}
                   onChange={handleDescriptionChange}
-                  placeholder={
-                    role === 'teacher'
-                      ? 'Describe brevemente la clase impartida (letras, números y ?)' 
-                      : 'Describe brevemente tu asistencia (letras, números y ?)'
-                  }
+                  placeholder={role === 'teacher' ? 'Describe brevemente la clase impartida' : 'Describe brevemente tu asistencia'}
                   style={{
                     width: '100%',
                     minHeight: 90,
@@ -280,15 +276,6 @@ export default function ConfirmAttendanceModal({ isOpen, onClose, role, item, lo
                   }}
                   aria-invalid={!!fileError}
                 />
-                <small
-                  style={{
-                    color: fileError ? '#ef4444' : '#6b7280',
-                    display: 'block',
-                    marginTop: 6,
-                  }}
-                >
-                  {fileError || `Formatos permitidos: PNG o JPG. Tamaño máximo: ${MAX_FILE_SIZE_MB}MB.`}
-                </small>
               </label>
 
               <div

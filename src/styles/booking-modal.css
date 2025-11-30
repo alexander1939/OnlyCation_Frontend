@@ -768,4 +768,13 @@
   .confirm-dialog-section img {
     max-height: 100px;
   }
+
+  /* Empuja el modal hacia abajo para que se vea la X en mobile */
+  .booking-modal-overlay { 
+    align-items: flex-start; 
+    padding-top: calc(56px + env(safe-area-inset-top, 0px)); 
+  }
+  .booking-modal-container { 
+    max-height: 82vh; 
+  }
 }

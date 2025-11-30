@@ -7,6 +7,7 @@ import { useUpdateProfile } from '../../hooks/auth/useUpdateProfile';
 import { useVideosApi } from '../../hooks/videos/useVideosApi';
 import type { VideoData } from '../../context/videos/types';
 import '../../styles/docente-datos.css';
+import LoadingOverlay from '../../components/shared/LoadingOverlay';
 
 export default function DocenteDatosPersonales() {
   const { user, setUser } = useAuthContext();
@@ -30,6 +31,7 @@ export default function DocenteDatosPersonales() {
   const [userVideos, setUserVideos] = useState<VideoData[]>([]);
   const [loadingVideos, setLoadingVideos] = useState(false);
   const [savingVideo, setSavingVideo] = useState(false);
+  const overlayOpen = Boolean(loading || loadingVideos || savingVideo);
 
   const extractYouTubeId = (url: string): string | null => {
     try {
@@ -422,6 +424,12 @@ export default function DocenteDatosPersonales() {
         </section>
       </main>
       <Footer />
+      <LoadingOverlay
+        open={overlayOpen}
+        message="Preparando tu experiencia..."
+        logoSrc="/logo.png"
+        gifSrc="/icons8-rhombus-loader-96.gif"
+      />
     </div>
   );
 }

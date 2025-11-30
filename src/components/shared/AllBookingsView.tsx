@@ -6,6 +6,7 @@ import type { NextClass } from '../../context/booking';
 import '../../styles/docente-general.css';
 import BookingDetailModal from './BookingDetailModal';
 import '../../styles/booking-view.css';
+import LoadingOverlay from './LoadingOverlay';
 
 type AllBookingsViewProps = {
   user: {
@@ -320,6 +321,12 @@ export default function AllBookingsView({
         </section>
       </main>
       <Footer />
+      <LoadingOverlay
+        open={Boolean(loading || detailLoading)}
+        message="Preparando tu experiencia..."
+        logoSrc="/logo.png"
+        gifSrc="/icons8-rhombus-loader-96.gif"
+      />
       
       {/* Modal de detalle */}
       <BookingDetailModal

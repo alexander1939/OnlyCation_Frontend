@@ -5,6 +5,7 @@ import { useAuthContext } from '../../context/auth';
 import { useUpdateProfile } from '../../hooks/auth/useUpdateProfile';
 import { useState } from 'react';
 import '../../styles/student-personal-data.css';
+import LoadingOverlay from '../../components/shared/LoadingOverlay';
 
 export default function EstudianteDatosPersonales() {
   const { user, setUser } = useAuthContext();
@@ -15,6 +16,7 @@ export default function EstudianteDatosPersonales() {
   const [lastName, setLastName] = useState(user?.last_name ?? '');
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const overlayOpen = Boolean(loading);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -203,6 +205,12 @@ export default function EstudianteDatosPersonales() {
         </section>
       </main>
       <Footer />
+      <LoadingOverlay
+        open={overlayOpen}
+        message="Preparando tu experiencia..."
+        logoSrc="/logo.png"
+        gifSrc="/icons8-rhombus-loader-96.gif"
+      />
     </div>
   );
 }

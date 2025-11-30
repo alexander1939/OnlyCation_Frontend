@@ -7,6 +7,7 @@ import BookingConfirmationModal from '../../components/booking/BookingConfirmati
 import type { BookingConfirmationData } from '../../components/booking/BookingConfirmationModal';
 import BookingErrorModal from '../../components/booking/BookingErrorModal';
 import { useBookingApi } from '../../hooks/booking/useBookingApi';
+import LoadingOverlay from '../../components/shared/LoadingOverlay';
 
 export default function BookingVerify() {
   const [params] = useSearchParams();
@@ -90,7 +91,6 @@ export default function BookingVerify() {
       <Header />
       <main className="flex-1 main-spacing">
         <section className="docente-container" style={{ maxWidth: 720, margin: '0 auto' }}>
-          <h1 className="section-heading">Verificando tu pago...</h1>
           {!sessionId && (
             <p className="text-gray-700" style={{ marginTop: 12 }}>
               No se encontró el parámetro <code>session_id</code>. Por favor, regresa a tus reservas.
@@ -118,19 +118,12 @@ export default function BookingVerify() {
       </main>
       <Footer />
 
-      {loading && (
-        <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40"
-          role="status"
-          aria-busy="true"
-          aria-live="polite"
-        >
-          <div className="rounded-2xl bg-white p-6 shadow-xl flex flex-col items-center">
-            <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-[#294954]" />
-            <p className="mt-3 text-gray-700">Procesando tu pago y creando tu reserva…</p>
-          </div>
-        </div>
-      )}
+      <LoadingOverlay
+        open={Boolean(loading)}
+        message="Verificando tu pago..."
+        logoSrc="/logo.png"
+        gifSrc="/icons8-rhombus-loader-96.gif"
+      />
 
       {/* Modales */}
       <BookingConfirmationModal

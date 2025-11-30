@@ -13,11 +13,13 @@ import { CreditCard, FileText, CalendarCheck, MessageSquare } from "lucide-react
 import TeacherStatus from "../../components/comptHome/TeacherStatus";
 import "../../styles/teacher-home.css";
 import Footer from "../../components/ui/Footer";
+import LoadingOverlay from "../../components/shared/LoadingOverlay";
 
 const TeacherHome: React.FC = () => {
   const { user } = useLoginContext();
-  const { fetchWalletBalance } = useWallet();
+  const { fetchWalletBalance, loading: walletLoading, creating: walletCreating } = useWallet();
   const [showWelcome, setShowWelcome] = useState(false);
+  
 
   useEffect(() => {
     try {
@@ -157,6 +159,12 @@ const TeacherHome: React.FC = () => {
 
       </div>
       <Footer />
+      <LoadingOverlay
+        open={Boolean(walletLoading || walletCreating)}
+        message="Preparando tu experiencia..."
+        logoSrc="/logo.png"
+        gifSrc="/icons8-rhombus-loader-96.gif"
+      />
     </>
   );
 };

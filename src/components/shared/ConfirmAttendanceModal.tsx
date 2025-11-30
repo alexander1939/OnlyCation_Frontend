@@ -128,73 +128,25 @@ export default function ConfirmAttendanceModal({ isOpen, onClose, role, item, lo
 
   return (
     <div className="booking-modal-overlay" onClick={onClose}>
-      <div className="booking-modal-container confirm-attendance-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="booking-modal-container" onClick={(e) => e.stopPropagation()}>
         <div className="booking-modal-header">
           <div>
-            <h2 className="booking-modal-title">
-              <span className="confirm-attendance-title">Confirmar asistencia</span>
-            </h2>
+            <h2 className="booking-modal-title">Confirmar asistencia</h2>
             <p className="booking-modal-id">Reserva #{item.payment_booking_id}</p>
           </div>
           <button className="booking-modal-close" onClick={onClose}>×</button>
         </div>
 
-        <div className="booking-modal-content confirm-attendance-content">
-          {/* Bloque de información principal */}
-          <div
-            className="booking-modal-section"
-            style={{ marginTop: 0, marginBottom: 18, display: 'grid', gap: 10 }}
-          >
-            <div
-              className="confirm-attendance-card"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 12,
-                padding: '10px 14px',
-                borderRadius: 12,
-                background:
-                  'linear-gradient(135deg, rgba(248,250,252,0.95), rgba(241,245,249,0.95))',
-                border: '1px solid rgba(148,163,184,0.35)',
-              }}
-            >
-              <div style={{ display: 'grid', gap: 4 }}>
-                <span
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 600,
-                    textTransform: 'uppercase',
-                    letterSpacing: 0.3,
-                    color: '#6b7280',
-                  }}
-                >
-                  Detalle de la sesión
-                </span>
-                <p style={{ margin: 0, color: '#374151', fontSize: 14 }}>
-                  Finalizó: {formatDate(item.booking_end)}, {formatTime(item.booking_end)}
-                </p>
-              </div>
-              <div
-                className="confirm-attendance-role-badge"
-                style={{
-                  padding: '6px 10px',
-                  borderRadius: 999,
-                  background: 'rgba(104,178,201,0.08)',
-                  border: '1px solid rgba(104,178,201,0.4)',
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: '#294954',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {role === 'teacher' ? 'Docente' : 'Estudiante'}
-              </div>
-            </div>
+        <div className="booking-modal-content">
+          <div className="booking-modal-section" style={{ marginTop: 0 }}>
+            <h4 style={{ margin: 0, color: '#294954' }}>Información</h4>
+            <p style={{ margin: '8px 0 0 0', color: '#374151' }}>
+              Finalizó: {formatDate(item.booking_end)}, {formatTime(item.booking_end)}
+            </p>
           </div>
 
           {disabledByWindow && (
-            <div className="booking-modal-error confirm-attendance-error" style={{ marginTop: 0 }}>
+            <div className="booking-modal-error" style={{ marginTop: 0 }}>
               <span className="booking-modal-error-icon">⚠️</span>
               <div>
                 <h4 className="booking-modal-error-title">Ventana expirada</h4>
@@ -204,7 +156,7 @@ export default function ConfirmAttendanceModal({ isOpen, onClose, role, item, lo
           )}
 
           {error && (
-            <div className="booking-modal-error confirm-attendance-error" style={{ marginTop: 0 }}>
+            <div className="booking-modal-error" style={{ marginTop: 0 }}>
               <span className="booking-modal-error-icon">⚠️</span>
               <div>
                 <h4 className="booking-modal-error-title">Error</h4>
@@ -214,7 +166,7 @@ export default function ConfirmAttendanceModal({ isOpen, onClose, role, item, lo
           )}
 
           {fileError && (
-            <div className="booking-modal-error confirm-attendance-error" style={{ marginTop: 0 }}>
+            <div className="booking-modal-error" style={{ marginTop: 0 }}>
               <span className="booking-modal-error-icon">⚠️</span>
               <div>
                 <h4 className="booking-modal-error-title">Archivo no válido</h4>
@@ -223,19 +175,11 @@ export default function ConfirmAttendanceModal({ isOpen, onClose, role, item, lo
             </div>
           )}
 
-          {/* Formulario */}
-          <form onSubmit={handleSubmit} className="booking-modal-section confirm-attendance-body">
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 14,
-              }}
-            >
+          <form onSubmit={handleSubmit} className="booking-modal-section">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <label style={{ color: '#294954', fontWeight: 600 }}>
                 Descripción
                 <textarea
-                  className="confirm-attendance-textarea"
                   value={description}
                   onChange={handleDescriptionChange}
                   placeholder={role === 'teacher' ? 'Describe brevemente la clase impartida' : 'Describe brevemente tu asistencia'}
@@ -243,22 +187,16 @@ export default function ConfirmAttendanceModal({ isOpen, onClose, role, item, lo
                     width: '100%',
                     minHeight: 90,
                     border: `1px solid ${descError ? '#ef4444' : '#e5e7eb'}`,
-                    borderRadius: 10,
+                    borderRadius: 8,
                     padding: 12,
                     marginTop: 6,
-                    fontSize: 14,
                   }}
                   aria-invalid={!!descError}
                 />
-                <small
-                  style={{
-                    color: descError ? '#ef4444' : '#6b7280',
-                    display: 'block',
-                    marginTop: 6,
-                  }}
-                >
-                  {descError || 'Comparte un resumen breve y claro de la sesión.'}
-                </small>
+                <small style={{ color: '#6b7280', display: 'block', marginTop: 6 }}></small>
+                {descError && (
+                  <small style={{ color: '#ef4444', display: 'block', marginTop: 6 }}>{descError}</small>
+                )}
               </label>
 
               <label style={{ color: '#294954', fontWeight: 600 }}>
@@ -267,26 +205,12 @@ export default function ConfirmAttendanceModal({ isOpen, onClose, role, item, lo
                   type="file"
                   accept={ALLOWED_EXTENSIONS.join(',')}
                   onChange={handleFileChange}
-                  style={{
-                    marginTop: 6,
-                    border: `1px solid ${fileError ? '#ef4444' : 'transparent'}`,
-                    borderRadius: 8,
-                    padding: 6,
-                    backgroundColor: '#f9fafb',
-                  }}
+                  style={{ marginTop: 6, border: `1px solid ${fileError ? '#ef4444' : 'transparent'}`, borderRadius: 6, padding: 6 }}
                   aria-invalid={!!fileError}
                 />
               </label>
 
-              <div
-                className="confirm-attendance-actions"
-                style={{
-                  display: 'flex',
-                  gap: 8,
-                  justifyContent: 'flex-end',
-                  marginTop: 8,
-                }}
-              >
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 8 }}>
                 <button type="button" onClick={onClose} className="btn-ver-detalles">
                   Cancelar
                 </button>

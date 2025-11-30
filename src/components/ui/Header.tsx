@@ -4,6 +4,7 @@ import { useLoginApi } from '../../hooks/auth/useLoginApi';
 import PublicHeader from './PublicHeader';
 import TeacherHeader from './TeacherHeader';
 import StudentHeader from './StudentHeader';
+import NavigationOverlay from '../shared/NavigationOverlay';
 
 const Header: React.FC = () => {
   const { user, setUser } = useAuthContext();
@@ -25,21 +26,41 @@ const Header: React.FC = () => {
 
   // Sin sesión: Header público
   if (!user) {
-    return <PublicHeader />;
+    return (
+      <>
+        <PublicHeader />
+        <NavigationOverlay />
+      </>
+    );
   }
 
   // Docente: Header de teacher
   if (isTeacher) {
-    return <TeacherHeader user={user} onLogout={handleLogout} />;
+    return (
+      <>
+        <TeacherHeader user={user} onLogout={handleLogout} />
+        <NavigationOverlay />
+      </>
+    );
   }
 
   // Alumno: Header de student
   if (isStudent) {
-    return <StudentHeader user={user} onLogout={handleLogout} />;
+    return (
+      <>
+        <StudentHeader user={user} onLogout={handleLogout} />
+        <NavigationOverlay />
+      </>
+    );
   }
 
   // Fallback: Header público
-  return <PublicHeader />;
+  return (
+    <>
+      <PublicHeader />
+      <NavigationOverlay />
+    </>
+  );
 };
 
 export default Header;

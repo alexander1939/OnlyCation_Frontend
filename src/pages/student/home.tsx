@@ -12,6 +12,7 @@ import { useTeachersApi, type Teacher } from "../../hooks/teachers/useTeachersAp
 import "../../styles/student-home-redesign.css";
 import { TeachersProvider } from "../../context/teachers/TeachersContext";
 import { RecommendedTeachers } from "../../components/comptHome/RecommendedTeachers"
+import LoadingOverlay from "../../components/shared/LoadingOverlay";
 
 
 // Tarjeta de Próxima Reserva (consume contexto existente de booking)
@@ -202,6 +203,12 @@ const StudentHome: React.FC = () => {
       </main>
 
       <Footer />
+      <LoadingOverlay
+        open={Boolean(loadingRecommended)}
+        message="Preparando tu experiencia..."
+        logoSrc="/logo.png"
+        gifSrc="/icons8-rhombus-loader-96.gif"
+      />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import Footer from '../../components/ui/Footer';
 import { useTeachersContext } from '../../context/teachers';
 import '../../styles/teacher-catalog.css';
 import { useNavigate as useRrdNavigate, useSearchParams } from 'react-router-dom';
+import LoadingOverlay from '../../components/shared/LoadingOverlay';
 
 type TeacherItem = {
   id: string;
@@ -52,6 +53,7 @@ export default function TeacherCatalog() {
   const [page, setPage] = useState(1);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const overlayOpen = Boolean(loading || loadingMore);
 
   const subjects = ['Matemáticas', 'Física', 'Estadística', 'Programación', 'Biología', 'Literatura', 'Química', 'Historia', 'Geografía', 'Inglés', 'Francés', 'Arte'];
   
@@ -460,6 +462,12 @@ export default function TeacherCatalog() {
         </section>
       </main>
       <Footer />
+      <LoadingOverlay
+        open={overlayOpen}
+        message="Preparando tu experiencia..."
+        logoSrc="/logo.png"
+        gifSrc="/icons8-rhombus-loader-96.gif"
+      />
 
       {showVideo && (
         <div className="video-modal-overlay" role="dialog" aria-modal="true">

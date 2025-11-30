@@ -6,6 +6,7 @@ import Footer from '../../components/ui/Footer';
 import '../../styles/docente-documentos.css';
 import { useNotificationContext } from '../../components/NotificationProvider';
 import ConfirmDialog from '../../components/shared/ConfirmDialog';
+import LoadingOverlay from '../../components/shared/LoadingOverlay';
 
 
 export default function DocenteDocumentos() {
@@ -46,6 +47,8 @@ export default function DocenteDocumentos() {
   }, []);
 
   const currentDoc = documents[0]; // Asumiendo un documento por usuario
+
+  const overlayOpen = Boolean(loading || updating || confirmLoading || downloading);
 
   const handleEditField = (field: string) => {
     if (!currentDoc) return;
@@ -818,6 +821,13 @@ export default function DocenteDocumentos() {
         </section>
       </main>
       <Footer />
+
+      <LoadingOverlay
+        open={overlayOpen}
+        message="Preparando tu experiencia..."
+        logoSrc="/logo.png"
+        gifSrc="/icons8-rhombus-loader-96.gif"
+      />
 
       <ConfirmDialog
         isOpen={!!confirmAction}

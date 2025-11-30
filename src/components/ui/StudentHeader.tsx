@@ -4,6 +4,7 @@ import ProfileDropdown from '../ProfileDropdown';
 import { useChatContext } from '../../context/chat';
 import { useBookingApi } from '../../hooks/booking/useBookingApi';
 import { useConfirmationsApi } from '../../hooks/confirmations/useConfirmationsApi';
+import { User, LogOut, ChevronDown } from 'lucide-react';
 
 type StudentHeaderProps = {
   user: any;
@@ -32,6 +33,50 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
   const unreadTotal = getUnreadCount();
   const hasFetchedRef = React.useRef(false);
 
+  // Cache y limites para los contadores
+  const readCountsFromStorage = () => {
+    try {
+      const raw = localStorage.getItem(COUNTS_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (typeof parsed?.ts !== 'number') return null;
+      return parsed as { ts: number; bookings: number; confirmations: number };
+    } catch {
+      return null;
+    }
+  };
+
+  const writeCountsToStorage = (bookings: number, confirmations: number) => {
+    try {
+      localStorage.setItem(COUNTS_KEY, JSON.stringify({ ts: Date.now(), bookings, confirmations }));
+    } catch {}
+  };
+
+  // Obtener contadores reales (alumno)
+  const fetchCounts = React.useCallback(async () => {
+    try {
+      const [nextClassesRes, recentConfRes] = await Promise.all([
+        getMyNextClasses(1, 0),
+        getStudentHistoryRecent(),
+      ]);
+
+      const bookings = nextClassesRes.success
+        ? (nextClassesRes.data?.total ?? nextClassesRes.data?.data?.length ?? 0)
+        : 0;
+
+      const confItems = recentConfRes.success ? (recentConfRes.data?.items ?? []) : [];
+      // Confirmaciones pendientes para alumno: confirmable_now y no confirmadas por el alumno
+      const pendingConf = confItems.filter((it: any) => it?.confirmable_now && !it?.confirmed_by_student).length;
+
+      setBookingsCount(bookings);
+      setConfirmationsCount(pendingConf);
+      writeCountsToStorage(bookings, pendingConf);
+      lastFetchRef.current = Date.now();
+    } catch {
+      // silencioso
+    }
+  }, [getMyNextClasses, getStudentHistoryRecent]);
+
   React.useEffect(() => {
     const onResize = () => setIsDesktop(window.innerWidth >= 1024);
     window.addEventListener('resize', onResize);
@@ -45,6 +90,37 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
       fetchChats();
     }
   }, [fetchChats]);
+
+  // Inicializar contadores desde cache o pedir al backend
+  React.useEffect(() => {
+    const cached = readCountsFromStorage();
+    if (cached && Date.now() - cached.ts < MIN_INTERVAL_MS) {
+      setBookingsCount(cached.bookings);
+      setConfirmationsCount(cached.confirmations);
+    } else {
+      fetchCounts();
+    }
+  }, [fetchCounts]);
+
+  // Refrescar cuando la pestaña sea visible (con throttle)
+  React.useEffect(() => {
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        if (debounceRef.current) window.clearTimeout(debounceRef.current);
+        debounceRef.current = window.setTimeout(() => {
+          const now = Date.now();
+          if (now - lastFetchRef.current >= MIN_INTERVAL_MS) {
+            fetchCounts();
+          }
+        }, VIS_DEBOUNCE_MS) as unknown as number;
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      if (debounceRef.current) window.clearTimeout(debounceRef.current);
+    };
+  }, [fetchCounts]);
 
   const userInitials = user
     ? `${user.first_name?.[0] ?? ''}${user.last_name?.[0] ?? ''}`.toUpperCase() || 'U'
@@ -118,6 +194,7 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
     };
 
     const renderBadge = (count: number, bg: string = '#F59E0B', visible: boolean = true) => {
+      if (!visible || !count || count <= 0) return null;
       const text = count > 99 ? '99+' : String(count);
       return (
         <span
@@ -133,8 +210,6 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
             background: bg,
             borderRadius: 999,
             textAlign: 'center',
-            opacity: visible ? 1 : 0,
-            transition: 'opacity 180ms ease',
             pointerEvents: 'none',
           }}
         >
@@ -380,7 +455,7 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
                   <div style={{ color: '#294954', opacity: 0.7, fontFamily: 'Roboto, sans-serif', fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</div>
                 </div>
                 <div style={{ color: '#294954', fontSize: '18px', transition: 'transform 200ms ease', transform: isProfileExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                  ▼
+                  <ChevronDown size={18} color="#294954" />
                 </div>
               </button>
 
@@ -407,7 +482,7 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(104, 178, 201, 0.12)'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
-                    <span style={{ marginRight: '8px', fontSize: '18px' }}>👤</span>
+                    <span style={{ marginRight: '8px', display: 'inline-flex' }}><User size={18} color="#294954" /></span>
                     Datos Personales
                   </Link>
 
@@ -433,7 +508,7 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(104, 178, 201, 0.12)'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
-                    <span style={{ marginRight: '8px', fontSize: '18px' }}>🚪</span>
+                    <span style={{ marginRight: '8px', display: 'inline-flex' }}><LogOut size={18} color="#FF9978" /></span>
                     Cerrar sesión
                   </button>
                 </div>

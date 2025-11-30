@@ -1,3 +1,4 @@
+/* @refresh reload */
 import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import type { PublicAssessmentsContextType, PublicAssessmentComment } from './types';
 import { usePublicAssessmentsApi } from '../../hooks/assessments/usePublicAssessmentsApi';
@@ -10,17 +11,19 @@ export const PublicAssessmentsProvider: React.FC<{ children: React.ReactNode }> 
   const [error, setError] = useState<string | null>(null);
   const [commentsByTeacherId, setCommentsByTeacherId] = useState<Record<number, PublicAssessmentComment[]>>({});
   const inFlightRef = useRef<Set<number>>(new Set());
+  // Cache interno estable para evitar depender del estado en la función y repetir peticiones
+  const commentsCacheRef = useRef<Record<number, PublicAssessmentComment[]>>({});
 
   const fetchPublicComments = useCallback(async (teacherId: number, options?: { force?: boolean }) => {
-    // Cache guard
-    if (!options?.force && commentsByTeacherId[teacherId]) {
+    // Cache guard (usa ref estable)
+    if (!options?.force && Object.prototype.hasOwnProperty.call(commentsCacheRef.current, teacherId)) {
       setError(null);
-      return { success: true, message: 'cached', data: commentsByTeacherId[teacherId] } as any;
+      return { success: true, message: 'cached', data: commentsCacheRef.current[teacherId] } as any;
     }
 
     // In-flight guard
     if (inFlightRef.current.has(teacherId)) {
-      return { success: true, message: 'in_flight', data: commentsByTeacherId[teacherId] } as any;
+      return { success: true, message: 'in_flight', data: commentsCacheRef.current[teacherId] } as any;
     }
 
     inFlightRef.current.add(teacherId);
@@ -28,12 +31,16 @@ export const PublicAssessmentsProvider: React.FC<{ children: React.ReactNode }> 
     setError(null);
     try {
       const res = await getPublicComments(teacherId);
-      if (res.success && res.data) {
-        setCommentsByTeacherId(prev => ({ ...prev, [teacherId]: res.data! }));
+      const data = Array.isArray(res.data) ? res.data : [];
+      if (res.success) {
+        // Cachear siempre, aunque esté vacío
+        commentsCacheRef.current[teacherId] = data;
+        setCommentsByTeacherId(prev => ({ ...prev, [teacherId]: data }));
+        setError(null);
       } else {
         setError(res.message);
       }
-      return res as any;
+      return { success: !!res.success, message: res.message, data } as any;
     } catch (e: any) {
       const message = e?.message || 'Error al obtener comentarios públicos';
       setError(message);
@@ -42,7 +49,7 @@ export const PublicAssessmentsProvider: React.FC<{ children: React.ReactNode }> 
       inFlightRef.current.delete(teacherId);
       setLoading(false);
     }
-  }, [getPublicComments, commentsByTeacherId]);
+  }, [getPublicComments]);
 
   const resetStatus = useCallback(() => {
     setError(null);

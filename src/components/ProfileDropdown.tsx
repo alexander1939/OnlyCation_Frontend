@@ -2,6 +2,7 @@
 import { Link } from 'react-router-dom';
 import { useWallet } from '../context/wallet/WalletContext';
 import '../styles/profile-dropdown.css';
+import { LogIn, UserPlus, GraduationCap, User, LogOut, BarChart3, Wallet, Folder } from 'lucide-react';
 
 type ProfileDropdownProps = {
   user: any;
@@ -44,7 +45,7 @@ export default function ProfileDropdown({ user, isTeacher, isStudent, onClose, o
               className="profile-dropdown-item"
               onClick={onClose}
             >
-              <span className="profile-dropdown-icon">🔑</span>
+              <span className="profile-dropdown-icon"><LogIn size={16} color="#68B2C9" /></span>
               Iniciar sesión
             </Link>
             <Link
@@ -52,7 +53,7 @@ export default function ProfileDropdown({ user, isTeacher, isStudent, onClose, o
               className="profile-dropdown-item"
               onClick={onClose}
             >
-              <span className="profile-dropdown-icon">📝</span>
+              <span className="profile-dropdown-icon"><UserPlus size={16} color="#FF9978" /></span>
               Registrarse
             </Link>
           </>
@@ -61,16 +62,16 @@ export default function ProfileDropdown({ user, isTeacher, isStudent, onClose, o
         {isStudent && (
           <>
             <Link to="/catalog/teachers" className="profile-dropdown-item" onClick={onClose}>
-              <span className="profile-dropdown-icon">🎓</span>
+              <span className="profile-dropdown-icon"><GraduationCap size={16} color="#8ED4BE" /></span>
               Buscar Docentes
             </Link>
             <Link to="/student/personal-data" className="profile-dropdown-item" onClick={onClose}>
-              <span className="profile-dropdown-icon">👤</span>
+              <span className="profile-dropdown-icon"><User size={16} color="#294954" /></span>
               Actualizar Datos Personales
             </Link>
             <div className="profile-dropdown-divider"></div>
             <button className="profile-dropdown-item profile-dropdown-button" onClick={onLogout}>
-              <span className="profile-dropdown-icon">🚪</span>
+              <span className="profile-dropdown-icon"><LogOut size={16} color="#FF9978" /></span>
               Cerrar Sesión
             </button>
           </>
@@ -79,7 +80,7 @@ export default function ProfileDropdown({ user, isTeacher, isStudent, onClose, o
         {isTeacher && (
           <>
             <Link to="/teacher/profile" className="profile-dropdown-item" onClick={onClose}>
-              <span className="profile-dropdown-icon">📊</span>
+              <span className="profile-dropdown-icon"><BarChart3 size={16} color="#68B2C9" /></span>
               Mi Perfil
             </Link>
             <Link 
@@ -91,20 +92,20 @@ export default function ProfileDropdown({ user, isTeacher, isStudent, onClose, o
                 fetchWalletBalance();
               }}
             >
-              <span className="profile-dropdown-icon">👜</span>
+              <span className="profile-dropdown-icon"><Wallet size={16} color="#68B2C9" /></span>
               Cartera
             </Link>
             <Link to="/teacher/personal-data" className="profile-dropdown-item" onClick={onClose}>
-              <span className="profile-dropdown-icon">👤</span>
+              <span className="profile-dropdown-icon"><User size={16} color="#294954" /></span>
               Actualizar Datos Personales
             </Link>
             <Link to="/teacher/documents" className="profile-dropdown-item" onClick={onClose}>
-              <span className="profile-dropdown-icon">📁</span>
+              <span className="profile-dropdown-icon"><Folder size={16} color="#294954" /></span>
               Documentos
             </Link>
             <div className="profile-dropdown-divider"></div>
             <button className="profile-dropdown-item profile-dropdown-button" onClick={onLogout}>
-              <span className="profile-dropdown-icon">🚪</span>
+              <span className="profile-dropdown-icon"><LogOut size={16} color="#FF9978" /></span>
               Cerrar Sesión
             </button>
           </>

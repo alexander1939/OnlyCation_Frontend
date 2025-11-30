@@ -1,4 +1,4 @@
-.blm-overlay{position:fixed;inset:0;background:rgba(17,24,39,.45);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:60}
+.blm-overlay{position:fixed;inset:0;background:rgba(17,24,39,.45);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:9999}
 .blm-container{width:min(960px,92vw);max-height:88vh;overflow:auto;background:#FAF9F5;border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,.25);border:1px solid #e5e7eb;position:relative}
 .blm-container:before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#8ED4BE,#68B2C9)}
 .blm-overlay{animation:blm-fade-in .22s ease-out}
@@ -59,6 +59,12 @@
 .blm-primary:hover{filter:brightness(1.03)}
 .blm-primary:active{transform:translateY(1px)}
 .blm-primary:disabled{opacity:.6;cursor:not-allowed}
+
+@media (max-width: 768px) {
+  /* Place modal a bit lower on small screens so the X is visible */
+  .blm-overlay { align-items: flex-start; padding-top: calc(56px + env(safe-area-inset-top, 0px)); }
+  .blm-container { max-height: 82vh; }
+}
 
 @keyframes blm-fade-in{from{opacity:0}to{opacity:1}}
 @keyframes blm-pop{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}

@@ -47,110 +47,28 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
     }
   }, [fetchChats]);
 
-  // Helpers de cache
-  const readCountsFromStorage = () => {
-    try {
-      const raw = localStorage.getItem(COUNTS_KEY);
-      if (!raw) return null;
-      const parsed = JSON.parse(raw);
-      if (typeof parsed?.ts !== 'number') return null;
-      return parsed as { ts: number; bookings: number; confirmations: number };
-    } catch { return null; }
-  };
-  const writeCountsToStorage = (bookings: number, confirmations: number) => {
-    try { localStorage.setItem(COUNTS_KEY, JSON.stringify({ ts: Date.now(), bookings, confirmations })); } catch {}
-  };
-
-  // Cargar contadores (throttle + cache + visibilidad)
-  React.useEffect(() => {
-    let mounted = true;
-    const fetchCounts = async () => {
-      try {
-        const [resBookings, recent] = await Promise.all([
-          getMyNextClasses(1, 0),
-          getStudentHistoryRecent(),
-        ]);
-        let newBookings = bookingsCount;
-        let newConfirmations = confirmationsCount;
-        if (mounted && resBookings?.success && resBookings.data) {
-          const total = (resBookings.data as any).total ?? (Array.isArray(resBookings.data.data) ? resBookings.data.data.length : 0);
-          newBookings = Number(total) || 0;
-        }
-        if (mounted && recent?.success && recent.data) {
-          const count = Array.isArray((recent.data as any).items)
-            ? (recent.data as any).items.filter((it: any) => it?.confirmable_now && ((it?.seconds_left ?? 0) > 0)).length
-            : 0;
-          newConfirmations = count;
-        }
-        if (!mounted) return;
-        setBookingsCount((prev) => (prev !== newBookings ? newBookings : prev));
-        setConfirmationsCount((prev) => (prev !== newConfirmations ? newConfirmations : prev));
-        writeCountsToStorage(newBookings, newConfirmations);
-        lastFetchRef.current = Date.now();
-      } catch {}
-    };
-
-    const cached = readCountsFromStorage();
-    const now = Date.now();
-    if (cached && (now - cached.ts) < MIN_INTERVAL_MS) {
-      const cb = Number(cached.bookings) || 0;
-      const cc = Number(cached.confirmations) || 0;
-      setBookingsCount((prev) => (prev !== cb ? cb : prev));
-      setConfirmationsCount((prev) => (prev !== cc ? cc : prev));
-    } else {
-      const run = () => { void fetchCounts(); };
-      if ('requestIdleCallback' in window) {
-        (window as any).requestIdleCallback(run, { timeout: 800 });
-      } else {
-        setTimeout(run, 250);
-      }
-    }
-
-    const onVisChange = () => {
-      if (document.visibilityState !== 'visible') return;
-      if (debounceRef.current) window.clearTimeout(debounceRef.current);
-      debounceRef.current = window.setTimeout(() => {
-        const cached = readCountsFromStorage();
-        const now = Date.now();
-        if (cached && (now - cached.ts) < MIN_INTERVAL_MS) {
-          const cb = Number(cached.bookings) || 0;
-          const cc = Number(cached.confirmations) || 0;
-          setBookingsCount((prev) => (prev !== cb ? cb : prev));
-          setConfirmationsCount((prev) => (prev !== cc ? cc : prev));
-          return;
-        }
-        if (now - (lastFetchRef.current || 0) < MIN_INTERVAL_MS) return;
-        void fetchCounts();
-      }, VIS_DEBOUNCE_MS);
-    };
-    document.addEventListener('visibilitychange', onVisChange);
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === COUNTS_KEY && e.newValue) {
-        try {
-          const parsed = JSON.parse(e.newValue);
-          if (typeof parsed?.ts === 'number') {
-            const cb = Number(parsed.bookings) || 0;
-            const cc = Number(parsed.confirmations) || 0;
-            setBookingsCount((prev) => (prev !== cb ? cb : prev));
-            setConfirmationsCount((prev) => (prev !== cc ? cc : prev));
-          }
-        } catch {}
-      }
-    };
-    window.addEventListener('storage', onStorage);
-    return () => {
-      mounted = false;
-      if (debounceRef.current) window.clearTimeout(debounceRef.current);
-      document.removeEventListener('visibilitychange', onVisChange);
-      window.removeEventListener('storage', onStorage);
-    };
-  }, [getMyNextClasses, getStudentHistoryRecent]);
-
-  const userInitials = user 
+  const userInitials = user
     ? `${user.first_name?.[0] ?? ''}${user.last_name?.[0] ?? ''}`.toUpperCase() || 'U'
     : '';
 
-  // SOLO una opción: Reservas y confirmaciones
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    };
+
+    if (isProfileOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isProfileOpen]);
+
   const menuItems = [
     { to: '/catalog/teachers', label: 'Docentes' },
     { to: '/student/my_next_booking', label: 'Reservas y confirmaciones' },
@@ -169,7 +87,7 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
       color: isActive ? '#68B2C9' : '#294954',
       fontFamily: 'Inter, sans-serif',
       padding: mobile ? '14px 20px' : '8px 12px',
-      borderRadius: mobile ? '12px' : 0,
+      borderRadius: mobile ? '12px' : '12px',
       textAlign: mobile ? 'left' : 'left',
       display: 'block',
       width: mobile ? '100%' : undefined,
@@ -276,8 +194,8 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
 
   return (
     <>
-      <header 
-        className="fixed top-0 left-0 right-0 z-[70] w-full" 
+      <header
+        className="fixed top-0 left-0 right-0 z-[70] w-full"
         style={{
           fontFamily: 'Roboto, sans-serif',
           backgroundColor: 'transparent',
@@ -319,8 +237,8 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
             )}
 
             {isDesktop && (
-              <div className="relative ml-8">
-                <button 
+              <div className="relative ml-8" ref={dropdownRef}>
+                <button
                   className="rounded-full flex items-center justify-center transition-all duration-300 overflow-hidden"
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                   style={{
@@ -354,10 +272,10 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="flex flex-col justify-center items-center"
-                style={{ 
-                  border: 'none', 
-                  background: 'transparent', 
-                  cursor: 'pointer', 
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer',
                   position: 'relative',
                   width: '44px',
                   height: '44px',
@@ -397,15 +315,8 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
         </div>
       </header>
 
-      {isDesktop && isProfileOpen && (
-        <div 
-          className="fixed inset-0 z-30" 
-          onClick={() => setIsProfileOpen(false)}
-        />
-      )}
-
       {!isDesktop && (
-        <div 
+        <div
           style={{
             position: 'fixed',
             top: '92px',
@@ -501,7 +412,7 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
                     Datos Personales
                   </Link>
 
-                  <button 
+                  <button
                     onClick={() => { setIsMenuOpen(false); onLogout(); }}
                     style={{
                       position: 'relative',

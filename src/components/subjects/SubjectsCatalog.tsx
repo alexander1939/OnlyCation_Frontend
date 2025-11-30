@@ -84,7 +84,7 @@ const SubjectsCatalog: React.FC = () => {
   
   const handleSelect = (s: SubjectItem) => {
     const params = new URLSearchParams({ subject: s.id, level: s.level });
-    window.location.href = `/catalog/teachers?${params.toString()}`;
+    //window.location.href = `/catalog/teachers?${params.toString()}`;
   };
 
   const filtered = useMemo(() => {

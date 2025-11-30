@@ -1,0 +1,307 @@
+/* Confirmations page styles - custom CSS (no Tailwind) */
+
+:root {
+  --oc-petroleum: #294954;
+  --oc-sky: #68B2C9;
+  --oc-mint: #8ED4BE;
+  --oc-coral: #FF9978;
+  --oc-soft-bg: #FAF9F5;
+  --oc-soft-sky: #EAF5F8;
+  --oc-border: #E6E8EB;
+  --oc-text: #374151;
+  --oc-muted: #6B7280;
+  --oc-white: #FFFFFF;
+  --oc-shadow: 0 6px 20px rgba(41, 73, 84, 0.10);
+}
+
+/* Page background */
+.confirmations-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--oc-soft-bg) 0%, var(--oc-soft-sky) 100%);
+  font-family: Roboto, Inter, system-ui, -apple-system, Segoe UI, sans-serif;
+}
+
+/* Container */
+.confirmations-container { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
+
+/* Header */
+.confirmations-header h1 { 
+  font-family: Roboto, Inter, system-ui, -apple-system, Segoe UI, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--oc-petroleum);
+}
+.confirmations-header .view-all-btn-header {
+  background: var(--oc-sky);
+  color: var(--oc-white);
+  padding: 10px 14px;
+  border-radius: 10px;
+  text-decoration: none;
+  box-shadow: var(--oc-shadow);
+}
+
+/* Back row below title */
+.confirmations-back-row { display: flex; justify-content: flex-end; margin: 8px 0 16px; }
+/* Ensure back button styling even outside header */
+.view-all-btn-header {
+  background: var(--oc-sky);
+  color: var(--oc-white);
+  padding: 10px 14px;
+  border-radius: 10px;
+  text-decoration: none;
+  box-shadow: var(--oc-shadow);
+}
+
+/* Filter card */
+.confirmations-filter {
+  background: var(--oc-white);
+  border: 1px solid var(--oc-border);
+  border-radius: 16px;
+  box-shadow: var(--oc-shadow);
+}
+.confirmations-form label { color: var(--oc-petroleum); font-weight: 600; }
+
+/* Field group (input + actions) */
+.confirmations-field {
+  display: grid;
+  grid-template-columns: 1fr auto auto; /* input | calendario | buscar */
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--oc-muted);
+  pointer-events: none;
+}
+
+.confirmations-input {
+  height: 44px;
+  border: 1px solid var(--oc-border);
+  border-radius: 10px;
+  padding: 0 14px;
+  color: var(--oc-text);
+  outline: none;
+}
+.confirmations-input.has-icon { padding-left: 40px; }
+.confirmations-input::placeholder { color: var(--oc-muted); }
+.confirmations-input:focus { border-color: var(--oc-sky); box-shadow: 0 0 0 3px rgba(104,178,201,0.2); }
+
+/* Buttons inside field */
+.confirmations-search-btn {
+  background: var(--oc-sky);
+  color: var(--oc-white);
+  border: none;
+  border-radius: 10px;
+  height: 44px;
+  padding: 0 14px;
+  font-weight: 700;
+  box-shadow: var(--oc-shadow);
+  cursor: pointer;
+}
+.confirmations-picker-btn,
+.confirmations-clear-btn {
+  background: linear-gradient(135deg, var(--oc-sky), var(--oc-mint));
+  color: var(--oc-white);
+  border: none;
+  border-radius: 10px;
+  height: 44px;
+  width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--oc-shadow);
+  cursor: pointer;
+}
+.confirmations-picker-btn:hover { filter: brightness(0.98); box-shadow: 0 8px 22px rgba(41,73,84,0.12); }
+.confirmations-search-btn:hover { filter: brightness(0.98); box-shadow: 0 8px 22px rgba(41,73,84,0.12); }
+.confirmations-page button.confirmations-picker-btn:disabled,
+.confirmations-page button.confirmations-search-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Hidden native date (kept accessible for showPicker) */
+.confirmations-native-date {
+  position: absolute;
+  opacity: 0.001;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+/* Helper texts */
+.confirmations-help { font-size: 12px; color: var(--oc-muted); margin: 2px 2px 0; }
+.confirmations-help.invalid { color: #C46247; }
+
+/* Form grid row */
+.confirmations-form-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 12px;
+}
+
+/* Buttons */
+.confirmations-page .btn-unirse,
+.confirmations-btn-search {
+  background: var(--oc-sky);
+  color: var(--oc-white);
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--oc-shadow);
+}
+.confirmations-page .btn-ver-detalles,
+.confirmations-btn-clear {
+  background: var(--oc-white);
+  color: var(--oc-petroleum);
+  border: 1px solid var(--oc-border);
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.confirmations-page button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Results card */
+.confirmations-results {
+  background: var(--oc-white);
+  border: 1px solid var(--oc-border);
+  border-radius: 16px;
+  box-shadow: var(--oc-shadow);
+}
+.confirmations-results h2 { color: var(--oc-petroleum); font-weight: 700; }
+
+/* Scrollable list: show ~5 items */
+.confirmations-list {
+  max-height: 520px; /* ~5 ítems visibles, el resto con scroll */
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Calendar popover */
+.confirmations-calendar-popover {
+  position: absolute;
+  top: 52px;
+  right: 0;
+  width: 320px;
+  background: var(--oc-white);
+  border: 1px solid var(--oc-border);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(41,73,84,0.16);
+  z-index: 2000;
+  padding: 12px;
+}
+
+.calendar-header { 
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  padding: 4px 4px 10px; 
+}
+.cal-title { color: var(--oc-petroleum); font-weight: 800; text-transform: capitalize; }
+.cal-nav {
+  background: var(--oc-white);
+  border: 1px solid var(--oc-border);
+  color: var(--oc-petroleum);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--oc-shadow);
+}
+.cal-nav:hover { background: #f8fafc; }
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+.cal-dow { 
+  text-align: center; 
+  color: var(--oc-muted); 
+  font-size: 12px; 
+  font-weight: 700; 
+}
+.cal-day,
+.cal-day--empty {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+}
+.cal-day {
+  background: #F7FAFB;
+  color: var(--oc-petroleum);
+  cursor: pointer;
+}
+.cal-day:hover { background: #EEF7FA; border-color: var(--oc-sky); }
+.cal-day.is-today { border-color: var(--oc-sky); box-shadow: 0 0 0 3px rgba(104,178,201,0.18) inset; }
+.cal-day.is-selected { 
+  background: linear-gradient(135deg, var(--oc-mint), var(--oc-sky));
+  color: #fff; 
+  border-color: transparent; 
+}
+.cal-day--empty { background: transparent; border-color: transparent; }
+
+/* Single item */
+.confirmations-page .clase-asistida-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 16px;
+  background: var(--oc-white);
+  border: 1px solid var(--oc-border);
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: var(--oc-shadow);
+  margin-bottom: 14px;
+}
+
+.confirmations-page .clase-asistida-icon { font-size: 20px; }
+.confirmations-page .clase-asistida-materia { color: var(--oc-petroleum); font-weight: 800; }
+.confirmations-page .clase-asistida-datetime { color: var(--oc-muted); font-size: 14px; margin-top: 4px; }
+
+/* Badges */
+.confirmacion-badge { 
+  display: inline-flex; 
+  align-items: center; 
+  gap: 8px; 
+  border-radius: 999px; 
+  font-weight: 700; 
+  padding: 8px 12px; 
+}
+.confirmacion-badge span { font-size: 16px; }
+
+.confirmacion-badge.pendiente { background: #FFD5C8; color: #C46247; }
+.confirmacion-badge.confirmada { background: #D4F2E7; color: #2F6B5A; }
+
+/* Pagination */
+.confirmations-pagination { 
+  border-top: 1px solid var(--oc-border);
+  padding-top: 16px;
+  margin-top: 8px;
+}
+.confirmations-pagination .text-slate-500 { color: var(--oc-muted); }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .confirmations-container { padding: 24px 16px; }
+  .confirmations-field { grid-template-columns: 1fr auto auto; }
+  .confirmations-form-row { grid-template-columns: 1fr; }
+  .confirmations-page .clase-asistida-item { 
+    grid-template-columns: 1fr; 
+    gap: 10px; 
+  }
+  .confirmacion-badge { width: fit-content; }
+  .confirmations-calendar-popover { right: 0; width: 100%; max-width: 340px; }
+}

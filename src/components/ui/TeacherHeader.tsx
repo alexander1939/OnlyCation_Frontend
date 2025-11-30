@@ -73,106 +73,27 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
     }
   }, [fetchChats]);
 
-  // Load counters once and on window focus, with throttling and shared cache across tabs
-  React.useEffect(() => {
-    let mounted = true;
-
-    const fetchCounts = async () => {
-      try {
-        const [resBookings, recent] = await Promise.all([
-          getMyNextClasses(1, 0),
-          getTeacherHistoryRecent(),
-        ]);
-
-        let newBookings = bookingsCount;
-        let newConfirmations = confirmationsCount;
-
-        if (mounted && resBookings?.success && resBookings.data) {
-          const total = (resBookings.data as any).total ?? (Array.isArray(resBookings.data.data) ? resBookings.data.data.length : 0);
-          newBookings = Number(total) || 0;
-        }
-        if (mounted && recent?.success && recent.data) {
-          const count = Array.isArray(recent.data.items)
-            ? recent.data.items.filter((it: any) => it?.confirmable_now && ((it?.seconds_left ?? 0) > 0)).length
-            : 0;
-          newConfirmations = count;
-        }
-
-        if (!mounted) return;
-        setBookingsCount((prev) => (prev !== newBookings ? newBookings : prev));
-        setConfirmationsCount((prev) => (prev !== newConfirmations ? newConfirmations : prev));
-        writeCountsToStorage(newBookings, newConfirmations);
-        lastFetchRef.current = Date.now();
-      } catch {}
-    };
-
-    // On mount: use fresh cache if available, otherwise fetch
-    const cached = readCountsFromStorage();
-    const now = Date.now();
-    if (cached && (now - cached.ts) < MIN_INTERVAL_MS) {
-      const cb = Number(cached.bookings) || 0;
-      const cc = Number(cached.confirmations) || 0;
-      setBookingsCount((prev) => (prev !== cb ? cb : prev));
-      setConfirmationsCount((prev) => (prev !== cc ? cc : prev));
-    } else {
-      // Defer initial network work to idle for smoother first paint
-      const run = () => { void fetchCounts(); };
-      if ('requestIdleCallback' in window) {
-        (window as any).requestIdleCallback(run, { timeout: 1000 });
-      } else {
-        setTimeout(run, 300);
-      }
-    }
-
-    const onVisChange = () => {
-      if (document.visibilityState !== 'visible') return;
-      if (debounceRef.current) window.clearTimeout(debounceRef.current);
-      debounceRef.current = window.setTimeout(() => {
-        const cached = readCountsFromStorage();
-        const now = Date.now();
-        if (cached && (now - cached.ts) < MIN_INTERVAL_MS) {
-          const cb = Number(cached.bookings) || 0;
-          const cc = Number(cached.confirmations) || 0;
-          setBookingsCount((prev) => (prev !== cb ? cb : prev));
-          setConfirmationsCount((prev) => (prev !== cc ? cc : prev));
-          return;
-        }
-        if (now - (lastFetchRef.current || 0) < MIN_INTERVAL_MS) {
-          return; // too soon since last fetch in this tab
-        }
-        void fetchCounts();
-      }, VIS_DEBOUNCE_MS);
-    };
-
-    document.addEventListener('visibilitychange', onVisChange);
-
-    // Sync across tabs: update UI when another tab writes fresh counts
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === COUNTS_KEY && e.newValue) {
-        try {
-          const parsed = JSON.parse(e.newValue);
-          if (typeof parsed?.ts === 'number') {
-            const cb = Number(parsed.bookings) || 0;
-            const cc = Number(parsed.confirmations) || 0;
-            setBookingsCount((prev) => (prev !== cb ? cb : prev));
-            setConfirmationsCount((prev) => (prev !== cc ? cc : prev));
-          }
-        } catch {}
-      }
-    };
-    window.addEventListener('storage', onStorage);
-
-    return () => {
-      mounted = false;
-      if (debounceRef.current) window.clearTimeout(debounceRef.current);
-      document.removeEventListener('visibilitychange', onVisChange);
-      window.removeEventListener('storage', onStorage);
-    };
-  }, []);
-
-  const userInitials = user 
+  const userInitials = user
     ? `${user.first_name?.[0] ?? ''}${user.last_name?.[0] ?? ''}`.toUpperCase() || 'U'
     : '';
+
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    };
+
+    if (isProfileOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isProfileOpen]);
 
   const menuItems = [
     { to: '/teacher/availability', label: 'Agenda' },
@@ -192,7 +113,7 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
       color: isActive ? '#68B2C9' : '#294954',
       fontFamily: 'Inter, sans-serif',
       padding: mobile ? '14px 20px' : '8px 12px',
-      borderRadius: mobile ? '12px' : 0,
+      borderRadius: mobile ? '12px' : '12px',
       textAlign: mobile ? 'left' : 'left',
       display: 'block',
       width: mobile ? '100%' : undefined,
@@ -281,8 +202,8 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
 
   return (
     <>
-      <header 
-        className="fixed top-0 left-0 right-0 z-[70] w-full" 
+      <header
+        className="fixed top-0 left-0 right-0 z-[70] w-full"
         style={{
           fontFamily: 'Roboto, sans-serif',
           backgroundColor: '#FAF9F5', // opaque to mask route content repaint
@@ -327,8 +248,8 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
             )}
 
             {isDesktop && (
-              <div className="relative ml-8">
-                <button 
+              <div className="relative ml-8" ref={dropdownRef}>
+                <button
                   className="rounded-full flex items-center justify-center transition-all duration-300 overflow-hidden"
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                   style={{
@@ -362,10 +283,10 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="flex flex-col justify-center items-center"
-                style={{ 
-                  border: 'none', 
-                  background: 'transparent', 
-                  cursor: 'pointer', 
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer',
                   position: 'relative',
                   width: '44px',
                   height: '44px',
@@ -405,15 +326,8 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
         </div>
       </header>
 
-      {isDesktop && isProfileOpen && (
-        <div 
-          className="fixed inset-0 z-30" 
-          onClick={() => setIsProfileOpen(false)}
-        />
-      )}
-
       {!isDesktop && (
-        <div 
+        <div
           style={{
             position: 'fixed',
             top: '92px',
@@ -584,7 +498,7 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
                     Documentos
                   </Link>
 
-                  <button 
+                  <button
                     onClick={() => { setIsMenuOpen(false); onLogout(); }}
                     style={{
                       position: 'relative',

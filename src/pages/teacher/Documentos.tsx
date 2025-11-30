@@ -5,9 +5,14 @@ import Header from '../../components/ui/Header';
 import Footer from '../../components/ui/Footer';
 import '../../styles/docente-documentos.css';
 import { GraduationCap, FileText, Folder, Target, Save, X, Pencil, Download, Loader2 } from 'lucide-react';
+import { useNotificationContext } from '../../components/NotificationProvider';
+import ConfirmDialog from '../../components/shared/ConfirmDialog';
+
 
 export default function DocenteDocumentos() {
   const { user } = useAuthContext();
+  const { showSuccess, showError, showWarning } = useNotificationContext();
+
   const { 
     documents, 
     loading, 
@@ -32,6 +37,10 @@ export default function DocenteDocumentos() {
     certificate: null as File | null,
     curriculum: null as File | null,
   });
+  const [confirmAction, setConfirmAction] = useState<
+    'all' | 'rfc' | 'description' | 'expertise_area' | 'certificate' | 'curriculum' | null
+  >(null);
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
   useEffect(() => {
     readDocuments();
@@ -60,6 +69,12 @@ export default function DocenteDocumentos() {
       certificate: null,
       curriculum: null,
     });
+  };
+
+  const sanitizeInput = (value: string) => {
+    // Permitir solo letras (incluyendo acentos y ñ), números y espacios.
+    // Cualquier otro carácter especial se elimina para evitar que se guarde.
+    return value.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\s]/g, '');
   };
 
   const handleSaveAll = async () => {
@@ -95,10 +110,10 @@ export default function DocenteDocumentos() {
     
     if (!hasErrors) {
       setEditingField(null);
-      alert('✅ Todos los campos actualizados exitosamente');
+      showSuccess('✅ Todos los campos actualizados exitosamente');
       await readDocuments();
     } else {
-      alert('⚠️ Algunos campos no se actualizaron correctamente');
+      showError('⚠️ Algunos campos no se actualizaron correctamente');
     }
   };
 
@@ -107,10 +122,10 @@ export default function DocenteDocumentos() {
     const result = await updateRfc(currentDoc.id, tempValues.rfc);
     if (result.success) {
       setEditingField(null);
-      alert('✅ RFC actualizado exitosamente');
+      showSuccess('✅ RFC actualizado exitosamente');
       await readDocuments();
     } else {
-      alert(`❌ Error: ${result.message}`);
+      showError(`❌ Error: ${result.message}`);
     }
   };
 
@@ -119,10 +134,10 @@ export default function DocenteDocumentos() {
     const result = await updateDescription(currentDoc.id, tempValues.description);
     if (result.success) {
       setEditingField(null);
-      alert('✅ Descripción actualizada exitosamente');
+      showSuccess('✅ Descripción actualizada exitosamente');
       await readDocuments();
     } else {
-      alert(`❌ Error: ${result.message}`);
+      showError(`❌ Error: ${result.message}`);
     }
   };
 
@@ -131,10 +146,10 @@ export default function DocenteDocumentos() {
     const result = await updateExpertiseArea(currentDoc.id, tempValues.expertise_area);
     if (result.success) {
       setEditingField(null);
-      alert('✅ Área de especialidad actualizada exitosamente');
+      showSuccess('✅ Área de especialidad actualizada exitosamente');
       await readDocuments();
     } else {
-      alert(`❌ Error: ${result.message}`);
+      showError(`❌ Error: ${result.message}`);
     }
   };
 
@@ -144,10 +159,10 @@ export default function DocenteDocumentos() {
     if (result.success) {
       setEditingField(null);
       setTempValues(prev => ({ ...prev, certificate: null }));
-      alert('✅ Certificado actualizado exitosamente');
+      showSuccess('✅ Certificado actualizado exitosamente');
       await readDocuments();
     } else {
-      alert(`❌ Error: ${result.message}`);
+      showError(`❌ Error: ${result.message}`);
     }
   };
 
@@ -157,10 +172,10 @@ export default function DocenteDocumentos() {
     if (result.success) {
       setEditingField(null);
       setTempValues(prev => ({ ...prev, curriculum: null }));
-      alert('✅ Curriculum actualizado exitosamente');
+      showSuccess('✅ Curriculum actualizado exitosamente');
       await readDocuments();
     } else {
-      alert(`❌ Error: ${result.message}`);
+      showError(`❌ Error: ${result.message}`);
     }
   };
 
@@ -176,8 +191,43 @@ export default function DocenteDocumentos() {
     setDownloading(null);
     
     if (!result.success) {
-      alert(`❌ Error al descargar: ${result.message}`);
+      showError(`❌ Error al descargar: ${result.message}`);
     }
+  };
+
+  const openConfirm = (
+    action: 'all' | 'rfc' | 'description' | 'expertise_area' | 'certificate' | 'curriculum'
+  ) => {
+    if (!currentDoc) return;
+    setConfirmAction(action);
+  };
+
+  const handleConfirmAction = async () => {
+    if (!confirmAction) return;
+    setConfirmLoading(true);
+    try {
+      if (confirmAction === 'all') {
+        await handleSaveAll();
+      } else if (confirmAction === 'rfc') {
+        await handleSaveRfc();
+      } else if (confirmAction === 'description') {
+        await handleSaveDescription();
+      } else if (confirmAction === 'expertise_area') {
+        await handleSaveExpertiseArea();
+      } else if (confirmAction === 'certificate') {
+        await handleSaveCertificate();
+      } else if (confirmAction === 'curriculum') {
+        await handleSaveCurriculum();
+      }
+    } finally {
+      setConfirmLoading(false);
+      setConfirmAction(null);
+    }
+  };
+
+  const handleCancelConfirm = () => {
+    if (confirmLoading) return;
+    setConfirmAction(null);
   };
 
   return (
@@ -196,7 +246,7 @@ export default function DocenteDocumentos() {
                 <div style={{ display: 'flex', gap: '12px' }}>
                   <button 
                     className="btn-actualizar"
-                    onClick={handleSaveAll}
+                    onClick={() => openConfirm('all')}
                     disabled={updating}
                     style={{ backgroundColor: '#10b981', color: 'white', minWidth: '120px' }}
                   >
@@ -260,7 +310,7 @@ export default function DocenteDocumentos() {
                         {editingField === 'certificate' && (
                           <>
                             <button 
-                              onClick={handleSaveCertificate}
+                              onClick={() => openConfirm('certificate')}
                               disabled={updating || !tempValues.certificate}
                               style={{
                                 background: '#10b981',
@@ -382,7 +432,7 @@ export default function DocenteDocumentos() {
                         {editingField === 'curriculum' && (
                           <>
                             <button 
-                              onClick={handleSaveCurriculum}
+                              onClick={() => openConfirm('curriculum')}
                               disabled={updating || !tempValues.curriculum}
                               style={{
                                 background: '#10b981',
@@ -500,7 +550,7 @@ export default function DocenteDocumentos() {
                         <input 
                           type="text"
                           value={tempValues.rfc}
-                          onChange={(e) => setTempValues(prev => ({ ...prev, rfc: e.target.value }))}
+                          onChange={(e) => setTempValues(prev => ({ ...prev, rfc: sanitizeInput(e.target.value) }))}
                           className="documento-rfc border-2 border-blue-400 rounded px-2 py-1"
                           placeholder="RFC"
                         />
@@ -511,7 +561,7 @@ export default function DocenteDocumentos() {
                     {editingField === 'rfc' && (
                       <div style={{ display: 'flex', gap: '8px' }}>
                         <button 
-                          onClick={handleSaveRfc}
+                          onClick={() => openConfirm('rfc')}
                           disabled={updating}
                           style={{
                             background: '#10b981',
@@ -589,7 +639,7 @@ export default function DocenteDocumentos() {
                         <input 
                           type="text"
                           value={tempValues.expertise_area}
-                          onChange={(e) => setTempValues(prev => ({ ...prev, expertise_area: e.target.value }))}
+                          onChange={(e) => setTempValues(prev => ({ ...prev, expertise_area: sanitizeInput(e.target.value) }))}
                           className="documento-rfc border-2 border-blue-400 rounded px-2 py-1"
                           placeholder="Área de especialidad"
                         />
@@ -600,7 +650,7 @@ export default function DocenteDocumentos() {
                     {editingField === 'expertise_area' && (
                       <div style={{ display: 'flex', gap: '8px' }}>
                         <button 
-                          onClick={handleSaveExpertiseArea}
+                          onClick={() => openConfirm('expertise_area')}
                           disabled={updating}
                           style={{
                             background: '#10b981',
@@ -679,7 +729,7 @@ export default function DocenteDocumentos() {
                       {editingField === 'description' && (
                         <div style={{ display: 'flex', gap: '8px' }}>
                           <button 
-                            onClick={handleSaveDescription}
+                            onClick={() => openConfirm('description')}
                             disabled={updating}
                             style={{
                               background: '#10b981',
@@ -745,7 +795,7 @@ export default function DocenteDocumentos() {
                     {editingField === 'all' || editingField === 'description' ? (
                       <textarea 
                         value={tempValues.description}
-                        onChange={(e) => setTempValues(prev => ({ ...prev, description: e.target.value }))}
+                        onChange={(e) => setTempValues(prev => ({ ...prev, description: sanitizeInput(e.target.value) }))}
                         className="w-full border-2 border-blue-400 rounded px-3 py-2 min-h-[100px]"
                         placeholder="Describe tu experiencia, especialidades, metodología..."
                       />
@@ -776,6 +826,21 @@ export default function DocenteDocumentos() {
         </section>
       </main>
       <Footer />
+
+      <ConfirmDialog
+        isOpen={!!confirmAction}
+        title="Confirmar cambios"
+        description={
+          confirmAction === 'all'
+            ? '¿Estás seguro de que deseas guardar todos los cambios realizados en tus documentos y datos?'
+            : '¿Estás seguro de que deseas guardar este cambio?'
+        }
+        confirmText="Sí, guardar"
+        cancelText="Cancelar"
+        onConfirm={handleConfirmAction}
+        onCancel={handleCancelConfirm}
+        loading={confirmLoading}
+      />
     </div>
   );
 }

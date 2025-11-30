@@ -42,11 +42,15 @@ export default function PublicTeacherProfile() {
     setSelectedDate(next);
   };
 
+  // Disparar una sola vez por teacherId; los providers manejan cache y in-flight
+  const requestedOnceRef = useRef<number | null>(null);
   useEffect(() => {
     if (!Number.isFinite(teacherId)) return;
+    if (requestedOnceRef.current === teacherId) return;
+    requestedOnceRef.current = teacherId;
     fetchPublicTeacherProfile(teacherId);
     fetchPublicComments(teacherId);
-  }, [teacherId, fetchPublicTeacherProfile, fetchPublicComments]);
+  }, [teacherId]);
 
   useEffect(() => {
     if (!Number.isFinite(teacherId)) return;
@@ -252,7 +256,7 @@ export default function PublicTeacherProfile() {
             <h2 className="section-heading">Reseñas de Alumnos</h2>
             <div className="reviews-grid" style={{ marginTop: 12 }}>
               {comments.length === 0 ? (
-                <p className="text-gray-600">Sin comentarios públicos</p>
+                <p className="text-gray-600">No hay comentarios aún</p>
               ) : (
                 comments.map((r) => (
                   <article key={r.id} className="review-card">

@@ -1,22 +1,35 @@
 import { useState, useEffect } from 'react';
 import Header from '../../components/ui/Header';
 import Footer from '../../components/ui/Footer';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/auth';
+import { useUpdateProfile } from '../../hooks/auth/useUpdateProfile';
+import { useVideosApi } from '../../hooks/videos/useVideosApi';
+import type { VideoData } from '../../context/videos/types';
 import '../../styles/docente-datos.css';
 
 export default function DocenteDatosPersonales() {
-  const { user } = useAuthContext();
+  const { user, setUser } = useAuthContext();
+  const { updateUserName, loading, error } = useUpdateProfile();
+  const { getMyVideos, updateMyVideo } = useVideosApi();
+  const navigate = useNavigate();
+
   const fullName = user ? `${user.first_name} ${user.last_name}`.trim() : '—';
   const [firstName, setFirstName] = useState<string>(user?.first_name ?? '');
   const [lastName, setLastName] = useState<string>(user?.last_name ?? '');
-  const [currentVideoUrl, setCurrentVideoUrl] = useState<string>('https://youtu.be/tdFNA7YBM4c');
+  const [currentVideoUrl, setCurrentVideoUrl] = useState<string>('');
   const [newVideoUrl, setNewVideoUrl] = useState<string>('');
   const [showCurrentPreview, setShowCurrentPreview] = useState(false);
   const [showNewPreview, setShowNewPreview] = useState(false);
-  const [editingPersonal, setEditingPersonal] = useState(false);
   const [currentVideoTitle, setCurrentVideoTitle] = useState<string>('');
   const [newVideoTitle, setNewVideoTitle] = useState<string>('');
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const [videoError, setVideoError] = useState<string | null>(null);
+  const [videoSuccessMessage, setVideoSuccessMessage] = useState<string | null>(null);
+  const [userVideos, setUserVideos] = useState<VideoData[]>([]);
+  const [loadingVideos, setLoadingVideos] = useState(false);
+  const [savingVideo, setSavingVideo] = useState(false);
 
   const extractYouTubeId = (url: string): string | null => {
     try {
@@ -31,7 +44,7 @@ export default function DocenteDatosPersonales() {
         const shortsIdx = parts.indexOf('shorts');
         if (shortsIdx >= 0 && parts[shortsIdx + 1]) return parts[shortsIdx + 1];
       }
-    } catch {}
+    } catch { }
     return null;
   };
 
@@ -77,6 +90,143 @@ export default function DocenteDatosPersonales() {
     return () => { cancelled = true; };
   }, [newId]);
 
+  // Load user videos on mount
+  useEffect(() => {
+    const loadVideos = async () => {
+      setLoadingVideos(true);
+      setVideoError(null);
+      const response = await getMyVideos();
+      if (response.success && response.data) {
+        setUserVideos(response.data);
+        // Set current video to the first one if exists
+        if (response.data.length > 0) {
+          setCurrentVideoUrl(response.data[0].original_url);
+          setCurrentVideoTitle(response.data[0].title);
+        }
+      } else {
+        setVideoError(response.message);
+      }
+      setLoadingVideos(false);
+    };
+    loadVideos();
+  }, []);
+
+  const handlePersonalDataSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSuccessMessage(null);
+    setValidationError(null);
+
+    // Validar que al menos un campo haya cambiado
+    if (firstName === user?.first_name && lastName === user?.last_name) {
+      setValidationError('No se detectaron cambios en los datos.');
+      return;
+    }
+
+    // Validar que ambos campos estén presentes
+    if (!firstName.trim() || !lastName.trim()) {
+      setValidationError('Debes proporcionar tanto el nombre como el apellido.');
+      return;
+    }
+
+    // Validar longitud máxima
+    if (firstName.length > 50 || lastName.length > 50) {
+      setValidationError('El nombre y apellido no pueden exceder los 50 caracteres.');
+      return;
+    }
+
+    // Validar caracteres permitidos (letras, espacios y caracteres especiales comunes)
+    const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/;
+    if (!nameRegex.test(firstName) || !nameRegex.test(lastName)) {
+      setValidationError('El nombre y apellido solo pueden contener letras y espacios.');
+      return;
+    }
+
+    // Validar que no haya más de 2 letras consecutivas repetidas
+    const repeatedCharsRegex = /(.)\1{2,}/;
+    if (repeatedCharsRegex.test(firstName) || repeatedCharsRegex.test(lastName)) {
+      setValidationError('El nombre y apellido no pueden tener más de 2 letras consecutivas iguales.');
+      return;
+    }
+
+    // Validar que no haya secuencias largas de consonantes (más de 4 seguidas)
+    // Esto ayuda a detectar "keyboard smashing" como "ananfaklnlaknklfa"
+    const excessiveConsonantsRegex = /[bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ]{5,}/;
+    if (excessiveConsonantsRegex.test(firstName) || excessiveConsonantsRegex.test(lastName)) {
+      setValidationError('El nombre y apellido contienen secuencias de letras no válidas.');
+      return;
+    }
+
+    // Preparar datos para actualizar
+    const updateData: { first_name?: string; last_name?: string } = {};
+    if (firstName.trim() !== user?.first_name) {
+      updateData.first_name = firstName.trim();
+    }
+    if (lastName.trim() !== user?.last_name) {
+      updateData.last_name = lastName.trim();
+    }
+
+    // Llamar a la API
+    const response = await updateUserName(updateData);
+
+    if (response.success && response.data) {
+      // Actualizar el contexto con los nuevos datos
+      setUser({
+        ...user!,
+        first_name: response.data.first_name,
+        last_name: response.data.last_name,
+      });
+
+      setSuccessMessage('¡Datos actualizados correctamente!');
+
+      // Redirigir después de 2 segundos
+      setTimeout(() => {
+        navigate('/teacher-home');
+      }, 2000);
+    }
+  };
+
+  const handleVideoSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newId) {
+      setVideoError('Por favor, ingresa una URL válida de YouTube');
+      return;
+    }
+
+    setSavingVideo(true);
+    setVideoError(null);
+    setVideoSuccessMessage(null);
+
+    // Update video using API (PUT /videos/my)
+    const response = await updateMyVideo({ url_or_id: newVideoUrl });
+
+    if (response.success && response.data?.data) {
+      // Update current video
+      setCurrentVideoUrl(response.data.data.original_url);
+      setCurrentVideoTitle(response.data.data.title);
+      setShowNewPreview(false);
+      setNewVideoUrl('');
+
+      // Refresh video list
+      const videosResponse = await getMyVideos();
+      if (videosResponse.success && videosResponse.data) {
+        setUserVideos(videosResponse.data);
+      }
+
+      // Show success message
+      setVideoError(null);
+      setVideoSuccessMessage('¡Video actualizado exitosamente!');
+
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setVideoSuccessMessage(null);
+      }, 3000);
+    } else {
+      setVideoError(response.message || 'Error al actualizar el video');
+    }
+
+    setSavingVideo(false);
+  };
+
   return (
     <div className="min-h-screen flex flex-col page-container">
       <Header />
@@ -89,39 +239,107 @@ export default function DocenteDatosPersonales() {
 
           <div className="datos-card">
             <h2 className="datos-section-title">Información Personal</h2>
-            <form onSubmit={(e)=>{e.preventDefault(); setEditingPersonal(false);}}>
+
+            {/* Mensajes de éxito y error */}
+            {successMessage && (
+              <div style={{
+                padding: '12px',
+                marginBottom: '16px',
+                backgroundColor: '#d4edda',
+                color: '#155724',
+                borderRadius: '4px',
+                border: '1px solid #c3e6cb'
+              }}>
+                {successMessage}
+              </div>
+            )}
+            {error && (
+              <div style={{
+                padding: '12px',
+                marginBottom: '16px',
+                backgroundColor: '#f8d7da',
+                color: '#721c24',
+                borderRadius: '4px',
+                border: '1px solid #f5c6cb'
+              }}>
+                {error}
+              </div>
+            )}
+            {validationError && (
+              <div style={{
+                padding: '12px',
+                marginBottom: '16px',
+                backgroundColor: '#fff3cd',
+                color: '#856404',
+                borderRadius: '4px',
+                border: '1px solid #ffeeba'
+              }}>
+                {validationError}
+              </div>
+            )}
+
+            <form onSubmit={handlePersonalDataSubmit}>
               <div className="form-grid">
                 <label className="datos-field">
                   <span className="datos-label">Nombre</span>
-                  <input className={`datos-input ${!editingPersonal ? 'datos-input--soft' : ''}`} placeholder="Nombre" value={firstName} onChange={(e)=>setFirstName(e.target.value)} readOnly={!editingPersonal} />
+                  <input
+                    className="datos-input"
+                    placeholder="Nombre"
+                    value={firstName}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value.length <= 50) {
+                        setFirstName(value);
+                      }
+                    }}
+                    disabled={loading}
+                    maxLength={50}
+                  />
                 </label>
                 <label className="datos-field">
                   <span className="datos-label">Apellido</span>
-                  <input className={`datos-input ${!editingPersonal ? 'datos-input--soft' : ''}`} placeholder="Apellido" value={lastName} onChange={(e)=>setLastName(e.target.value)} readOnly={!editingPersonal} />
+                  <input
+                    className="datos-input"
+                    placeholder="Apellido"
+                    value={lastName}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value.length <= 50) {
+                        setLastName(value);
+                      }
+                    }}
+                    disabled={loading}
+                    maxLength={50}
+                  />
                 </label>
               </div>
               <div className="datos-actions-row">
-                {!editingPersonal ? (
-                  <button type="button" className="btn-green-outline" onClick={()=>setEditingPersonal(true)}>Editar Datos</button>
-                ) : (
-                  <button type="submit" className="btn-green-outline">Guardar Datos</button>
-                )}
+                <button type="submit" className="btn-green-outline" disabled={loading}>
+                  {loading ? 'Guardando...' : 'Guardar Datos'}
+                </button>
               </div>
             </form>
 
-            <div className="note-warning" style={{marginTop:12}}>
+            <div className="note-warning" style={{ marginTop: 12 }}>
               <span>⚠️</span>
               <span>Nota Importante: Si modificas tu nombre o apellido, deberás actualizar tu video de presentación para que la información sea consistente.</span>
             </div>
 
-            <h2 className="datos-section-title" style={{marginTop:18}}>Mi Video de Presentación</h2>
+            <h2 className="datos-section-title" style={{ marginTop: 18 }}>Mi Video de Presentación</h2>
+
+            {loadingVideos && (
+              <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+                Cargando videos...
+              </div>
+            )}
+
             <div className="datos-video-grid">
               <div className="datos-video-card">
                 <div className="datos-video-title">Video Actual</div>
                 {currentId ? (
                   <div className="datos-video-frame">
                     {!showCurrentPreview ? (
-                      <button type="button" className="datos-video-thumb" style={{backgroundImage:`url(${currentThumb})`}} onClick={()=>setShowCurrentPreview(true)}>
+                      <button type="button" className="datos-video-thumb" style={{ backgroundImage: `url(${currentThumb})` }} onClick={() => setShowCurrentPreview(true)}>
                         ▶
                       </button>
                     ) : (
@@ -141,7 +359,7 @@ export default function DocenteDatosPersonales() {
                 {newId ? (
                   <div className="datos-video-frame">
                     {!showNewPreview ? (
-                      <button type="button" className="datos-video-thumb" style={{backgroundImage:`url(${newThumb})`}} onClick={()=>setShowNewPreview(true)}>
+                      <button type="button" className="datos-video-thumb" style={{ backgroundImage: `url(${newThumb})` }} onClick={() => setShowNewPreview(true)}>
                         ▶
                       </button>
                     ) : (
@@ -157,16 +375,48 @@ export default function DocenteDatosPersonales() {
               </div>
             </div>
 
-            <h3 className="datos-section-title" style={{marginTop:12}}>Actualizar Video</h3>
+            <h3 className="datos-section-title" style={{ marginTop: 12 }}>Actualizar Video</h3>
             <p className="datos-help">Para actualizar tu video de presentación, pega la URL de un video de YouTube en el siguiente campo.</p>
-            <form className="video-update-row" onSubmit={(e)=>{e.preventDefault(); if(newId){ setCurrentVideoUrl(newVideoUrl); setShowNewPreview(false);} }}>
+
+            {/* Video success message */}
+            {videoSuccessMessage && (
+              <div style={{
+                padding: '12px',
+                marginBottom: '16px',
+                backgroundColor: '#d4edda',
+                color: '#155724',
+                borderRadius: '4px',
+                border: '1px solid #c3e6cb'
+              }}>
+                {videoSuccessMessage}
+              </div>
+            )}
+
+            {/* Video error message */}
+            {videoError && (
+              <div style={{
+                padding: '12px',
+                marginBottom: '16px',
+                backgroundColor: '#f8d7da',
+                color: '#721c24',
+                borderRadius: '4px',
+                border: '1px solid #f5c6cb'
+              }}>
+                {videoError}
+              </div>
+            )}
+
+            <form className="video-update-row" onSubmit={handleVideoSubmit}>
               <input
                 className="datos-input datos-input--soft"
                 placeholder="https://youtu.be/… o https://www.youtube.com/watch?v=…"
                 value={newVideoUrl}
-                onChange={(e)=>setNewVideoUrl(e.target.value)}
+                onChange={(e) => setNewVideoUrl(e.target.value)}
+                disabled={savingVideo}
               />
-              <button type="submit" className="btn-green-outline">Guardar Video</button>
+              <button type="submit" className="btn-green-outline" disabled={savingVideo || !newId}>
+                {savingVideo ? 'Actualizando...' : 'Actualizar Video'}
+              </button>
             </form>
           </div>
         </section>

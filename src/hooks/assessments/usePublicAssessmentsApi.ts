@@ -19,18 +19,23 @@ export const usePublicAssessmentsApi = () => {
       const res = await client.get<{ success: boolean; message: string; data: PublicAssessmentComment[] }>(
         `/assessments/public/comments/${teacherId}`
       );
+      // Normalize: if API returns success but no data, treat as empty list to cache "no comments"
       return {
-        success: !!res.data?.success,
+        success: true,
         message: res.data?.message || 'Comentarios obtenidos exitosamente',
-        data: res.data?.data,
+        data: Array.isArray(res.data?.data) ? res.data.data : [],
       };
     } catch (err) {
       const axErr = err as AxiosError<{ detail?: string; message?: string }>;
       const status = axErr.response?.status;
+      // If 404, consider it as "no comments" and return empty array to allow caching and avoid repeated calls
+      if (status === 404) {
+        const message = axErr.response?.data?.detail || axErr.response?.data?.message || 'El docente no tiene comentarios públicos';
+        return { success: true, message, data: [] };
+      }
       const message =
         axErr.response?.data?.detail ||
         axErr.response?.data?.message ||
-        (status === 404 ? 'El docente no tiene comentarios públicos' : undefined) ||
         axErr.message ||
         'Error al obtener los comentarios públicos';
       return { success: false, message };

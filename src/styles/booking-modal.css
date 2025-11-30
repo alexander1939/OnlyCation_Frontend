@@ -4,30 +4,33 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(15, 23, 42, 0.0);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  padding: 20px;
+  padding: 16px;
   font-family: 'Roboto', sans-serif;
+  animation: booking-modal-overlay-fade 0.18s ease-out forwards;
 }
 
 .booking-modal-container {
-  background-color: white;
-  border-radius: 16px;
+  background-color: #ffffff;
+  border-radius: 18px;
   width: 100%;
-  max-width: 900px;
+  max-width: 480px;
   max-height: 90vh;
   overflow: hidden;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 22px 45px rgba(15, 23, 42, 0.35);
   position: relative;
   font-family: 'Roboto', sans-serif;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  animation: booking-modal-pop 0.18s ease-out;
 }
 
 .booking-modal-header {
-  background: linear-gradient(135deg, #294954 0%, #3d6b7a 100%);
-  padding: 24px 32px;
+  background: linear-gradient(135deg, #1f2937 0%, #294954 100%);
+  padding: 18px 20px;
   border-bottom: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
@@ -35,10 +38,10 @@
 }
 
 .booking-modal-title {
-  font-size: 28px;
+  font-size: 20px;
   font-weight: bold;
   color: white;
-  margin: 0 0 8px 0;
+  margin: 0;
   font-family: 'Roboto', sans-serif;
 }
 
@@ -50,14 +53,14 @@
 }
 
 .booking-modal-close {
-  width: 48px;
-  height: 48px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(15, 23, 42, 0.25);
   border: none;
   cursor: pointer;
-  font-size: 32px;
-  color: white;
+  font-size: 22px;
+  color: #f9fafb;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -65,13 +68,17 @@
 }
 
 .booking-modal-close:hover {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(15, 23, 42, 0.45);
+}
+
+.booking-modal-close:active {
+  transform: scale(0.96);
 }
 
 .booking-modal-content {
-  max-height: calc(90vh - 120px);
+  max-height: calc(90vh - 110px);
   overflow-y: auto;
-  padding: 32px;
+  padding: 20px 22px 22px;
 }
 
 .booking-modal-loading {
@@ -130,7 +137,208 @@
 }
 
 .booking-modal-section {
-  margin-bottom: 24px;
+  margin-bottom: 18px;
+}
+
+/* Capa difuminada y con "rayos" animados para el cuadro de Confirmar cambios */
+.confirm-dialog-blur {
+  background-image: repeating-linear-gradient(
+    120deg,
+    rgba(15, 23, 42, 0.08) 0px,
+    rgba(15, 23, 42, 0.08) 10px,
+    rgba(148, 163, 184, 0.18) 10px,
+    rgba(148, 163, 184, 0.18) 22px
+  );
+  animation: confirm-dialog-rays 5s linear infinite;
+}
+
+.confirm-attendance-card {
+  position: relative;
+  overflow: hidden;
+  animation: confirm-attendance-pulse 4.5s ease-in-out infinite;
+}
+
+.confirm-attendance-content {
+  animation: confirm-attendance-fade 0.22s ease-out;
+}
+
+.confirm-attendance-modal .booking-modal-content {
+  background:
+    radial-gradient(circle at top left, rgba(148, 163, 184, 0.16), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(104, 178, 201, 0.22), transparent 55%),
+    rgba(249, 250, 251, 0.96);
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.28);
+}
+
+.confirm-attendance-role-badge {
+  animation: confirm-attendance-badge-float 3.2s ease-in-out infinite;
+}
+
+.confirm-attendance-textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 1px rgba(104, 178, 201, 0.55), 0 8px 20px rgba(15, 23, 42, 0.12);
+}
+
+.confirm-attendance-actions .btn-unirse {
+  position: relative;
+  overflow: hidden;
+}
+
+.confirm-attendance-actions .btn-unirse::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+  opacity: 0;
+  transform: translateX(-80%);
+  transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+  pointer-events: none;
+}
+
+.confirm-attendance-actions .btn-unirse:hover::before {
+  opacity: 1;
+  transform: translateX(40%);
+}
+
+.confirm-attendance-modal .booking-modal-header {
+  position: relative;
+  overflow: hidden;
+}
+
+.confirm-attendance-modal .booking-modal-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 3px;
+  background: linear-gradient(90deg, #38bdf8, #22c55e, #facc15);
+  opacity: 0.9;
+}
+
+.confirm-attendance-title {
+  position: relative;
+  z-index: 1;
+  color: #f9fafb;
+}
+
+.confirm-attendance-modal .booking-modal-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+    120deg,
+    rgba(56, 189, 248, 0.25) 0%,
+    rgba(37, 99, 235, 0.45) 30%,
+    rgba(129, 140, 248, 0.40) 60%,
+    rgba(16, 185, 129, 0.32) 100%
+  );
+  background-size: 260% 260%;
+  opacity: 0.65;
+  mix-blend-mode: soft-light;
+  animation: confirm-attendance-title-rays 5s linear infinite;
+}
+
+.confirm-attendance-body {
+  border-radius: 14px;
+  padding: 16px 16px 14px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(241, 245, 249, 0.96));
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+}
+
+.confirm-attendance-error {
+  animation: confirm-attendance-error-in 0.25s ease-out;
+}
+
+@keyframes booking-modal-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes booking-modal-overlay-fade {
+  0% {
+    background-color: rgba(15, 23, 42, 0.0);
+  }
+  100% {
+    background-color: rgba(15, 23, 42, 0.55);
+  }
+}
+
+@keyframes confirm-attendance-fade {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes confirm-attendance-shine {
+  0% {
+    transform: translateX(-140%);
+  }
+  100% {
+    transform: translateX(140%);
+  }
+}
+
+@keyframes confirm-attendance-pulse {
+  0%, 100% {
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
+  }
+  50% {
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.24);
+  }
+}
+
+@keyframes confirm-attendance-badge-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes confirm-attendance-error-in {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes confirm-attendance-title-rays {
+  0% {
+    background-position: 0% 40%;
+  }
+  50% {
+    background-position: 100% 60%;
+  }
+  100% {
+    background-position: 200% 40%;
+  }
+}
+
+@keyframes confirm-dialog-rays {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(60px);
+  }
 }
 
 .booking-detail-materia {

@@ -1,5 +1,5 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import Home from '../pages/home/Home';
+import HomeGuard from '../components/HomeGuard';
 import AllTeachers from '../pages/home/AllTeachers';
 import AboutUs from '../pages/about-us/AboutUs';
 import BeTeacher from '../pages/home/BeTeacher';
@@ -62,7 +62,7 @@ import { StudentAssessmentsProvider } from '../context/assessments/StudentAssess
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Home />,
+    element: <HomeGuard />,
   },
   {
     path: '/profile/preferences',

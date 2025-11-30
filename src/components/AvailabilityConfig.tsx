@@ -280,7 +280,6 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityA
               </div>
             </div>
             <div className="modal-footer">
-              <button className="btn-secondary" onClick={() => { setIsModalOpen(false); setSelectedHours(new Set()); }}>Cancelar</button>
               <button className="btn-primary" onClick={confirmAdd}>Guardar</button>
             </div>
           </div>

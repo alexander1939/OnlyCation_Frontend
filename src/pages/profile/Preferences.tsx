@@ -244,27 +244,20 @@ const PreferencesPage: React.FC = () => {
             </div>
 
             {/* Actions */}
-            <div className="pref-actions">
+            <div className="pref-actions flex justify-center">
               <button
                 type="button"
                 onClick={() => navigate('/teacher-home')}
-                className="pref-btn--secondary"
+                className="pref-btn--danger pref-btn--lg pref-btn--exit"
               >
-                Terminar proceso
-              </button>
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="pref-btn--secondary"
-              >
-                Cancelar
+                Salir de activación
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className={`pref-btn--primary ${loading ? 'cursor-not-allowed' : ''}`}
+                className={`pref-btn--primary pref-btn--lg pref-btn--next ${loading ? 'cursor-not-allowed' : ''}`}
               >
-                {loading ? 'Guardando...' : 'Guardar Cambios'}
+                {loading ? 'Guardando...' : 'Siguiente'}
               </button>
             </div>
 
@@ -277,9 +270,10 @@ const PreferencesPage: React.FC = () => {
             )}
           </form>
         </div>
-      </div>
-      <div className="onboarding-mascot">
-        <img src="/Activar_cuenta.png" alt="activar cuenta" />
+
+        <div className="onboarding-mascot">
+          <img src="/Activar_cuenta.png" alt="activar cuenta" />
+        </div>
       </div>
     </div>
   );

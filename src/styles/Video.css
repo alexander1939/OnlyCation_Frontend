@@ -108,7 +108,7 @@
 .video-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9CA3AF; display: flex; align-items: center; justify-content: center; }
 .video-icon svg { width: 20px; height: 20px; }
 
-.video-actions { display: flex; align-items: center; justify-content: flex-end; gap: 0.75rem; margin-top: 2rem; }
+.video-actions { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-top: 2rem; }
 
 .video-btn--secondary { border: 1px solid var(--video-border); background: var(--video-bg); color: var(--video-text); border-radius: var(--video-radius); padding: 0.5rem 1rem; font-size: 0.9rem; transition: background 120ms ease, transform 80ms ease, box-shadow 120ms ease; }
 .video-btn--secondary:hover { background: #F3F4F6; }
@@ -117,6 +117,36 @@
 .video-btn--primary { background: var(--video-brand); color: white; border-radius: var(--video-radius); padding: 0.5rem 1rem; font-size: 0.92rem; font-weight: 600; transition: background 120ms ease, transform 80ms ease, opacity 120ms ease, box-shadow 120ms ease; }
 .video-btn--primary:hover { background: var(--video-brand-700); }
 .video-btn--primary:disabled { opacity: 0.7; background: var(--video-brand-300); cursor: not-allowed; }
+
+.video-btn--lg {
+  padding: 0.9rem 1.5rem;
+  font-size: 1rem;
+  min-height: 48px;
+  min-width: 180px;
+  border-radius: 999px;
+}
+@media (max-width: 640px) { .video-btn--lg { min-width: 140px; } }
+
+.video-btn--danger {
+  background: #DC2626;
+  color: #fff;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.625rem 1rem;
+  font-weight: 600;
+  transition: background-color 150ms ease, opacity 150ms ease;
+}
+.video-btn--danger:hover { background: #B91C1C; }
+.video-btn--danger:focus-visible,
+.video-btn--primary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.25); }
+
+@media (max-width: 768px) {
+  .video-actions .video-btn--lg { display: block; width: 100% !important; max-width: 100%; flex: 1 1 100%; }
+}
+
+@media (min-width: 1024px) {
+
+}
 
 .video-alert { margin-top: 1rem; font-size: 0.875rem; }
 .video-alert--error { color: #DC2626; }

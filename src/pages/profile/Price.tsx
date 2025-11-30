@@ -155,9 +155,20 @@ const CreatePriceForm: React.FC = () => {
             
 
             <div className="price-actions">
-              <button type="button" className="price-btn--secondary" onClick={() => navigate('/teacher-home')}>Terminar proceso</button>
-              <button type="button" className="price-btn--secondary" onClick={onCancel}>Cancelar</button>
-              <button type="submit" className="price-btn--primary" disabled={!isValid || creating}>{creating ? 'Guardando...' : 'Guardar'}</button>
+              <button
+                type="button"
+                className="price-btn--danger price-btn--lg price-btn--exit"
+                onClick={() => navigate('/teacher-home')}
+              >
+                Salir de activación
+              </button>
+              <button
+                type="submit"
+                className="price-btn--primary price-btn--lg price-btn--next"
+                disabled={!isValid || creating}
+              >
+                {creating ? 'Guardando...' : 'Siguiente'}
+              </button>
             </div>
 
             {error && <div className="price-alert price-alert--error">{error}</div>}

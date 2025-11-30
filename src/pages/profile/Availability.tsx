@@ -11,6 +11,7 @@ import { useTokenRefresh } from '../../hooks/auth/useTokenRefresh';
 const BookingPage: React.FC = () => {
   // Al montar la página, si falta preference_id intentamos renovarlo
   const { refreshIfMissingPreference } = useTokenRefresh();
+  const navigate = useNavigate();
   React.useEffect(() => {
     let mounted = true;
     (async () => {
@@ -119,11 +120,15 @@ const SaveAvailabilityBar: React.FC = () => {
 
   return (
     <div className="booking-actions" style={{ marginTop: '1rem' }}>
-      <button type="button" className="booking-btn--secondary" onClick={() => navigate('/teacher-home')} style={{ marginRight: 8 }}>
-        Terminar proceso
+      <button
+        type="button"
+        className="booking-btn--danger booking-btn--lg booking-btn--exit"
+        onClick={() => navigate('/teacher-home')}
+      >
+        Salir de activación
       </button>
-      <button type="button" className="booking-btn--primary" onClick={onSave} disabled={creating}>
-        {creating ? 'Guardando...' : 'Guardar disponibilidad'}
+      <button type="button" className="booking-btn--primary booking-btn--lg booking-btn--next" onClick={onSave} disabled={creating}>
+        {creating ? 'Guardando...' : 'Siguiente'}
       </button>
       {error && <p className="booking-alert booking-alert--error" style={{ marginTop: 8 }}>{error}</p>}
       {success && <p className="booking-alert booking-alert--success" style={{ marginTop: 8 }}>{success}</p>}

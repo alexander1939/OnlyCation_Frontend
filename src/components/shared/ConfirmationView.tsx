@@ -6,6 +6,7 @@ import ConfirmationDetailModal from './ConfirmationDetailModal';
 import '../../styles/confirmations.css';
 import HintBadge from '../ui/HintBadge';
 import { Calendar as CalendarIcon, CalendarDays, FileText, Hourglass, CheckCircle, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
+import LoadingOverlay from './LoadingOverlay';
 
 type ConfirmationViewProps = {
   role?: string;
@@ -374,6 +375,12 @@ export default function ConfirmationView({ role }: ConfirmationViewProps) {
           loading={!!detailCtx?.loading}
           error={detailCtx?.error || null}
           detail={detailCtx?.detail || null}
+        />
+        <LoadingOverlay
+          open={Boolean(loading || detailCtx?.loading || (isTeacher ? teacherCtx?.submitLoading : studentCtx?.submitLoading))}
+          message="Preparando tu experiencia..."
+          logoSrc="/logo.png"
+          gifSrc="/icons8-rhombus-loader-96.gif"
         />
       </div>
     </div>

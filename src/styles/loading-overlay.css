@@ -1,0 +1,91 @@
+/* OnlyCation Loading Overlay (no Tailwind) */
+
+.oc-overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  width: 100dvw;
+  height: 100dvh;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transition: opacity 300ms ease-out;
+  z-index: 2147483647; /* ensure above everything */
+}
+
+.oc-overlay--visible {
+  opacity: 1;
+}
+
+.oc-overlay-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 8px;
+  border: 0;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.85);
+  color: #294954;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  backdrop-filter: blur(2px);
+  transition: transform 150ms ease;
+}
+
+.oc-overlay-close:hover {
+  transform: scale(1.06);
+}
+
+.oc-overlay-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.oc-overlay-logo {
+  height: 400px;
+  width: auto;
+  opacity: 0.95;
+}
+
+.oc-overlay-ring {
+  position: relative;
+  padding: 3px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #8ED4BE, #68B2C9);
+  box-shadow: 0 0 25px 8px rgba(104, 178, 201, 0.45);
+}
+
+.oc-overlay-circle {
+  width: 144px;
+  height: 144px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.oc-overlay-gif {
+  width: 96px;
+  height: 96px;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.oc-overlay-message {
+  margin-top: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+  animation: oc-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes oc-pulse {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}

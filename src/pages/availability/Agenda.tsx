@@ -6,6 +6,7 @@ import AvailabilityConfig from '../../components/AvailabilityConfig';
 import { ScheduleProvider, useSchedule, type DayKey } from '../../context/availability/ScheduleContext';
 import { useAgendaApi } from '../../hooks/availability/useavailabilityApi';
 import { useWeeklyAgendaContext, WeeklyAgendaProvider } from '../../context/availability/WeeklyAgendaContext';
+import LoadingOverlay from '../../components/shared/LoadingOverlay';
 
 export default function AgendaDocente() {
   return (
@@ -20,11 +21,24 @@ export default function AgendaDocente() {
             <ScheduleProvider>
               <AgendaContent />
             </ScheduleProvider>
+            <AgendaWeeklyOverlay />
           </WeeklyAgendaProvider>
         </section>
       </main>
       <Footer />
     </div>
+  );
+}
+
+function AgendaWeeklyOverlay() {
+  const { loading } = useWeeklyAgendaContext();
+  return (
+    <LoadingOverlay
+      open={Boolean(loading)}
+      message="Preparando tu experiencia..."
+      logoSrc="/logo.png"
+      gifSrc="/icons8-rhombus-loader-96.gif"
+    />
   );
 }
 
@@ -106,7 +120,12 @@ const AgendaContent: React.FC = () => {
         💡 Los horarios que configures aquí se reflejarán automáticamente en tu agenda semanal.
       </p>
 
-      {loading && <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded">🔄 Cargando...</div>}
+      <LoadingOverlay
+        open={Boolean(loading)}
+        message="Preparando tu experiencia..."
+        logoSrc="/logo.png"
+        gifSrc="/icons8-rhombus-loader-96.gif"
+      />
 
       <AvailabilityConfig 
         onAvailabilityAdded={handleAvailabilityAdded}

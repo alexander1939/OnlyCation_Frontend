@@ -99,10 +99,8 @@ export default function NetworkNotification({
         position: 'fixed',
         top: `${topPosition}px`,
         right: '16px',
-        left: '16px',
-        width: 'min(500px, calc(100vw - 32px))',
-        marginLeft: 'auto',
-        marginRight: '0',
+        width: 'calc(100% - 32px)',
+        maxWidth: '500px',
         background: typeStyles.background,
         borderLeft: `3px solid ${typeStyles.borderColor}`,
         borderRadius: '8px',
@@ -148,6 +146,7 @@ export default function NetworkNotification({
           color: typeStyles.textColor,
           letterSpacing: '-0.01em',
           fontFamily: 'Roboto, sans-serif',
+          paddingRight: '16px',
         }}
       >
         {message}
@@ -172,6 +171,7 @@ export default function NetworkNotification({
           transition: 'all 0.2s ease',
           opacity: 0.5,
           flexShrink: 0,
+          marginLeft: '32px',
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.opacity = '1';

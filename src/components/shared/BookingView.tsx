@@ -13,6 +13,7 @@ import type { ConfirmationHistoryItem } from '../../context/confirmations';
 import { useNotificationContext } from '../NotificationProvider';
 import AssessmentModal from './AssessmentModal';
 import { useOptionalStudentAssessmentsContext } from '../../context/assessments/StudentAssessmentsContext';
+import LoadingOverlay from './LoadingOverlay';
 import {
   CalendarDays,
   Clock,
@@ -638,6 +639,12 @@ export default function BookingView({
         </section>
       </main>
       <Footer />
+      <LoadingOverlay
+        open={Boolean(loading || detailLoading || confirmSubmitting || studentAssessCtx?.createLoading)}
+        message="Preparando tu experiencia..."
+        logoSrc="/logo.png"
+        gifSrc="/icons8-rhombus-loader-96.gif"
+      />
       
       {/* Modal de detalle */}
       <BookingDetailModal

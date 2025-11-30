@@ -38,16 +38,87 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         </div>
 
         <div className="booking-modal-content">
-          <div className="booking-modal-section" style={{ display: 'grid', gap: 12 }}>
-            <div style={{ color: '#374151', fontSize: 14 }}>{description}</div>
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 8 }}>
-              <button type="button" className="btn-ver-detalles" onClick={onCancel} disabled={loading}>
-                {cancelText}
-              </button>
-              <button type="button" className="btn-unirse" onClick={onConfirm} disabled={loading}>
-                {loading ? 'Procesando…' : confirmText}
-              </button>
+          <div
+            className="booking-modal-section confirm-dialog-section"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 24,
+            }}
+          >
+            {/* Texto a la izquierda */}
+            <div
+              style={{
+                alignSelf: 'center',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 8,
+                  color: '#374151',
+                  fontSize: 16,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 22,
+                    lineHeight: 1,
+                    color: '#f97316',
+                  }}
+                >
+                  ⚠️
+                </span>
+                <div>
+                  <p style={{ margin: 0, fontWeight: 600, fontSize: 17 }}>
+                    ¿Estás seguro de que deseas guardar este cambio?
+                  </p>
+                  <p style={{ margin: '4px 0 0 0', fontSize: 15 }}>
+                    Este ajuste actualizará la información actual. Revisa bien los datos antes de guardar.
+                  </p>
+                </div>
+              </div>
             </div>
+
+            {/* Imagen al centro */}
+            <div
+              style={{
+                flex: '0 0 150px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <img
+                src="/alert_zorro.png"
+                alt="Alerta zorro"
+                style={{
+                  maxHeight: 120,
+                  width: '100%',
+                  objectFit: 'contain',
+                  display: 'block',
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Botones debajo, fuera del recuadro de texto/imagen */}
+          <div
+            style={{
+              display: 'flex',
+              gap: 10,
+              justifyContent: 'flex-end',
+              marginTop: 24,
+            }}
+          >
+            <button type="button" className="btn-ver-detalles" onClick={onCancel} disabled={loading}>
+              {cancelText}
+            </button>
+            <button type="button" className="btn-unirse" onClick={onConfirm} disabled={loading}>
+              {loading ? 'Procesando…' : confirmText}
+            </button>
           </div>
         </div>
       </div>

@@ -644,6 +644,80 @@
   box-shadow: 0 2px 8px rgba(104, 178, 201, 0.3);
 }
 
+/* ===== Estilos especiales para el cuadro de confirmación ===== */
+
+.confirm-dialog-section {
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at top left, rgba(104, 178, 201, 0.18), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.12), transparent 55%),
+    #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.25);
+}
+
+.confirm-dialog-section img {
+  filter: drop-shadow(0 10px 18px rgba(15, 23, 42, 0.25));
+}
+
+.confirm-dialog-section button {
+  border-radius: 9999px;
+}
+
+.btn-ver-detalles {
+  border: 1px solid rgba(148, 163, 184, 0.9);
+  background: linear-gradient(135deg, #f9fafb, #e5e7eb);
+  color: #111827;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.18);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease,
+              border-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-ver-detalles:hover:not(:disabled) {
+  background: linear-gradient(135deg, #e5e7eb, #e0f2fe);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-ver-detalles:active:not(:disabled) {
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.3);
+  transform: translateY(0);
+}
+
+.btn-ver-detalles:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-unirse {
+  border: 1px solid rgba(16, 185, 129, 0.9);
+  background: linear-gradient(135deg, #22c55e, #0ea5e9);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.5);
+  transition: background-position 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease,
+              filter 0.15s ease;
+  background-size: 150% 150%;
+}
+
+.btn-unirse:hover:not(:disabled) {
+  background-position: 100% 0;
+  box-shadow: 0 8px 22px rgba(16, 185, 129, 0.7);
+  transform: translateY(-1px);
+}
+
+.btn-unirse:active:not(:disabled) {
+  box-shadow: 0 3px 10px rgba(16, 185, 129, 0.7);
+  transform: translateY(0);
+}
+
+.btn-unirse:disabled {
+  opacity: 0.7;
+  filter: grayscale(0.1);
+  cursor: progress;
+}
+
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -673,5 +747,25 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
+  }
+
+  /* Más espacio entre el título y la X en pantallas pequeñas */
+  .booking-modal-title {
+    padding-right: 32px;
+  }
+
+  /* Confirm dialog responsive layout */
+  .confirm-dialog-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .confirm-dialog-section > div:nth-child(2) {
+    align-self: center;
+  }
+
+  .confirm-dialog-section img {
+    max-height: 100px;
   }
 }

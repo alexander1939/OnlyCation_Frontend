@@ -39,110 +39,86 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
 
         <div className="booking-modal-content">
           <div
-            className="booking-modal-section"
-            style={{ display: 'grid', gap: 14 }}
+            className="booking-modal-section confirm-dialog-section"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 24,
+            }}
           >
+            {/* Texto a la izquierda */}
             <div
               style={{
-                position: 'relative',
-                borderRadius: 16,
-                padding: '14px 16px',
-                background:
-                  'linear-gradient(135deg, rgba(248,250,252,0.88), rgba(241,245,249,0.96))',
-                border: '1px solid rgba(148,163,184,0.5)',
-                boxShadow: '0 10px 25px rgba(15,23,42,0.15)',
-                overflow: 'hidden',
+                alignSelf: 'center',
               }}
             >
               <div
-                className="confirm-dialog-blur"
                 style={{
-                  position: 'absolute',
-                  inset: -20,
-                  backdropFilter: 'blur(10px)',
-                  WebkitBackdropFilter: 'blur(10px)',
-                  opacity: 0.7,
-                  pointerEvents: 'none',
-                }}
-              />
-
-              <div
-                style={{
-                  position: 'relative',
                   display: 'flex',
                   alignItems: 'flex-start',
-                  gap: 12,
+                  gap: 8,
+                  color: '#374151',
+                  fontSize: 16,
                 }}
               >
-                <div
+                <span
                   style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: '9999px',
-                    background:
-                      'radial-gradient(circle at 30% 20%, #facc15, #eab308)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#111827',
-                    fontWeight: 800,
                     fontSize: 22,
-                    boxShadow: '0 8px 18px rgba(234,179,8,0.5)',
-                    flexShrink: 0,
+                    lineHeight: 1,
+                    color: '#f97316',
                   }}
                 >
-                  !
-                </div>
-                <div style={{ display: 'grid', gap: 6 }}>
-                  <span
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 600,
-                      letterSpacing: 0.12,
-                      textTransform: 'uppercase',
-                      color: '#6b7280',
-                    }}
-                  >
-                    Confirmar cambios
-                  </span>
-                  <div
-                    style={{
-                      color: '#111827',
-                      fontSize: 14,
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    {description}
-                  </div>
+                  ⚠️
+                </span>
+                <div>
+                  <p style={{ margin: 0, fontWeight: 600, fontSize: 17 }}>
+                    ¿Estás seguro de que deseas guardar este cambio?
+                  </p>
+                  <p style={{ margin: '4px 0 0 0', fontSize: 15 }}>
+                    Este ajuste actualizará la información actual. Revisa bien los datos antes de guardar.
+                  </p>
                 </div>
               </div>
             </div>
 
+            {/* Imagen al centro */}
             <div
               style={{
+                flex: '0 0 150px',
                 display: 'flex',
-                gap: 10,
-                justifyContent: 'flex-end',
-                marginTop: 4,
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              <button
-                type="button"
-                className="btn-ver-detalles"
-                onClick={onCancel}
-                disabled={loading}
-              >
-                {cancelText}
-              </button>
-              <button
-                type="button"
-                className="btn-unirse"
-                onClick={onConfirm}
-                disabled={loading}
-              >
-                {loading ? 'Procesando…' : confirmText}
-              </button>
+              <img
+                src="/alert_zorro.png"
+                alt="Alerta zorro"
+                style={{
+                  maxHeight: 120,
+                  width: '100%',
+                  objectFit: 'contain',
+                  display: 'block',
+                }}
+              />
             </div>
+          </div>
+
+          {/* Botones debajo, fuera del recuadro de texto/imagen */}
+          <div
+            style={{
+              display: 'flex',
+              gap: 10,
+              justifyContent: 'flex-end',
+              marginTop: 24,
+            }}
+          >
+            <button type="button" className="btn-ver-detalles" onClick={onCancel} disabled={loading}>
+              {cancelText}
+            </button>
+            <button type="button" className="btn-unirse" onClick={onConfirm} disabled={loading}>
+              {loading ? 'Procesando…' : confirmText}
+            </button>
           </div>
         </div>
       </div>

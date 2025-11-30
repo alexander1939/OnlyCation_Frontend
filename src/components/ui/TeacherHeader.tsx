@@ -53,6 +53,30 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
     } catch {}
   };
 
+  const fetchCounts = React.useCallback(async () => {
+    try {
+      const [nextClassesRes, recentConfRes] = await Promise.all([
+        getMyNextClasses(1, 0), // small payload, use `total` when available
+        getTeacherHistoryRecent(),
+      ]);
+
+      const bookings = nextClassesRes.success
+        ? (nextClassesRes.data?.total ?? nextClassesRes.data?.data?.length ?? 0)
+        : 0;
+
+      const confItems = recentConfRes.success ? (recentConfRes.data?.items ?? []) : [];
+      // Pending confirmations for teacher: confirmable_now and not yet confirmed by teacher
+      const pendingConf = confItems.filter((it: any) => it?.confirmable_now && !it?.confirmed_by_teacher).length;
+
+      setBookingsCount(bookings);
+      setConfirmationsCount(pendingConf);
+      writeCountsToStorage(bookings, pendingConf);
+      lastFetchRef.current = Date.now();
+    } catch {
+      // silent fail
+    }
+  }, [getMyNextClasses, getTeacherHistoryRecent]);
+
   React.useEffect(() => {
     const onResize = () => setIsDesktop(window.innerWidth >= 1024);
     window.addEventListener('resize', onResize);
@@ -72,6 +96,35 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
       }
     }
   }, [fetchChats]);
+
+  React.useEffect(() => {
+    const cached = readCountsFromStorage();
+    if (cached && Date.now() - cached.ts < MIN_INTERVAL_MS) {
+      setBookingsCount(cached.bookings);
+      setConfirmationsCount(cached.confirmations);
+    } else {
+      fetchCounts();
+    }
+  }, [fetchCounts]);
+
+  React.useEffect(() => {
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        if (debounceRef.current) window.clearTimeout(debounceRef.current);
+        debounceRef.current = window.setTimeout(() => {
+          const now = Date.now();
+          if (now - lastFetchRef.current >= MIN_INTERVAL_MS) {
+            fetchCounts();
+          }
+        }, VIS_DEBOUNCE_MS) as unknown as number;
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      if (debounceRef.current) window.clearTimeout(debounceRef.current);
+    };
+  }, [fetchCounts]);
 
   const userInitials = user
     ? `${user.first_name?.[0] ?? ''}${user.last_name?.[0] ?? ''}`.toUpperCase() || 'U'
@@ -145,6 +198,7 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
     };
 
     const renderBadge = (count: number, bg: string = '#F59E0B', visible: boolean = true) => {
+      if (!visible || !count || count <= 0) return null;
       const text = count > 99 ? '99+' : String(count);
       return (
         <span
@@ -160,8 +214,6 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
             background: bg,
             borderRadius: 999,
             textAlign: 'center',
-            opacity: visible ? 1 : 0,
-            transition: 'opacity 180ms ease',
             pointerEvents: 'none',
           }}
         >
@@ -182,10 +234,10 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
           {label === 'Reservas y confirmaciones' ? (
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
               <span>Reservas</span>
-              {renderBadge(rsvCount ?? 0, '#F59E0B', true)}
+              {renderBadge(rsvCount ?? 0, '#F59E0B', !!(rsvCount && rsvCount > 0))}
               <span style={{ opacity: 0.8, margin: '0 2px' }}>y</span>
               <span>Confirmaciones</span>
-              {renderBadge(confCount ?? 0, '#F59E0B', true)}
+              {renderBadge(confCount ?? 0, '#F59E0B', !!(confCount && confCount > 0))}
             </span>
           ) : (
             <>

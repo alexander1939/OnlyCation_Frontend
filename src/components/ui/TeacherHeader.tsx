@@ -4,6 +4,7 @@ import ProfileDropdown from '../ProfileDropdown';
 import { useChatContext } from '../../context/chat';
 import { useBookingApi } from '../../hooks/booking/useBookingApi';
 import { useConfirmationsApi } from '../../hooks/confirmations/useConfirmationsApi';
+import { BarChart3, Wallet, User, Folder, LogOut, ChevronDown } from 'lucide-react';
 
 type TeacherHeaderProps = {
   user: any;
@@ -391,7 +392,7 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
                   <div style={{ color: '#294954', opacity: 0.7, fontFamily: 'Roboto, sans-serif', fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</div>
                 </div>
                 <div style={{ color: '#294954', fontSize: '18px', transition: 'transform 200ms ease', transform: isProfileExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                  ▼
+                  <ChevronDown size={18} color="#294954" />
                 </div>
               </button>
 
@@ -418,7 +419,7 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(104, 178, 201, 0.12)'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
-                    <span style={{ marginRight: '8px', fontSize: '18px' }}>📊</span>
+                    <span style={{ marginRight: '8px', display: 'inline-flex' }}><BarChart3 size={18} color="#68B2C9" /></span>
                     Mi Perfil
                   </Link>
 
@@ -443,7 +444,7 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(104, 178, 201, 0.12)'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
-                    <span style={{ marginRight: '8px', fontSize: '18px' }}>👜</span>
+                    <span style={{ marginRight: '8px', display: 'inline-flex' }}><Wallet size={18} color="#68B2C9" /></span>
                     Cartera
                   </Link>
 
@@ -468,7 +469,7 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(104, 178, 201, 0.12)'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
-                    <span style={{ marginRight: '8px', fontSize: '18px' }}>👤</span>
+                    <span style={{ marginRight: '8px', display: 'inline-flex' }}><User size={18} color="#294954" /></span>
                     Datos Personales
                   </Link>
 
@@ -493,7 +494,7 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(104, 178, 201, 0.12)'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
-                    <span style={{ marginRight: '8px', fontSize: '18px' }}>📁</span>
+                    <span style={{ marginRight: '8px', display: 'inline-flex' }}><Folder size={18} color="#294954" /></span>
                     Documentos
                   </Link>
 
@@ -519,7 +520,7 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(104, 178, 201, 0.12)'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
-                    <span style={{ marginRight: '8px', fontSize: '18px' }}>🚪</span>
+                    <span style={{ marginRight: '8px', display: 'inline-flex' }}><LogOut size={18} color="#FF9978" /></span>
                     Cerrar sesión
                   </button>
                 </div>

@@ -4,6 +4,7 @@ import ProfileDropdown from '../ProfileDropdown';
 import { useChatContext } from '../../context/chat';
 import { useBookingApi } from '../../hooks/booking/useBookingApi';
 import { useConfirmationsApi } from '../../hooks/confirmations/useConfirmationsApi';
+import { User, LogOut, ChevronDown } from 'lucide-react';
 
 type StudentHeaderProps = {
   user: any;
@@ -380,7 +381,7 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
                   <div style={{ color: '#294954', opacity: 0.7, fontFamily: 'Roboto, sans-serif', fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</div>
                 </div>
                 <div style={{ color: '#294954', fontSize: '18px', transition: 'transform 200ms ease', transform: isProfileExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                  ▼
+                  <ChevronDown size={18} color="#294954" />
                 </div>
               </button>
 
@@ -407,7 +408,7 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(104, 178, 201, 0.12)'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
-                    <span style={{ marginRight: '8px', fontSize: '18px' }}>👤</span>
+                    <span style={{ marginRight: '8px', display: 'inline-flex' }}><User size={18} color="#294954" /></span>
                     Datos Personales
                   </Link>
 
@@ -433,7 +434,7 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(104, 178, 201, 0.12)'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
-                    <span style={{ marginRight: '8px', fontSize: '18px' }}>🚪</span>
+                    <span style={{ marginRight: '8px', display: 'inline-flex' }}><LogOut size={18} color="#FF9978" /></span>
                     Cerrar sesión
                   </button>
                 </div>

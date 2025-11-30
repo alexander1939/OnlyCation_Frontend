@@ -4,7 +4,7 @@ import '../../styles/subjects-catalog.css';
 
 type Level = 'Preparatoria' | 'Universidad' | 'Posgrado';
 
-interface SubjectItem {
+export interface SubjectItem {
   id: string;
   name: string;
   level: Level;
@@ -13,7 +13,7 @@ interface SubjectItem {
 
 const LEVELS: Level[] = ['Preparatoria', 'Universidad', 'Posgrado'];
 
-const SUBJECTS: SubjectItem[] = [
+export const SUBJECTS: SubjectItem[] = [
   { id: 'alg-prepa', name: 'Álgebra', level: 'Preparatoria', icon: '🎓' },
   { id: 'qui-prepa', name: 'Química General', level: 'Preparatoria', icon: '⚗️' },
   { id: 'his-prepa', name: 'Historia de México', level: 'Preparatoria', icon: '🏛️' },

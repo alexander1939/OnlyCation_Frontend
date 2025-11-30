@@ -121,13 +121,43 @@
 .price-range::-moz-range-thumb { width: 16px; height: 16px; background: var(--price-brand); border-radius: 50%; border: none; }
 
 /* Footer actions */
-.price-actions { display: flex; align-items: center; justify-content: flex-end; padding-top: 1rem; border-top: 1px solid #F3F4F6; gap: 0.75rem; }
+.price-actions { display: flex; align-items: center; justify-content: center; padding-top: 1rem; border-top: 1px solid #F3F4F6; gap: 0.75rem; }
 .price-btn--secondary { border: 1px solid var(--price-border); background: var(--price-bg); color: var(--price-text); border-radius: var(--price-radius); padding: 0.5rem 1rem; font-size: 0.9rem; transition: background 120ms ease, transform 80ms ease, box-shadow 120ms ease; }
 .price-btn--secondary:hover { background: #F3F4F6; }
 
 .price-btn--primary { background: var(--price-brand); color: white; border-radius: var(--price-radius); padding: 0.5rem 1rem; font-size: 0.92rem; font-weight: 600; transition: background 120ms ease, transform 80ms ease, opacity 120ms ease, box-shadow 120ms ease; }
 .price-btn--primary:hover { background: var(--price-brand-700); }
 .price-btn--primary:disabled { opacity: 0.7; background: var(--price-brand-300); cursor: not-allowed; }
+
+.price-btn--lg {
+  padding: 0.9rem 1.5rem;
+  font-size: 1rem;
+  min-height: 48px;
+  min-width: 180px;
+  border-radius: 999px;
+}
+@media (max-width: 640px) { .price-btn--lg { min-width: 140px; } }
+
+.price-btn--danger {
+  background: #DC2626;
+  color: #fff;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.625rem 1rem;
+  font-weight: 600;
+  transition: background-color 150ms ease, opacity 150ms ease;
+}
+.price-btn--danger:hover { background: #B91C1C; }
+.price-btn--danger:focus-visible,
+.price-btn--primary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.25); }
+
+@media (max-width: 768px) {
+  .price-actions .price-btn--lg { display: block; width: 100% !important; max-width: 100%; flex: 1 1 100%; }
+}
+
+@media (min-width: 1024px) {
+  
+}
 
 /* Alerts */
 .price-alert { margin-top: 0.75rem; font-size: 0.875rem; }

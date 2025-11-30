@@ -114,14 +114,11 @@ const VideoInner: React.FC = () => {
             </div>
 
             <div className="video-actions">
-              <button type="button" onClick={() => navigate('/teacher-home')} className="video-btn--secondary">
-                Terminar proceso
+              <button type="button" onClick={() => navigate('/teacher-home')} className="video-btn--danger video-btn--lg video-btn--exit">
+                Salir de activación
               </button>
-              <button type="button" onClick={handleCancel} className="video-btn--secondary">
-                Cancelar
-              </button>
-              <button type="submit" disabled={saving || !extractYouTubeId(form.url_or_id)} className={`video-btn--primary ${saving ? 'cursor-not-allowed' : ''}`}>
-                {saving ? 'Guardando...' : 'Guardar Video'}
+              <button type="submit" disabled={saving || !extractYouTubeId(form.url_or_id)} className={`video-btn--primary video-btn--lg video-btn--next ${saving ? 'cursor-not-allowed' : ''}`}>
+                {saving ? 'Guardando...' : 'Siguiente'}
               </button>
             </div>
 

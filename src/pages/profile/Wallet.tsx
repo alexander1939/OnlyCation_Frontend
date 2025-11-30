@@ -57,6 +57,20 @@ const AgendaPage: React.FC = () => {
             <div className="agenda-actions">
               <button
                 type="button"
+                onClick={() => navigate('/teacher-home')}
+                className="agenda-btn--danger agenda-btn--lg agenda-btn--exit"
+              >
+                Salir de activación
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/profile/activate')}
+                className="agenda-btn--primary agenda-btn--lg agenda-btn--next"
+              >
+                Siguiente
+              </button>
+              <button
+                type="button"
                 onClick={handleCreate}
                 disabled={creating}
                 className="agenda-btn--primary"

@@ -25,6 +25,35 @@
 .obs-item:hover .obs-sep{ background: color-mix(in oklab, var(--obs-active) 60%, var(--obs-text)); height:5px; }
 .obs-sep.is-done{ background: var(--obs-done); opacity:1; }
 
+/* Responsive: tablets and phones */
+@media (max-width: 768px){
+  .obs-steps{ padding: 0 1rem; }
+  .obs-list{
+    gap: .5rem;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+  }
+  .obs-list::-webkit-scrollbar{ display: none; }
+  .obs-item{ flex: 0 0 auto; scroll-snap-align: start; gap: .5rem; }
+  .obs-circle{ width: 40px; height: 40px; font-size: 20px; }
+  .obs-label{ font-size: .9rem; }
+  /* Evitar que se vea una línea en medio de los círculos en pantallas pequeñas */
+  .obs-sep{ display: none !important; }
+  .obs-sep{ flex: 0 0 clamp(24px, 8vw, 64px); height: 3px; margin-left: .5rem; margin-right: .5rem; }
+}
+
+/* Very small phones: show label only for active step to save space */
+@media (max-width: 420px){
+  .obs-circle{ width: 34px; height: 34px; font-size: 16px; }
+  .obs-label{ display: none; }
+  .obs-link.is-active .obs-label{ display: inline; font-size: .9rem; }
+  .obs-item{ gap: .5rem; }
+  .obs-sep{ flex: 0 0 clamp(18px, 10vw, 48px); height: 3px; }
+}
+
 @media (min-width: 1280px){
   .obs-list{ gap:1.25rem; }
   .obs-circle{ width:52px; height:52px; font-size:24px; }

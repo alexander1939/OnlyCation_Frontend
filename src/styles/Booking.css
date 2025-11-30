@@ -88,11 +88,46 @@
 }
 
 .booking-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.booking-card .booking-actions { justify-content: center; }
 
 .booking-btn--primary { background: var(--booking-brand); color: #0b2a33; border: 1px solid transparent; border-radius: 999px; padding: 0.625rem 1rem; font-weight: 600; transition: background-color 150ms ease, opacity 150ms ease; }
 .booking-btn--primary:hover { background: var(--booking-brand-700); }
 .booking-btn--secondary { background: #fff; color: var(--booking-text); border: 1px solid var(--booking-border); border-radius: 999px; padding: 0.625rem 1rem; font-weight: 600; transition: box-shadow 150ms ease, border-color 150ms ease; }
 .booking-btn--secondary:hover { border-color: color-mix(in oklab, var(--booking-brand) 50%, var(--booking-border)); box-shadow: 0 0 0 3px color-mix(in oklab, var(--booking-brand) 25%, transparent); }
+
+.booking-btn--lg {
+  padding: 0.9rem 1.5rem;
+  font-size: 1rem;
+  min-height: 48px;
+  min-width: 180px;
+  border-radius: 999px;
+}
+@media (max-width: 640px) { .booking-btn--lg { min-width: 140px; } }
+
+.booking-btn--danger {
+  background: #DC2626;
+  color: #fff;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.625rem 1rem;
+  font-weight: 600;
+  transition: background-color 150ms ease, opacity 150ms ease;
+}
+.booking-btn--danger:hover { background: #B91C1C; }
+.booking-btn--danger:focus-visible,
+.booking-btn--primary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.25); }
+
+/* Mobile/tablet: full-width for bigger tap targets */
+@media (max-width: 768px) {
+  .booking-actions .booking-btn--lg { display: block; width: 100% !important; max-width: 100%; flex: 1 1 100%; }
+}
+
+/* Desktop: left-align to honor requested margins */
+@media (min-width: 1024px) {
+  .booking-card .booking-actions { justify-content: flex-start !important; }
+  .booking-actions .booking-btn--exit { margin-right: 15% !important; }
+  .booking-actions .booking-btn--next { margin-right: 20% !important; }
+}
 
 .booking-alert { border-radius: 12px; padding: 0.75rem 1rem; font-size: 0.95rem; margin-top: 0.5rem; }
 .booking-alert--error { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }

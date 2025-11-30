@@ -5,6 +5,7 @@ import '../../styles/documents.css';
 import OnboardingSteps from '../../components/OnboardingSteps';
 import { useActivation } from '../../context/activation/useActivation';
 import { useAuthContext } from '../../context/auth';
+import { SUBJECTS } from '../../components/subjects/SubjectsCatalog';
 
 const CreateDocument: React.FC = () => {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ const CreateDocument: React.FC = () => {
 
   const [rfc, setRfc] = useState('');
   const [expertise, setExpertise] = useState('');
+  const [selectedSubjectId, setSelectedSubjectId] = useState('');
   const [description, setDescription] = useState('');
   const [certificate, setCertificate] = useState<File | null>(null);
   const [curriculum, setCurriculum] = useState<File | null>(null);
@@ -73,22 +75,12 @@ const CreateDocument: React.FC = () => {
 
   const isValid = useMemo(() => {
     const rfcOk = !validateRfc(rfcSanitize(rfc));
-    const validateFreeText = (v: string) => {
-      const s = String(v).trim();
-      const onlyLetters = s.replace(/[^A-Za-zÀ-ÿ]/g, '');
-      const hasLetters = /[A-Za-zÀ-ÿ]/.test(s);
-      const hasMinLetters = onlyLetters.length >= 3;
-      const repeatedChar = /(.)\1{3,}/i.test(s);
-      const laughter = /(ja|je|ji|jo|ju|ha|he|hi|ho|hu){3,}/i.test(s);
-      const hasVowel = /[AEIOUÁÉÍÓÚaeiouáéíóú]/.test(s);
-      return hasLetters && hasMinLetters && hasVowel && !repeatedChar && !laughter;
-    };
-    const expOk = validateFreeText(expertise);
-    const descOk = validateFreeText(description);
+    const expOk = selectedSubjectId.trim() !== '' && expertise.trim() !== '';
+    const descOk = String(description).trim().length >= 10;
     const base = rfcOk && expOk && descOk && certificate && curriculum;
     if (!base) return false;
     return matchesExpectedPdfName(certificate, 'cert') && matchesExpectedPdfName(curriculum, 'cv');
-  }, [rfc, expertise, description, certificate, curriculum]);
+  }, [rfc, selectedSubjectId, expertise, description, certificate, curriculum]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -217,29 +209,25 @@ const CreateDocument: React.FC = () => {
               </div>
             </div>
 
-            {/* Expertise */}
+            {/* Materia */}
             <div>
-              <label className="doc-label">Área de Experiencia</label>
-              <input
-                type="text"
+              <label className="doc-label">Materia</label>
+              <select
                 className="doc-input"
-                placeholder="Ej. Desarrollo Frontend"
-                value={expertise}
+                value={selectedSubjectId}
                 onChange={(e) => {
-                  const sanitize = (s: string) => s.replace(/[^A-Za-zÀ-ÿ0-9 ,\.]+/g, ' ').replace(/\s{2,}/g, ' ').trimStart();
-                  const v = sanitize(e.target.value);
-                  setExpertise(v);
-                  const s = v.trim();
-                  const onlyLetters = s.replace(/[^A-Za-zÀ-ÿ]/g, '');
-                  const hasLetters = /[A-Za-zÀ-ÿ]/.test(s);
-                  const hasMinLetters = onlyLetters.length >= 3;
-                  const repeatedChar = /(.)\1{3,}/i.test(s);
-                  const laughter = /(ja|je|ji|jo|ju|ha|he|hi|ho|hu){3,}/i.test(s);
-                  const hasVowel = /[AEIOUÁÉÍÓÚaeiouáéíóú]/.test(s);
-                  const valid = hasLetters && hasMinLetters && hasVowel && !repeatedChar && !laughter;
-                  setExpertiseError(valid ? null : 'Ingresa un área de experiencia válida.');
+                  const id = e.target.value;
+                  setSelectedSubjectId(id);
+                  const subj = SUBJECTS.find(s => s.id === id);
+                  setExpertise(subj ? subj.name : '');
+                  setExpertiseError(id ? null : 'Seleccione una materia.');
                 }}
-              />
+              >
+                <option value="">Selecciona una materia</option>
+                {SUBJECTS.map(s => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
               {expertiseError && <div className="doc-alert doc-alert--error" style={{ marginTop: '0.25rem' }}>{expertiseError}</div>}
             </div>
 
@@ -255,14 +243,7 @@ const CreateDocument: React.FC = () => {
                   const v = sanitize(e.target.value);
                   setDescription(v);
                   const s = v.trim();
-                  const onlyLetters = s.replace(/[^A-Za-zÀ-ÿ]/g, '');
-                  const hasLetters = /[A-Za-zÀ-ÿ]/.test(s);
-                  const hasMinLetters = onlyLetters.length >= 3;
-                  const repeatedChar = /(.)\1{3,}/i.test(s);
-                  const laughter = /(ja|je|ji|jo|ju|ha|he|hi|ho|hu){3,}/i.test(s);
-                  const hasVowel = /[AEIOUÁÉÍÓÚaeiouáéíóú]/.test(s);
-                  const valid = hasLetters && hasMinLetters && hasVowel && !repeatedChar && !laughter;
-                  setDescriptionError(valid ? null : 'Ingresa una descripción válida.');
+                  setDescriptionError(s.length >= 10 ? null : 'El campo Descripción debe tener al menos 10 caracteres.');
                 }}
                 maxLength={500}
               />
@@ -271,11 +252,20 @@ const CreateDocument: React.FC = () => {
 
             {/* Footer */}
             <div className="doc-actions">
-              <div style={{ display: 'flex', gap: '0.75rem' }}>
-                <button type="button" className="doc-btn--secondary" onClick={() => navigate('/teacher-home')}>Terminar proceso</button>
-                <button type="button" className="doc-btn--secondary" onClick={onCancel}>Cancelar</button>
-                <button type="submit" className="doc-btn--primary" disabled={!isValid || creating}>{creating ? 'Guardando...' : 'Guardar'}</button>
-              </div>
+              <button
+                type="button"
+                className="doc-btn--danger doc-btn--lg doc-btn--exit"
+                onClick={() => navigate('/teacher-home')}
+              >
+                Salir de activación
+              </button>
+              <button
+                type="submit"
+                className="doc-btn--primary doc-btn--lg doc-btn--next"
+                disabled={!isValid || creating}
+              >
+                {creating ? 'Guardando...' : 'Siguiente'}
+              </button>
             </div>
 
             {/* Status */}

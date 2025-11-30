@@ -178,11 +178,11 @@ export default function ConfirmAttendanceModal({ isOpen, onClose, role, item, lo
           <form onSubmit={handleSubmit} className="booking-modal-section">
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <label style={{ color: '#294954', fontWeight: 600 }}>
-                Descripción (solo letras y números)
+                Descripción
                 <textarea
                   value={description}
                   onChange={handleDescriptionChange}
-                  placeholder={role === 'teacher' ? 'Describe brevemente la clase impartida (letras, números y ?)' : 'Describe brevemente tu asistencia (letras, números y ?)'}
+                  placeholder={role === 'teacher' ? 'Describe brevemente la clase impartida' : 'Describe brevemente tu asistencia'}
                   style={{
                     width: '100%',
                     minHeight: 90,
@@ -208,7 +208,6 @@ export default function ConfirmAttendanceModal({ isOpen, onClose, role, item, lo
                   style={{ marginTop: 6, border: `1px solid ${fileError ? '#ef4444' : 'transparent'}`, borderRadius: 6, padding: 6 }}
                   aria-invalid={!!fileError}
                 />
-                <small style={{ color: '#6b7280', display: 'block', marginTop: 6 }}>Formatos permitidos: PNG o JPG. Tamaño máximo: {MAX_FILE_SIZE_MB}MB.</small>
               </label>
 
               <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 8 }}>

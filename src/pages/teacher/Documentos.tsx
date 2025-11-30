@@ -4,6 +4,7 @@ import { useDocumentsContext } from '../../context/documents';
 import Header from '../../components/ui/Header';
 import Footer from '../../components/ui/Footer';
 import '../../styles/docente-documentos.css';
+import { GraduationCap, FileText, Folder, Target, Save, X, Pencil, Download, Loader2 } from 'lucide-react';
 import { useNotificationContext } from '../../components/NotificationProvider';
 import ConfirmDialog from '../../components/shared/ConfirmDialog';
 import LoadingOverlay from '../../components/shared/LoadingOverlay';
@@ -252,7 +253,7 @@ export default function DocenteDocumentos() {
                     disabled={updating}
                     style={{ backgroundColor: '#10b981', color: 'white', minWidth: '120px' }}
                   >
-                    {updating ? 'Guardando...' : '💾 Guardar todo'}
+                    {updating ? 'Guardando...' : (<><Save size={16} /> <span style={{ marginLeft: 6 }}>Guardar todo</span></>)}
                   </button>
                   <button 
                     className="btn-actualizar"
@@ -260,7 +261,7 @@ export default function DocenteDocumentos() {
                     disabled={updating}
                     style={{ backgroundColor: '#6b7280', color: 'white', minWidth: '120px' }}
                   >
-                    ❌ Cancelar
+                    <X size={16} /> <span style={{ marginLeft: 6 }}>Cancelar</span>
                   </button>
                 </div>
               ) : (
@@ -269,14 +270,14 @@ export default function DocenteDocumentos() {
                   onClick={() => handleEditField('all')}
                   style={{ backgroundColor: '#3b82f6', color: 'white', minWidth: '120px' }}
                 >
-                  ✏️ Editar todo
+                  <Pencil size={16} /> <span style={{ marginLeft: 6 }}>Editar todo</span>
                 </button>
               )
             )}
           </div>
 
-          {loading && <p className="text-center text-gray-600">🔄 Cargando documentos...</p>}
-          {error && <p className="text-center text-red-600">❌ {error}</p>}
+          {loading && <p className="text-center text-gray-600"><Loader2 size={16} /> <span style={{ marginLeft: 6 }}>Cargando documentos...</span></p>}
+          {error && <p className="text-center text-red-600"><X size={16} /> <span style={{ marginLeft: 6 }}>{error}</span></p>}
 
           {!loading && !currentDoc && (
             <div className="text-center p-8 bg-gray-50 rounded-lg">
@@ -294,7 +295,7 @@ export default function DocenteDocumentos() {
                 {/* Certificado */}
                 <div className="documentos-list">
                   <article className="documento-item">
-                    <div className="documento-icon">🎓</div>
+                    <div className="documento-icon"><GraduationCap size={20} /></div>
                     <div className="documento-info">
                       <div className="documento-nombre">Certificado</div>
                       <div className="documento-fecha">
@@ -325,7 +326,7 @@ export default function DocenteDocumentos() {
                                 opacity: !tempValues.certificate ? 0.5 : 1
                               }}
                             >
-                              💾 Guardar
+                              <Save size={16} /> <span style={{ marginLeft: 6 }}>Guardar</span>
                             </button>
                             <button 
                               onClick={handleCancelEdit}
@@ -340,7 +341,7 @@ export default function DocenteDocumentos() {
                                 fontSize: '14px'
                               }}
                             >
-                              ❌ Cancelar
+                              <X size={16} /> <span style={{ marginLeft: 6 }}>Cancelar</span>
                             </button>
                           </>
                         )}
@@ -360,6 +361,7 @@ export default function DocenteDocumentos() {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
+                            color: 'white',
                             cursor: downloading === 'certificate' || !currentDoc.certificate ? 'not-allowed' : 'pointer',
                             transition: 'all 0.3s ease',
                             fontSize: '20px',
@@ -377,7 +379,7 @@ export default function DocenteDocumentos() {
                             e.currentTarget.style.boxShadow = '0 2px 8px rgba(59, 130, 246, 0.3)';
                           }}
                         >
-                          {downloading === 'certificate' ? '⏳' : '⬇️'}
+                          {downloading === 'certificate' ? <Loader2 size={18} /> : <Download size={18} />}
                         </button>
                         
                         <button 
@@ -392,6 +394,7 @@ export default function DocenteDocumentos() {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
+                            color: 'white',
                             cursor: 'pointer',
                             transition: 'all 0.3s ease',
                             fontSize: '18px',
@@ -406,7 +409,7 @@ export default function DocenteDocumentos() {
                             e.currentTarget.style.boxShadow = '0 2px 8px rgba(16, 185, 129, 0.3)';
                           }}
                         >
-                          ✏️
+                          <Pencil size={16} />
                         </button>
                       </div>
                     )}
@@ -414,7 +417,7 @@ export default function DocenteDocumentos() {
 
                   {/* Curriculum */}
                   <article className="documento-item">
-                    <div className="documento-icon">📄</div>
+                    <div className="documento-icon"><FileText size={20} /></div>
                     <div className="documento-info">
                       <div className="documento-nombre">Curriculum Vitae</div>
                       <div className="documento-fecha">
@@ -445,7 +448,7 @@ export default function DocenteDocumentos() {
                                 opacity: !tempValues.curriculum ? 0.5 : 1
                               }}
                             >
-                              💾 Guardar
+                              <Save size={16} /> <span style={{ marginLeft: 6 }}>Guardar</span>
                             </button>
                             <button 
                               onClick={handleCancelEdit}
@@ -460,7 +463,7 @@ export default function DocenteDocumentos() {
                                 fontSize: '14px'
                               }}
                             >
-                              ❌ Cancelar
+                              <X size={16} /> <span style={{ marginLeft: 6 }}>Cancelar</span>
                             </button>
                           </>
                         )}
@@ -480,6 +483,7 @@ export default function DocenteDocumentos() {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
+                            color: 'white',
                             cursor: downloading === 'curriculum' || !currentDoc.curriculum ? 'not-allowed' : 'pointer',
                             transition: 'all 0.3s ease',
                             fontSize: '20px',
@@ -497,7 +501,7 @@ export default function DocenteDocumentos() {
                             e.currentTarget.style.boxShadow = '0 2px 8px rgba(59, 130, 246, 0.3)';
                           }}
                         >
-                          {downloading === 'curriculum' ? '⏳' : '⬇️'}
+                          {downloading === 'curriculum' ? <Loader2 size={18} /> : <Download size={18} />}
                         </button>
                         
                         {editingField !== 'all' && (
@@ -513,6 +517,7 @@ export default function DocenteDocumentos() {
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
+                              color: 'white',
                               cursor: 'pointer',
                               transition: 'all 0.3s ease',
                               fontSize: '18px',
@@ -527,7 +532,7 @@ export default function DocenteDocumentos() {
                               e.currentTarget.style.boxShadow = '0 2px 8px rgba(16, 185, 129, 0.3)';
                             }}
                           >
-                            ✏️
+                            <Pencil size={16} />
                           </button>
                         )}
                       </div>
@@ -541,7 +546,7 @@ export default function DocenteDocumentos() {
                 <h2 className="documentos-section-title">Registro Federal de Contribuyentes (RFC)</h2>
                 <div className="documentos-list">
                   <article className="documento-item">
-                    <div className="documento-icon">📁</div>
+                    <div className="documento-icon"><Folder size={20} /></div>
                     <div className="documento-info">
                       <div className="documento-fecha">Tu RFC</div>
                       {editingField === 'all' || editingField === 'rfc' ? (
@@ -571,7 +576,7 @@ export default function DocenteDocumentos() {
                             fontSize: '14px'
                           }}
                         >
-                          💾 Guardar
+                          <Save size={16} /> <span style={{ marginLeft: 6 }}>Guardar</span>
                         </button>
                         <button 
                           onClick={handleCancelEdit}
@@ -586,7 +591,7 @@ export default function DocenteDocumentos() {
                             fontSize: '14px'
                           }}
                         >
-                          ❌ Cancelar
+                          <X size={16} /> <span style={{ marginLeft: 6 }}>Cancelar</span>
                         </button>
                       </div>
                     )}
@@ -603,6 +608,7 @@ export default function DocenteDocumentos() {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
+                          color: 'white',
                           cursor: 'pointer',
                           transition: 'all 0.3s ease',
                           fontSize: '18px',
@@ -617,7 +623,7 @@ export default function DocenteDocumentos() {
                           e.currentTarget.style.boxShadow = '0 2px 8px rgba(16, 185, 129, 0.3)';
                         }}
                       >
-                        ✏️
+                        <Pencil size={16} />
                       </button>
                     )}
                   </article>
@@ -629,7 +635,7 @@ export default function DocenteDocumentos() {
                 <h2 className="documentos-section-title">Área de Especialidad</h2>
                 <div className="documentos-list">
                   <article className="documento-item">
-                    <div className="documento-icon">🎯</div>
+                    <div className="documento-icon"><Target size={20} /></div>
                     <div className="documento-info">
                       <div className="documento-fecha">Especialidad</div>
                       {editingField === 'all' || editingField === 'expertise_area' ? (
@@ -659,7 +665,7 @@ export default function DocenteDocumentos() {
                             fontSize: '14px'
                           }}
                         >
-                          💾 Guardar
+                          <Save size={16} /> <span style={{ marginLeft: 6 }}>Guardar</span>
                         </button>
                         <button 
                           onClick={handleCancelEdit}
@@ -674,7 +680,7 @@ export default function DocenteDocumentos() {
                             fontSize: '14px'
                           }}
                         >
-                          ❌ Cancelar
+                          <X size={16} /> <span style={{ marginLeft: 6 }}>Cancelar</span>
                         </button>
                       </div>
                     )}
@@ -691,6 +697,7 @@ export default function DocenteDocumentos() {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
+                          color: 'white',
                           cursor: 'pointer',
                           transition: 'all 0.3s ease',
                           fontSize: '18px',
@@ -705,7 +712,7 @@ export default function DocenteDocumentos() {
                           e.currentTarget.style.boxShadow = '0 2px 8px rgba(16, 185, 129, 0.3)';
                         }}
                       >
-                        ✏️
+                        <Pencil size={16} />
                       </button>
                     )}
                   </article>
@@ -719,7 +726,7 @@ export default function DocenteDocumentos() {
                   <article className="documento-item" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
                     <div style={{ display: 'flex', alignItems: 'center', width: '100%', marginBottom: '8px', justifyContent: 'space-between' }}>
                       <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <div className="documento-icon">📝</div>
+                        <div className="documento-icon"><FileText size={20} /></div>
                         <div className="documento-fecha" style={{ marginLeft: '12px' }}>Descripción del perfil</div>
                       </div>
                       {editingField === 'description' && (
@@ -737,7 +744,7 @@ export default function DocenteDocumentos() {
                               fontSize: '14px'
                             }}
                           >
-                            💾 Guardar
+                            <Save size={16} /> <span style={{ marginLeft: 6 }}>Guardar</span>
                           </button>
                           <button 
                             onClick={handleCancelEdit}
@@ -752,7 +759,7 @@ export default function DocenteDocumentos() {
                               fontSize: '14px'
                             }}
                           >
-                            ❌ Cancelar
+                            <X size={16} /> <span style={{ marginLeft: 6 }}>Cancelar</span>
                           </button>
                         </div>
                       )}
@@ -772,7 +779,8 @@ export default function DocenteDocumentos() {
                             cursor: 'pointer',
                             transition: 'all 0.3s ease',
                             fontSize: '18px',
-                            boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)'
+                            boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)',
+                            color: 'white'
                           }}
                           onMouseEnter={(e) => {
                             e.currentTarget.style.transform = 'scale(1.1)';
@@ -783,7 +791,7 @@ export default function DocenteDocumentos() {
                             e.currentTarget.style.boxShadow = '0 2px 8px rgba(16, 185, 129, 0.3)';
                           }}
                         >
-                          ✏️
+                          <Pencil size={16} />
                         </button>
                       )}
                     </div>

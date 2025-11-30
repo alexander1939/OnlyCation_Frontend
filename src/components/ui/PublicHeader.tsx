@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import HintBadge from './HintBadge';
+import { KeyRound } from 'lucide-react';
 
 const PublicHeader: React.FC = () => {
   const location = useLocation();
@@ -233,7 +234,7 @@ const PublicHeader: React.FC = () => {
                 onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(104, 178, 201, 0.12)')}
                 onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
-                <span style={{ marginRight: '8px', fontSize: '18px' }}>🔑</span>
+                <span style={{ marginRight: '8px', display: 'inline-flex' }}><KeyRound size={18} color="#68B2C9" /></span>
                 Iniciar Sesión
               </Link>
             </div>

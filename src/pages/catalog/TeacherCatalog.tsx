@@ -4,6 +4,7 @@ import Footer from '../../components/ui/Footer';
 import { useTeachersContext } from '../../context/teachers';
 import '../../styles/teacher-catalog.css';
 import { useNavigate as useRrdNavigate, useSearchParams } from 'react-router-dom';
+import { Settings, X, Search as SearchIcon, BookOpen, Check, GraduationCap, CircleDollarSign, Star, Play, ArrowRight } from 'lucide-react';
 import LoadingOverlay from '../../components/shared/LoadingOverlay';
 
 type TeacherItem = {
@@ -190,7 +191,7 @@ export default function TeacherCatalog() {
             <aside className={`catalog-filters ${filtersOpen ? 'open' : ''}`}>
               <div className="filters-title">
                 <div style={{display: 'flex', alignItems: 'center', gap: '10px', flex: 1}}>
-                  <span className="label-icon">⚙️</span>
+                  <span className="label-icon"><Settings size={16} /></span>
                   <h3>Filtros Avanzados</h3>
                 </div>
                 <button 
@@ -198,19 +199,19 @@ export default function TeacherCatalog() {
                   onClick={() => setFiltersOpen(false)}
                   aria-label="Cerrar filtros"
                 >
-                  ✕
+                  <X size={16} />
                 </button>
               </div>
 
               <label className="filter-field">
-                <div className="label-row"><span className="label-icon">🔍</span><span>Nombre del Docente</span></div>
+                <div className="label-row"><span className="label-icon"><SearchIcon size={18} /></span><span>Nombre del Docente</span></div>
                 <div className="filter-input-wrap">
                   <input className="filter-input" placeholder="Buscar por nombre..." value={name} onChange={(e) => setName(e.target.value)} />
                 </div>
               </label>
 
               <div className="filter-field">
-                <div className="label-row"><span className="label-icon">📚</span><span>Materia</span></div>
+                <div className="label-row"><span className="label-icon"><BookOpen size={18} /></span><span>Materia</span></div>
                 <div className="searchable-select-wrapper" ref={dropdownRef}>
                   <div className="searchable-select-input-wrapper">
                     <input
@@ -234,10 +235,12 @@ export default function TeacherCatalog() {
                         }}
                         aria-label="Limpiar selección"
                       >
-                        ✕
+                        <X size={12} />
                       </button>
                     )}
-                    <span className={`searchable-select-arrow ${subjectDropdownOpen ? 'open' : ''}`}>🔍</span>
+                    <span className={`searchable-select-arrow ${subjectDropdownOpen ? 'open' : ''}`}>
+                      <SearchIcon size={18} />
+                    </span>
                   </div>
                   {subjectDropdownOpen && (
                     <div className="searchable-select-dropdown">
@@ -252,7 +255,7 @@ export default function TeacherCatalog() {
                           }}
                         >
                           Todas las materias
-                          {!subject && <span className="check-icon">✓</span>}
+                          {!subject && <span className="check-icon"><Check size={18} /></span>}
                         </button>
                       )}
                       {filteredSubjects.length > 0 ? (
@@ -268,12 +271,12 @@ export default function TeacherCatalog() {
                             }}
                           >
                             {opt}
-                            {subject === opt && <span className="check-icon">✓</span>}
+                            {subject === opt && <span className="check-icon"><Check size={18} /></span>}
                           </button>
                         ))
                       ) : (
                         <div className="no-results">
-                          <span className="no-results-icon">🔍</span>
+                          <span className="no-results-icon"><SearchIcon size={16} /></span>
                           <p>No se encontraron materias</p>
                           <small>Intenta con otro término</small>
                         </div>
@@ -284,7 +287,7 @@ export default function TeacherCatalog() {
               </div>
 
               <div className="filter-group">
-                <div className="label-row"><span className="label-icon">🎓</span><h4>Nivel Educativo</h4></div>
+                <div className="label-row"><span className="label-icon"><GraduationCap size={18} /></span><h4>Nivel Educativo</h4></div>
                 <div className="pill-row">
                   {(['Preparatoria','Universidad','Posgrado'] as const).map((lvl) => (
                     <button
@@ -301,7 +304,7 @@ export default function TeacherCatalog() {
               </div>
 
               <div className="filter-group price-group">
-                <div className="label-row"><span className="label-icon">💲</span><h4>Rango de Precio / hora</h4></div>
+                <div className="label-row"><span className="label-icon"><CircleDollarSign size={18} /></span><h4>Rango de Precio / hora</h4></div>
                 <div className="price-head">
                   <span>Hasta</span>
                   <span className="price-badge">${priceMax} MXN/hr</span>
@@ -317,7 +320,7 @@ export default function TeacherCatalog() {
               </div>
 
               <div className="filter-group rating-group">
-                <div className="label-row"><span className="label-icon">⭐</span><h4>Calificación Mínima</h4></div>
+                <div className="label-row"><span className="label-icon"><Star size={18} /></span><h4>Calificación Mínima</h4></div>
                 <div className="rating-row">
                   {[1, 2, 3, 4, 5].map((i) => (
                     <button
@@ -328,7 +331,7 @@ export default function TeacherCatalog() {
                       aria-label={`${i} estrellas o más`}
                       aria-pressed={minRating >= i}
                     >
-                      ★
+                      <Star size={18} />
                     </button>
                   ))}
                 </div>
@@ -351,7 +354,7 @@ export default function TeacherCatalog() {
                   <p className="results-sub">Explora perfiles, mira sus videos y elige al mejor para ti.</p>
                 </div>
                 <button className="btn-filter-mobile" onClick={() => setFiltersOpen(!filtersOpen)}>
-                  <span>{filtersOpen ? '✕' : '⚙️'}</span>
+                  <span>{filtersOpen ? <X size={16} /> : <Settings size={16} />}</span>
                   <span>{filtersOpen ? 'Cerrar' : 'Filtros'}</span>
                 </button>
               </div>
@@ -408,7 +411,7 @@ export default function TeacherCatalog() {
                           }} 
                           aria-label={`Reproducir video de ${t.name}`}
                         >
-                          ▶
+                          <Play size={18} />
                         </button>
                       </div>
                       <div className="card-body">
@@ -428,7 +431,7 @@ export default function TeacherCatalog() {
                             </div>
                             <div className="info-box rating-box">
                               <div className="rating-content">
-                                <span className="star-icon">★</span>
+                                <span className="star-icon"><Star size={18} /></span>
                                 <span className="info-value">{t.rating.toFixed(1)}</span>
                               </div>
                               <span className="info-label">CALIFICACIÓN</span>
@@ -443,7 +446,7 @@ export default function TeacherCatalog() {
                             href="#"
                           >
                             Ver Perfil
-                            <span className="arrow-icon">→</span>
+                            <span className="arrow-icon"><ArrowRight size={18} /></span>
                           </a>
                         </div>
                       </div>
@@ -474,7 +477,7 @@ export default function TeacherCatalog() {
           <div className="video-modal">
             <div className="video-aspect">
               <iframe src={videoEmbed} title="Video de presentación" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
-              <button className="video-close" aria-label="Cerrar video" onClick={() => setShowVideo(false)}>✕</button>
+              <button className="video-close" aria-label="Cerrar video" onClick={() => setShowVideo(false)}><X size={16} /></button>
             </div>
           </div>
         </div>

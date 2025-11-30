@@ -14,6 +14,39 @@ import { useNotificationContext } from '../NotificationProvider';
 import AssessmentModal from './AssessmentModal';
 import { useOptionalStudentAssessmentsContext } from '../../context/assessments/StudentAssessmentsContext';
 import LoadingOverlay from './LoadingOverlay';
+import {
+  CalendarDays,
+  Clock,
+  MapPin,
+  Link2,
+  Eye,
+  Video,
+  ClipboardList,
+  Timer,
+  FileText,
+  Check,
+  GraduationCap,
+  CheckCircle,
+  Info,
+  BookOpen,
+  Pi,
+  Atom,
+  FlaskConical,
+  Code,
+  Languages,
+  Dna,
+  ScrollText,
+  Globe,
+  Sigma,
+  Palette,
+  Music,
+  Brain,
+  FileSpreadsheet,
+  Cpu,
+  Ruler,
+  LineChart,
+  Search,
+} from 'lucide-react';
 
 type BookingViewProps = {
   user: {
@@ -147,16 +180,26 @@ export default function BookingView({
     return 'Docente';
   };
 
-  const getSubjectIcon = (materia: string) => {
-    const lowerMateria = materia.toLowerCase();
-    if (lowerMateria.includes('matemática') || lowerMateria.includes('cálculo') || lowerMateria.includes('álgebra')) return '📐';
-    if (lowerMateria.includes('física')) return '⚛️';
-    if (lowerMateria.includes('química')) return '🧪';
-    if (lowerMateria.includes('programación') || lowerMateria.includes('código')) return '💻';
-    if (lowerMateria.includes('inglés') || lowerMateria.includes('idioma')) return '🌍';
-    if (lowerMateria.includes('historia')) return '📚';
-    if (lowerMateria.includes('biología')) return '🧬';
-    return '📖';
+  const getSubjectIcon = (materia: string): React.ReactNode => {
+    const m = (materia || '').toLowerCase();
+    if (m.includes('matem') || m.includes('álgebra') || m.includes('algebra') || m.includes('cálculo') || m.includes('calculo') || m.includes('trigonom')) return <Pi size={18} />;
+    if (m.includes('física') || m.includes('fisica')) return <Atom size={18} />;
+    if (m.includes('química') || m.includes('quimica')) return <FlaskConical size={18} />;
+    if (m.includes('program') || m.includes('código') || m.includes('codigo') || m.includes('inform')) return <Code size={18} />;
+    if (m.includes('inglés') || m.includes('ingles') || m.includes('idioma') || m.includes('language') || m.includes('english')) return <Languages size={18} />;
+    if (m.includes('historia')) return <ScrollText size={18} />;
+    if (m.includes('biolog')) return <Dna size={18} />;
+    if (m.includes('literat')) return <BookOpen size={18} />;
+    if (m.includes('geograf')) return <Globe size={18} />;
+    if (m.includes('econom') || m.includes('finanzas')) return <LineChart size={18} />;
+    if (m.includes('estad')) return <Sigma size={18} />;
+    if (m.includes('arte') || m.includes('dibu') || m.includes('pint')) return <Palette size={18} />;
+    if (m.includes('música') || m.includes('musica')) return <Music size={18} />;
+    if (m.includes('filoso')) return <Brain size={18} />;
+    if (m.includes('contab') || m.includes('contabilidad')) return <FileSpreadsheet size={18} />;
+    if (m.includes('electrónica') || m.includes('electronica')) return <Cpu size={18} />;
+    if (m.includes('arquitec') || m.includes('diseño')) return <Ruler size={18} />;
+    return <GraduationCap size={18} />;
   };
 
   // Confirmables ahora (recent) por rol
@@ -372,15 +415,15 @@ export default function BookingView({
                     </p>
                     <div className="proxima-info-row">
                       <div className="proxima-info-item">
-                        <span className="proxima-info-icon">📅</span>
+                        <span className="proxima-info-icon"><CalendarDays size={16} /></span>
                         <span>{formatDate(nextClass.start_time)}</span>
                       </div>
                       <div className="proxima-info-item">
-                        <span className="proxima-info-icon">🕐</span>
+                        <span className="proxima-info-icon"><Clock size={16} /></span>
                         <span>{formatTimeRange(nextClass.start_time, nextClass.end_time)}</span>
                       </div>
                       <div className="proxima-info-item">
-                        <span className="proxima-info-icon">{nextClass.modality === 'In-person' ? '📍' : '🔗'}</span>
+                        <span className="proxima-info-icon">{nextClass.modality === 'In-person' ? <MapPin size={16} /> : <Link2 size={16} />}</span>
                         <span>{nextClass.modality === 'In-person' ? 'Enlace de Jitsimeet' : 'Enlace de Jitsimeet'}</span>
                       </div>
                     </div>
@@ -389,27 +432,27 @@ export default function BookingView({
                         className="btn-ver-detalles"
                         onClick={() => onCardClick(nextClass.booking_id)}
                       >
-                        <span>👁️</span>
+                        <Eye size={16} />
                         Ver detalles
                       </button>
                       <button 
                         className="btn-unirse"
                         onClick={() => handleJoinClass(nextClass.class_link)}
                       >
-                        <span>📹</span>
+                        <Video size={16} />
                         Unirse a la llamada
                       </button>
                     </div>
                   </div>
                 ) : (
                   <div className="empty-proxima-state">
-                    <div className="empty-proxima-icon">📚</div>
+                    <div className="empty-proxima-icon"><BookOpen size={24} /></div>
                     <p className="empty-proxima-title">No tienes asesorías próximas</p>
                     <p className="empty-proxima-desc">
                       Para reservar una asesoría, visita nuestro catálogo de docentes y encuentra al profesor ideal para ti.
                     </p>
                     <Link to="/catalog/teachers" className="btn-ir-catalogo">
-                      <span>🔍</span>
+                      <Search size={16} />
                       Ir al catálogo de docentes
                     </Link>
                   </div>
@@ -451,7 +494,7 @@ export default function BookingView({
                   </>
                 ) : (
                   <div className="empty-futuras-state">
-                    <div className="empty-futuras-icon">📅</div>
+                    <div className="empty-futuras-icon"><CalendarDays size={24} /></div>
                     <p className="empty-futuras-title">No tienes más asesorías programadas</p>
                     <p className="empty-futuras-desc">
                       Explora nuestro catálogo de docentes para agendar nuevas asesorías.
@@ -463,11 +506,12 @@ export default function BookingView({
                 )}
               </div>
 
-                 {/* Botón Ver todas */}
-                 {showViewAllButton && (upcomingClasses.length > 0 || completedClasses.length > 0) && (
+              {/* Botón Ver todas */}
+              {showViewAllButton && (upcomingClasses.length > 0 || completedClasses.length > 0) && (
                 <div style={{ marginTop: '32px', textAlign: 'center' }}>
-                  <Link to={allBookingsPath} className="view-all-btn-header">
-                    📋 Ver todas las reservas
+                  <Link to={allBookingsPath} className="view-all-btn-header" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                    <ClipboardList size={16} />
+                    Ver todas las reservas
                   </Link>
                 </div>
               )}
@@ -479,8 +523,9 @@ export default function BookingView({
                 {/* Confirmables ahora (según rol) */}
                 {(user?.role === 'teacher' || user?.role === 'student') && (
                   <div className="empty-confirmacion-state" style={{ marginBottom: 16 }}>
-                    <div className="empty-confirmacion-icon">⏱️</div>
+                    <div className="empty-confirmacion-icon"><Timer size={18} /></div>
                     <div className="empty-confirmacion-title">Confirmables ahora</div>
+
                     {recentLoading && (
                       <div className="text-gray-600" style={{ padding: '6px 0' }}>Cargando confirmaciones…</div>
                     )}
@@ -494,8 +539,9 @@ export default function BookingView({
                       <div className="asesorias-list" style={{ marginTop: 8 }}>
                         {recentItems.map((it) => (
                           <div key={it.id} className="clase-asistida-item">
-                            <div className="clase-asistida-icon">📝</div>
+                            <div className="clase-asistida-icon"><FileText size={20} /></div>
                             <div className="clase-asistida-content">
+
                               <div className="clase-asistida-materia">Reserva #{it.payment_booking_id}</div>
                               <div className="clase-asistida-datetime">
                                 Finalizó: {formatDate(it.booking_end)}, {formatTime(it.booking_end)} · Tiempo restante: {formatSecondsLeft(it.seconds_left)}
@@ -507,7 +553,7 @@ export default function BookingView({
                               onClick={() => openConfirmModal(it)}
                               disabled={!it.confirmable_now || (it.seconds_left ?? 0) <= 0}
                             >
-                              <span>✓</span>
+                              <Check size={16} />
                               Confirmar ahora
                             </button>
                           </div>
@@ -518,7 +564,7 @@ export default function BookingView({
                             to={user?.role === 'teacher' ? '/teacher/confirmation' : '/student/confirmation'}
                             className="view-all-btn-header"
                           >
-                            📋 Ver todas las reservas
+                            <ClipboardList size={16} /> Ver todas las reservas
                           </Link>
                         </div>
                       </div>
@@ -535,7 +581,7 @@ export default function BookingView({
                         
                         return (
                           <div key={clase.booking_id} className="clase-asistida-item">
-                            <div className="clase-asistida-icon">🎓</div>
+                            <div className="clase-asistida-icon"><GraduationCap size={20} /></div>
                             <div className="clase-asistida-content">
                               <div className="clase-asistida-materia">{clase.materia} - {getTeacherName(clase)}</div>
                               <div className="clase-asistida-datetime">
@@ -544,7 +590,7 @@ export default function BookingView({
                             </div>
                             {isConfirmed ? (
                               <div className="confirmacion-badge confirmada">
-                                <span>✅</span>
+                                <CheckCircle size={16} />
                                 Confirmar Asistencia
                               </div>
                             ) : (
@@ -552,7 +598,7 @@ export default function BookingView({
                                 className="btn-confirmar-asistencia"
                                 onClick={() => handleConfirmAttendance(clase.booking_id)}
                               >
-                                <span>✓</span>
+                                <Check size={16} />
                                 Confirmar Asistencia
                               </button>
                             )}
@@ -560,6 +606,7 @@ export default function BookingView({
                         );
                       })}
                     </div>
+
                     {hasMoreCompletadas && !showAllCompletadas && (
                       <div className="ver-mas-link" onClick={() => setShowAllCompletadas(true)}>
                         Ver {completedClasses.length - MAX_ITEMS} clase{completedClasses.length - MAX_ITEMS > 1 ? 's' : ''} más ↓
@@ -570,9 +617,12 @@ export default function BookingView({
                         Ver menos ↑
                       </div>
                     )}
-                    <div className="confirmacion-nota">
-                      ℹ️ Tienes un periodo de 2 horas máximo después de la clase para confirmar tu asistencia, 
-                      de no ser así podrías recibir una penalización.
+                    <div className="confirmacion-nota" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <Info size={14} />
+                      <span>
+                        Tienes un periodo de 2 horas máximo después de la clase para confirmar tu asistencia, 
+                        de no ser así podrías recibir una penalización.
+                      </span>
                     </div>
                   </>
                 ) : (

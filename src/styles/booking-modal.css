@@ -152,6 +152,105 @@
   animation: confirm-dialog-rays 5s linear infinite;
 }
 
+.confirm-attendance-card {
+  position: relative;
+  overflow: hidden;
+  animation: confirm-attendance-pulse 4.5s ease-in-out infinite;
+}
+
+.confirm-attendance-content {
+  animation: confirm-attendance-fade 0.22s ease-out;
+}
+
+.confirm-attendance-modal .booking-modal-content {
+  background:
+    radial-gradient(circle at top left, rgba(148, 163, 184, 0.16), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(104, 178, 201, 0.22), transparent 55%),
+    rgba(249, 250, 251, 0.96);
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.28);
+}
+
+.confirm-attendance-role-badge {
+  animation: confirm-attendance-badge-float 3.2s ease-in-out infinite;
+}
+
+.confirm-attendance-textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 1px rgba(104, 178, 201, 0.55), 0 8px 20px rgba(15, 23, 42, 0.12);
+}
+
+.confirm-attendance-actions .btn-unirse {
+  position: relative;
+  overflow: hidden;
+}
+
+.confirm-attendance-actions .btn-unirse::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+  opacity: 0;
+  transform: translateX(-80%);
+  transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+  pointer-events: none;
+}
+
+.confirm-attendance-actions .btn-unirse:hover::before {
+  opacity: 1;
+  transform: translateX(40%);
+}
+
+.confirm-attendance-modal .booking-modal-header {
+  position: relative;
+  overflow: hidden;
+}
+
+.confirm-attendance-modal .booking-modal-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 3px;
+  background: linear-gradient(90deg, #38bdf8, #22c55e, #facc15);
+  opacity: 0.9;
+}
+
+.confirm-attendance-title {
+  position: relative;
+  z-index: 1;
+  color: #f9fafb;
+}
+
+.confirm-attendance-modal .booking-modal-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+    120deg,
+    rgba(56, 189, 248, 0.25) 0%,
+    rgba(37, 99, 235, 0.45) 30%,
+    rgba(129, 140, 248, 0.40) 60%,
+    rgba(16, 185, 129, 0.32) 100%
+  );
+  background-size: 260% 260%;
+  opacity: 0.65;
+  mix-blend-mode: soft-light;
+  animation: confirm-attendance-title-rays 5s linear infinite;
+}
+
+.confirm-attendance-body {
+  border-radius: 14px;
+  padding: 16px 16px 14px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(241, 245, 249, 0.96));
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+}
+
+.confirm-attendance-error {
+  animation: confirm-attendance-error-in 0.25s ease-out;
+}
+
 @keyframes booking-modal-pop {
   0% {
     opacity: 0;
@@ -169,6 +268,67 @@
   }
   100% {
     background-color: rgba(15, 23, 42, 0.55);
+  }
+}
+
+@keyframes confirm-attendance-fade {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes confirm-attendance-shine {
+  0% {
+    transform: translateX(-140%);
+  }
+  100% {
+    transform: translateX(140%);
+  }
+}
+
+@keyframes confirm-attendance-pulse {
+  0%, 100% {
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
+  }
+  50% {
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.24);
+  }
+}
+
+@keyframes confirm-attendance-badge-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes confirm-attendance-error-in {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes confirm-attendance-title-rays {
+  0% {
+    background-position: 0% 40%;
+  }
+  50% {
+    background-position: 100% 60%;
+  }
+  100% {
+    background-position: 200% 40%;
   }
 }
 

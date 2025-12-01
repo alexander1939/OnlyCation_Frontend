@@ -42,8 +42,15 @@ export default function DocenteDatosPersonales() {
   const overlayOpen = Boolean(loading || loadingVideos || savingVideo);
 
   const extractYouTubeId = (url: string): string | null => {
+    if (!url) return null;
     try {
-      const u = new URL(url);
+      // Si la URL no tiene protocolo, agregamos https:// para que el constructor URL no falle
+      let safeUrl = url.trim();
+      if (!/^https?:\/\//i.test(safeUrl)) {
+        safeUrl = `https://${safeUrl}`;
+      }
+
+      const u = new URL(safeUrl);
       if (u.hostname === 'youtu.be') return u.pathname.slice(1);
       if (u.hostname.includes('youtube.com')) {
         const v = u.searchParams.get('v');

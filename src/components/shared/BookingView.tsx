@@ -121,6 +121,9 @@ export default function BookingView({
 
   // Calcular tiempo restante hasta la clase
   const [timeRemaining, setTimeRemaining] = useState<string>('');
+  // Habilitar "Unirse" 15 minutos antes del inicio de la clase
+  const [joinEnabled, setJoinEnabled] = useState<boolean>(false);
+  const [joinUnlockAt, setJoinUnlockAt] = useState<Date | null>(null);
 
   const calculateTimeRemaining = (startTime: string) => {
     const now = new Date();
@@ -157,6 +160,30 @@ export default function BookingView({
     } else {
       setTimeRemaining('');
     }
+  }, [classes]);
+
+  // Controlar el desbloqueo de "Unirse" 15 minutos antes del inicio
+  useEffect(() => {
+    const upcoming = [...classes]
+      .filter(c => c.status === 'approved' || c.status === 'active')
+      .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
+
+    if (upcoming.length === 0) {
+      setJoinEnabled(false);
+      setJoinUnlockAt(null);
+      return;
+    }
+    const start = new Date(upcoming[0].start_time);
+    const unlock = new Date(start.getTime() - 15 * 60 * 1000);
+    setJoinUnlockAt(unlock);
+
+    const update = () => {
+      const now = new Date();
+      setJoinEnabled(now.getTime() >= unlock.getTime());
+    };
+    update();
+    const id = setInterval(update, 15000); // revisar cada 15s para precisión
+    return () => clearInterval(id);
   }, [classes]);
 
   const formatDate = (dateTimeStr: string) => {
@@ -437,6 +464,8 @@ export default function BookingView({
                       </button>
                       <button 
                         className="btn-unirse"
+                        disabled={!joinEnabled || !nextClass.class_link}
+                        title={!joinEnabled && joinUnlockAt ? `Disponible a las ${joinUnlockAt.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}` : undefined}
                         onClick={() => handleJoinClass(nextClass.class_link)}
                       >
                         <Video size={16} />

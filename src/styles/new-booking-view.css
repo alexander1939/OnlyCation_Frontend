@@ -139,6 +139,21 @@
   box-shadow: 0 4px 12px rgba(142, 212, 190, 0.4);
 }
 
+.btn-unirse:disabled {
+  background: #d1d5db;
+  color: #6b7280;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+  opacity: 0.9;
+}
+
+.btn-unirse:disabled:hover {
+  background: #d1d5db;
+  transform: none;
+  box-shadow: none;
+}
+
 /* Secciones de lista */
 .asesorias-section {
   margin-bottom: 40px;

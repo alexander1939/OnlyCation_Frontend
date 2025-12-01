@@ -28,7 +28,7 @@ const safeParseJSON = <T = any>(raw: string | null): T | null => {
 export default function DocenteDatosPersonales() {
   const { user, setUser } = useAuthContext();
   const { updateUserName, loading, error } = useUpdateProfile();
-  const { updateMyVideo } = useVideosApi();
+  const { updateMyVideo, getMyVideoUrl: apiGetMyVideoUrl } = useVideosApi();
   const navigate = useNavigate();
   const { getAccessToken } = useAuthToken();
 
@@ -116,8 +116,8 @@ export default function DocenteDatosPersonales() {
     let active = true;
     setLoadingVideos(true);
     setVideoError(null);
-    const token = getAccessToken();
-    const endpoint = `/api/videos/my-video-url/`;
+    // Tocar el token para asegurar que esté presente; axios del hook usa Bearer internamente
+    void getAccessToken();
 
     // 1) Cache en sessionStorage para evitar llamadas repetidas
     try {
@@ -132,17 +132,10 @@ export default function DocenteDatosPersonales() {
 
     if (!myVideoInfoPromise) {
       myVideoInfoPromise = (async () => {
-        const res = await fetch(endpoint, {
-          method: 'GET',
-          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-          // No usamos credentials para evitar duplicar con cookies; backend acepta Bearer
-        });
-        if (!res.ok) throw new Error('No se pudo obtener el video');
-        const text = await res.text();
-        const j = safeParseJSON<any>(text);
-        if (!j || typeof j !== 'object') return null;
-        const original = j?.data?.original_url || '';
-        const embed = j?.data?.embed_url || '';
+        const res = await apiGetMyVideoUrl();
+        if (!res?.success || !res.data) return null;
+        const original = res.data.original_url || '';
+        const embed = res.data.embed_url || '';
         if (!original && !embed) return null;
         try { sessionStorage.setItem(SS_KEY_VIDEO_INFO, JSON.stringify({ original, embed })); } catch {}
         return { original, embed };

@@ -14,6 +14,7 @@ import TeacherStatus from "../../components/comptHome/TeacherStatus";
 import "../../styles/teacher-home.css";
 import Footer from "../../components/ui/Footer";
 import LoadingOverlay from "../../components/shared/LoadingOverlay";
+import HintBadge from "../../components/ui/HintBadge";
 
 const TeacherHome: React.FC = () => {
   const { user } = useLoginContext();
@@ -155,10 +156,74 @@ const TeacherHome: React.FC = () => {
           <div style={{ height: "100%" }}>
             <AdaptiveList role="teacher" />
           </div>
+          <div style={{ height: "100%" }}>
+            <div
+              style={{
+                background: "#ffffff",
+                borderRadius: "1rem",
+                boxShadow: "0 4px 8px rgba(0,0,0,0.05)",
+                padding: "1rem",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.75rem",
+                fontFamily: "Roboto, sans-serif",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <h3
+                  style={{
+                    fontSize: "1.05rem",
+                    fontWeight: 700,
+                    color: "#0f172a",
+                    margin: 0,
+                  }}
+                >
+                  Video de ayuda para reservas como profesor
+                </h3>
+              </div>
+              <div
+                style={{
+                  position: "relative",
+                  width: "100%",
+                  aspectRatio: "16 / 9",
+                  overflow: "hidden",
+                  borderRadius: "0.75rem",
+                  boxShadow: "0 6px 14px rgba(0,0,0,0.08)",
+                }}
+              >
+                <iframe
+                  src="https://www.youtube.com/embed/VVhaxweBjz8?rel=0&modestbranding=1"
+                  title="Video de ayuda para reservas como profesor"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
       </div>
       <Footer />
+      <div style={{ position: "fixed", right: 16, bottom: 16, zIndex: 50 }}>
+        <HintBadge text="Tutorial de ayuda" intervalMs={20000} showDurationMs={15000} offsetY={40}>
+          <button
+            style={{
+              background: "#294954",
+              color: "#fff",
+              border: "none",
+              borderRadius: "9999px",
+              padding: "10px 14px",
+              boxShadow: "0 6px 14px rgba(41,73,84,0.22)",
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
+            ¿Necesitas ayuda?
+          </button>
+        </HintBadge>
+      </div>
       <LoadingOverlay
         open={Boolean(walletLoading || walletCreating)}
         message="Preparando tu experiencia..."

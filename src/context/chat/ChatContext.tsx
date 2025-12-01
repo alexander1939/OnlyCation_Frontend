@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 import { useChatApi } from '../../hooks/chat/useChatApi';
 import type { ChatSummary, Message } from '../../hooks/chat/useChatApi';
 import { useAuthContext } from '../auth';
+import { useNotificationContext } from '../../components/NotificationProvider';
 
 interface ChatContextType {
   chats: ChatSummary[];
@@ -39,6 +40,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { showSuccess, showError } = useNotificationContext();
 
   // Obtener chats (previews ligeros, auto-asegura según reservas activas)
   const fetchChats = useCallback(async () => {
@@ -174,6 +176,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const response = await createChatApi(teacherId);
       if (response.success) {
+        showSuccess('Chat creado exitosamente');
         // No actualizamos la lista de chats porque está deshabilitada
         return { success: true, message: response.message || 'Chat creado exitosamente' };
       } else {
@@ -183,11 +186,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Error al crear el chat:', err);
       const errorMessage = err instanceof Error ? err.message : 'Error al crear el chat';
       setError(errorMessage);
+      showError(errorMessage);
       return { success: false, message: errorMessage };
     } finally {
       setLoading(false);
     }
-  }, [createChatApi]);
+  }, [createChatApi, showSuccess, showError]);
 
   // Contar mensajes no leídos
   const getUnreadCount = useCallback(() => {

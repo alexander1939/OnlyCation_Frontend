@@ -8,7 +8,7 @@ import { GraduationCap, FileText, Folder, Target, Save, X, Pencil, Download, Loa
 import { useNotificationContext } from '../../components/NotificationProvider';
 import ConfirmDialog from '../../components/shared/ConfirmDialog';
 import LoadingOverlay from '../../components/shared/LoadingOverlay';
-
+import { SUBJECTS } from '../../components/subjects/SubjectsCatalog';
 
 export default function DocenteDocumentos() {
   const { user } = useAuthContext();
@@ -38,6 +38,7 @@ export default function DocenteDocumentos() {
     certificate: null as File | null,
     curriculum: null as File | null,
   });
+  const [selectedSubjectId, setSelectedSubjectId] = useState<string>('');
   const [confirmAction, setConfirmAction] = useState<
     'all' | 'rfc' | 'description' | 'expertise_area' | 'certificate' | 'curriculum' | null
   >(null);
@@ -61,6 +62,10 @@ export default function DocenteDocumentos() {
       certificate: null,
       curriculum: null,
     });
+    try {
+      const subj = SUBJECTS.find(s => s.name === currentDoc.expertise_area);
+      setSelectedSubjectId(subj ? subj.id : '');
+    } catch {}
   };
 
   const handleCancelEdit = () => {
@@ -72,11 +77,10 @@ export default function DocenteDocumentos() {
       certificate: null,
       curriculum: null,
     });
+    setSelectedSubjectId('');
   };
 
   const sanitizeInput = (value: string) => {
-    // Permitir solo letras (incluyendo acentos y ñ), números y espacios.
-    // Cualquier otro carácter especial se elimina para evitar que se guarde.
     return value.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\s]/g, '');
   };
 
@@ -85,7 +89,6 @@ export default function DocenteDocumentos() {
     
     let hasErrors = false;
     
-    // Actualizar cada campo que cambió
     if (tempValues.rfc !== currentDoc.rfc) {
       const result = await updateRfc(currentDoc.id, tempValues.rfc);
       if (!result.success) hasErrors = true;
@@ -639,13 +642,21 @@ export default function DocenteDocumentos() {
                     <div className="documento-info">
                       <div className="documento-fecha">Especialidad</div>
                       {editingField === 'all' || editingField === 'expertise_area' ? (
-                        <input 
-                          type="text"
-                          value={tempValues.expertise_area}
-                          onChange={(e) => setTempValues(prev => ({ ...prev, expertise_area: sanitizeInput(e.target.value) }))}
+                        <select
+                          value={selectedSubjectId}
+                          onChange={(e) => {
+                            const id = e.target.value;
+                            setSelectedSubjectId(id);
+                            const subj = SUBJECTS.find(s => s.id === id);
+                            setTempValues(prev => ({ ...prev, expertise_area: subj ? subj.name : '' }));
+                          }}
                           className="documento-rfc border-2 border-blue-400 rounded px-2 py-1"
-                          placeholder="Área de especialidad"
-                        />
+                        >
+                          <option value="">Selecciona una materia</option>
+                          {SUBJECTS.map(s => (
+                            <option key={s.id} value={s.id}>{s.name}</option>
+                          ))}
+                        </select>
                       ) : (
                         <div className="documento-rfc">{currentDoc.expertise_area}</div>
                       )}
@@ -654,7 +665,7 @@ export default function DocenteDocumentos() {
                       <div style={{ display: 'flex', gap: '8px' }}>
                         <button 
                           onClick={() => openConfirm('expertise_area')}
-                          disabled={updating}
+                          disabled={updating || !tempValues.expertise_area}
                           style={{
                             background: '#10b981',
                             border: 'none',

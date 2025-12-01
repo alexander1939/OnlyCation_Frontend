@@ -13,6 +13,7 @@ import LoadingOverlay from '../../components/shared/LoadingOverlay';
 // Evita peticiones duplicadas (StrictMode monta/desmonta dos veces en dev):
 // compartimos la misma promesa entre montajes para que solo haya 1 request real.
 let myVideoInfoPromise: Promise<{ original: string; embed: string } | null> | null = null;
+const SS_KEY_VIDEO_INFO = 'oc_my_video_info';
 
 export default function DocenteDatosPersonales() {
   const { user, setUser } = useAuthContext();
@@ -100,6 +101,20 @@ export default function DocenteDatosPersonales() {
     const token = getAccessToken();
     const endpoint = `/api/videos/my-video-url/`;
 
+    // 1) Cache en sessionStorage para evitar llamadas repetidas
+    try {
+      const cachedRaw = sessionStorage.getItem(SS_KEY_VIDEO_INFO);
+      if (cachedRaw) {
+        const cached = JSON.parse(cachedRaw) as { original?: string; embed?: string };
+        if (cached && (cached.original || cached.embed)) {
+          setCurrentVideoUrl(cached.original || '');
+          setCurrentVideoEmbedUrl(cached.embed || '');
+          setLoadingVideos(false);
+          return () => { active = false; };
+        }
+      }
+    } catch { }
+
     if (!myVideoInfoPromise) {
       myVideoInfoPromise = (async () => {
         const res = await fetch(endpoint, {
@@ -112,6 +127,7 @@ export default function DocenteDatosPersonales() {
         const original = j?.data?.original_url || '';
         const embed = j?.data?.embed_url || '';
         if (!original && !embed) return null;
+        try { sessionStorage.setItem(SS_KEY_VIDEO_INFO, JSON.stringify({ original, embed })); } catch { }
         return { original, embed };
       })();
     }
@@ -229,15 +245,24 @@ export default function DocenteDatosPersonales() {
     if (response.success && response.data?.data) {
       // Update current video
       setCurrentVideoUrl(response.data.data.original_url);
+      setCurrentVideoEmbedUrl(response.data.data.embed_url || '');
       setCurrentVideoTitle(response.data.data.title);
       setShowNewPreview(false);
       setNewVideoUrl('');
+
+      // Actualiza cache para evitar próxima carga duplicada
+      try {
+        sessionStorage.setItem(SS_KEY_VIDEO_INFO, JSON.stringify({
+          original: response.data.data.original_url,
+          embed: response.data.data.embed_url || ''
+        }));
+      } catch { }
 
       // Show success message
       setVideoError(null);
       setVideoSuccessMessage('¡Video actualizado exitosamente!');
 
-      // Clear success message after 3 seconds
+      // Clear success message after 3 segundos
       setTimeout(() => {
         setVideoSuccessMessage(null);
       }, 3000);
@@ -357,9 +382,9 @@ export default function DocenteDatosPersonales() {
             <div className="datos-video-grid">
               <div className="datos-video-card">
                 <div className="datos-video-title">Video Actual</div>
-                {currentId ? (
+                {(currentId || currentVideoEmbedUrl) ? (
                   <div className="datos-video-frame">
-                    {!showCurrentPreview ? (
+                    {(!showCurrentPreview && currentThumb) ? (
                       <button type="button" className="datos-video-thumb" style={{ backgroundImage: `url(${currentThumb})` }} onClick={() => setShowCurrentPreview(true)}>
                         ▶
                       </button>

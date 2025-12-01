@@ -14,6 +14,7 @@ import { useNotificationContext } from '../NotificationProvider';
 import AssessmentModal from './AssessmentModal';
 import { useOptionalStudentAssessmentsContext } from '../../context/assessments/StudentAssessmentsContext';
 import LoadingOverlay from './LoadingOverlay';
+import { useBookingApi } from '../../hooks/booking/useBookingApi';
 import {
   CalendarDays,
   Clock,
@@ -405,22 +406,32 @@ export default function BookingView({
   const hasMoreFuturas = futureClasses.length > MAX_ITEMS;
   const hasMoreCompletadas = completedClasses.length > MAX_ITEMS;
 
-  const handleJoinClass = (classLink?: string) => {
-    if (!classLink) {
+  const { getBookingDetail } = useBookingApi();
+  const [joinFetching, setJoinFetching] = useState(false);
+
+  const handleJoinClass = async (bookingId: number, fallbackLink?: string) => {
+    if (!joinEnabled) {
       const when = joinUnlockAt ? joinUnlockAt.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : null;
-      showError(when
-        ? `El enlace aún no está disponible. Se activará alrededor de las ${when}.`
-        : 'El enlace aún no está disponible. Intenta de nuevo cerca del inicio.'
-      );
+      showError(when ? `Disponible a las ${when}` : 'Aún no es hora de unirse.');
       return;
     }
+    setJoinFetching(true);
     try {
-      const w = window.open(classLink, '_blank', 'noopener,noreferrer');
-      if (!w) {
-        showError('No se pudo abrir la llamada. Habilita ventanas emergentes e intenta nuevamente.');
+      // Siempre consultamos el detalle oficial para obtener el link actualizado
+      const res = await getBookingDetail(bookingId);
+      const link = res?.success ? res.data?.data?.class_link : undefined;
+      const finalLink = link || fallbackLink;
+      if (!finalLink) {
+        showError('El enlace de la clase aún no está disponible. Intenta nuevamente al inicio.');
+        return;
       }
-    } catch (e) {
-      showError('Ocurrió un error al abrir la llamada.');
+      const w = window.open(finalLink, '_blank', 'noopener,noreferrer');
+      if (!w) showError('No se pudo abrir la llamada. Habilita ventanas emergentes e intenta nuevamente.');
+    } catch (e: any) {
+      const msg = e?.message || 'Ocurrió un error al obtener el enlace de la clase.';
+      showError(msg);
+    } finally {
+      setJoinFetching(false);
     }
   };
 
@@ -496,16 +507,16 @@ export default function BookingView({
                       </button>
                       <button 
                         className="btn-unirse"
-                        disabled={!joinEnabled}
+                        disabled={!joinEnabled || joinFetching}
                         title={
                           !joinEnabled && joinUnlockAt
                             ? `Disponible a las ${joinUnlockAt.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`
-                            : (!nextClass.class_link ? 'El enlace aún no está disponible; se activará al inicio' : undefined)
+                            : (joinFetching ? 'Conectando…' : 'Abrir llamada')
                         }
-                        onClick={() => handleJoinClass(nextClass.class_link)}
+                        onClick={() => { void handleJoinClass(nextClass.booking_id, nextClass.class_link); }}
                       >
                         <Video size={16} />
-                        Unirse a la llamada
+                        {joinFetching ? 'Entrando…' : 'Unirse a la llamada'}
                       </button>
                     </div>
                   </div>

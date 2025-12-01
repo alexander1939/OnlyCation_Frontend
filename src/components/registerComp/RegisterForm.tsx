@@ -341,7 +341,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ userType, onSubmit, isLoadi
 
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         {/* Nombres */}
-        <div className="register-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+        <div className="register-form-grid">
           <div>
             <label style={{
               display: 'block',
@@ -432,7 +432,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ userType, onSubmit, isLoadi
         </div>
 
         {/* Contraseñas */}
-        <div className="register-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+        <div className="register-form-grid">
           <div>
             <label style={{
               display: 'flex',

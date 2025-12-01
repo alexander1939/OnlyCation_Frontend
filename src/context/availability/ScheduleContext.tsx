@@ -110,21 +110,23 @@ export const ScheduleProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           });
 
           if (recurringSlots.length > 0) {
-            newEnabledDays[dayKey] = true;
-            newSlots[dayKey] = recurringSlots.map((slot: any) => {
+            // Deduplicar por hora (HH:MM) para evitar chips duplicados
+            const uniqueMap = new Map<string, Slot>();
+            for (const slot of recurringSlots) {
               // Limpiar formato: "09:00:00" → "09:00"
               let cleanTime = slot.start_time;
               if (cleanTime && cleanTime.includes(':')) {
                 const parts = cleanTime.split(':');
                 cleanTime = `${parts[0]}:${parts[1]}`; // Solo HH:MM
               }
-              
-              return {
-                id: `${slot.availability_id}`,
-                hour: cleanTime
-              };
-            });
-            console.log(`✅ ${dayKey}: ${recurringSlots.length} slots recurrentes`, newSlots[dayKey]);
+              if (!uniqueMap.has(cleanTime)) {
+                uniqueMap.set(cleanTime, { id: `${slot.availability_id}`, hour: cleanTime });
+              }
+            }
+            const uniqueArray = Array.from(uniqueMap.values()).sort((a, b) => a.hour.localeCompare(b.hour));
+            newSlots[dayKey] = uniqueArray;
+            newEnabledDays[dayKey] = uniqueArray.length > 0;
+            console.log(`✅ ${dayKey}: ${uniqueArray.length} slots (deduplicados)` , uniqueArray);
           } else {
             console.log(`⚠️ ${dayKey}: sin slots recurrentes`);
           }

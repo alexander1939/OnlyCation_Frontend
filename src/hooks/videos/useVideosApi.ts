@@ -98,7 +98,7 @@ export const useVideosApi = () => {
       if (!token) throw new Error('No hay token de acceso. Inicia sesión nuevamente.');
 
       const res = await client.put<VideoUpdateResponse>(
-        '/videos/my',
+        '/videos/my/',
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );

@@ -12,7 +12,7 @@ import LoadingOverlay from '../../components/shared/LoadingOverlay';
 export default function DocenteDatosPersonales() {
   const { user, setUser } = useAuthContext();
   const { updateUserName, loading, error } = useUpdateProfile();
-  const { getMyVideos, updateMyVideo, getMyVideoUrl } = useVideosApi();
+  const { updateMyVideo } = useVideosApi();
   const navigate = useNavigate();
 
   const fullName = user ? `${user.first_name} ${user.last_name}`.trim() : '—';
@@ -69,15 +69,7 @@ export default function DocenteDatosPersonales() {
   };
 
   useEffect(() => {
-    let cancelled = false;
-    const run = async () => {
-      if (!currentId) { setCurrentVideoTitle(''); return; }
-      const url = `https://www.youtube.com/watch?v=${currentId}`;
-      const t = await fetchYouTubeTitle(url);
-      if (!cancelled) setCurrentVideoTitle(t ?? '');
-    };
-    run();
-    return () => { cancelled = true; };
+    setCurrentVideoTitle('');
   }, [currentId]);
 
   useEffect(() => {
@@ -92,31 +84,31 @@ export default function DocenteDatosPersonales() {
     return () => { cancelled = true; };
   }, [newId]);
 
-  // Load user video on mount (prefer single URL endpoint like Profile)
   useEffect(() => {
+    let cancelled = false;
     const load = async () => {
       setLoadingVideos(true);
       setVideoError(null);
       try {
-        const single = await getMyVideoUrl();
-        if (single?.success && single.data) {
-          setCurrentVideoUrl(single.data.original_url);
+        const res = await fetch('/api/videos/my-video-url/', { credentials: 'include' });
+        if (!res.ok) throw new Error('No se pudo obtener el video');
+        const j = await res.json();
+        if (cancelled) return;
+        const url = j?.data?.original_url;
+        if (typeof url === 'string' && url.length > 0) {
+          setCurrentVideoUrl(url);
         } else {
-          const response = await getMyVideos();
-          if (response.success && response.data && response.data.length > 0) {
-            setUserVideos(response.data);
-            setCurrentVideoUrl(response.data[0].original_url);
-            setCurrentVideoTitle(response.data[0].title || '');
-          } else {
-            setVideoError(single?.message || response.message || 'No se pudo obtener el video');
-          }
+          setVideoError(j?.message || 'No hay video configurado');
         }
+      } catch (e: any) {
+        if (!cancelled) setVideoError(e?.message || 'Error al obtener el video');
       } finally {
-        setLoadingVideos(false);
+        if (!cancelled) setLoadingVideos(false);
       }
     };
     load();
-  }, [getMyVideoUrl, getMyVideos]);
+    return () => { cancelled = true; };
+  }, []);
 
   const handlePersonalDataSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -212,12 +204,6 @@ export default function DocenteDatosPersonales() {
       setCurrentVideoTitle(response.data.data.title);
       setShowNewPreview(false);
       setNewVideoUrl('');
-
-      // Refresh video list
-      const videosResponse = await getMyVideos();
-      if (videosResponse.success && videosResponse.data) {
-        setUserVideos(videosResponse.data);
-      }
 
       // Show success message
       setVideoError(null);

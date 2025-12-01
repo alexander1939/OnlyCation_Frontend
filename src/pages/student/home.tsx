@@ -186,9 +186,21 @@ const StudentHome: React.FC = () => {
               const ratingLabel = typeof t.average_rating === 'number'
                 ? `★ ★ ★ ★ ★ (${t.average_rating.toFixed(1)})`
                 : 'Sin calificaciones';
+              const id = (t.user_id ?? t.teacher_id) as number | undefined;
+              const key = String(id ?? `${t.first_name}-${t.last_name}`);
 
-              return (
-                <div key={t.user_id || t.teacher_id || `${t.first_name}-${t.last_name}`} className="shv2-reco-card">
+              // Card clickable si hay id, de lo contrario es estático
+              return id ? (
+                <Link key={key} to={`/teachers/${id}`} className="shv2-reco-card" style={{ textDecoration: 'none' }}>
+                  <div className="shv2-avatar">{initials}</div>
+                  <div style={{ flex: 1 }}>
+                    <div className="shv2-reco-name">{t.first_name} {t.last_name}</div>
+                    <div className="shv2-reco-sub">{t.subject || t.expertise_area || 'Docente'}</div>
+                    <div className="shv2-stars">{ratingLabel}</div>
+                  </div>
+                </Link>
+              ) : (
+                <div key={key} className="shv2-reco-card">
                   <div className="shv2-avatar">{initials}</div>
                   <div style={{ flex: 1 }}>
                     <div className="shv2-reco-name">{t.first_name} {t.last_name}</div>

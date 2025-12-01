@@ -48,6 +48,28 @@ import {
   Search,
 } from 'lucide-react';
 
+// Normaliza cadenas de fecha/hora a un formato parseable en todos los navegadores.
+// Acepta formatos tipo "YYYY-MM-DD HH:mm:ss" (los convierte a "YYYY-MM-DDTHH:mm:ss").
+// Si aún es inválido, intenta con sufijo Z como fallback.
+const parseDateTime = (s: string): Date => {
+  try {
+    if (!s) return new Date(NaN);
+    let str = s.trim();
+    if (/^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(:\d{2})?$/.test(str)) {
+      str = str.replace(' ', 'T');
+    }
+    const d = new Date(str);
+    if (!isNaN(d.getTime())) return d;
+    if (!/[zZ]|[+-]\d{2}:\d{2}$/.test(str)) {
+      const d2 = new Date(`${str}Z`);
+      if (!isNaN(d2.getTime())) return d2;
+    }
+    return new Date(str);
+  } catch {
+    return new Date(NaN);
+  }
+};
+
 type BookingViewProps = {
   user: {
     first_name?: string;
@@ -127,7 +149,8 @@ export default function BookingView({
 
   const calculateTimeRemaining = (startTime: string) => {
     const now = new Date();
-    const classStart = new Date(startTime);
+    const classStart = parseDateTime(startTime);
+    if (isNaN(classStart.getTime())) return 'Horario por definir';
     const diff = classStart.getTime() - now.getTime();
 
     if (diff <= 0) return 'La clase está en curso';
@@ -149,7 +172,7 @@ export default function BookingView({
     // Calcular la verdadera próxima asesoría: estados activos o aprobados ordenados por start_time
     const upcoming = [...classes]
       .filter(c => c.status === 'approved' || c.status === 'active')
-      .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
+      .sort((a, b) => parseDateTime(a.start_time).getTime() - parseDateTime(b.start_time).getTime());
 
     if (upcoming.length > 0) {
       setTimeRemaining(calculateTimeRemaining(upcoming[0].start_time));
@@ -166,14 +189,19 @@ export default function BookingView({
   useEffect(() => {
     const upcoming = [...classes]
       .filter(c => c.status === 'approved' || c.status === 'active')
-      .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
+      .sort((a, b) => parseDateTime(a.start_time).getTime() - parseDateTime(b.start_time).getTime());
 
     if (upcoming.length === 0) {
       setJoinEnabled(false);
       setJoinUnlockAt(null);
       return;
     }
-    const start = new Date(upcoming[0].start_time);
+    const start = parseDateTime(upcoming[0].start_time);
+    if (isNaN(start.getTime())) {
+      setJoinEnabled(false);
+      setJoinUnlockAt(null);
+      return;
+    }
     const unlock = new Date(start.getTime() - 15 * 60 * 1000);
     setJoinUnlockAt(unlock);
 
@@ -187,12 +215,12 @@ export default function BookingView({
   }, [classes]);
 
   const formatDate = (dateTimeStr: string) => {
-    const date = new Date(dateTimeStr);
+    const date = parseDateTime(dateTimeStr);
     return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
   };
 
   const formatTime = (dateTimeStr: string) => {
-    const date = new Date(dateTimeStr);
+    const date = parseDateTime(dateTimeStr);
     return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: true });
   };
 
@@ -362,7 +390,7 @@ export default function BookingView({
   // Separar clases por estado (próximas: 'active' y 'approved')
   const upcomingClasses = [...classes]
     .filter(c => c.status === 'approved' || c.status === 'active')
-    .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
+    .sort((a, b) => parseDateTime(a.start_time).getTime() - parseDateTime(b.start_time).getTime());
   const nextClass = upcomingClasses[0];
   const futureClasses = upcomingClasses.slice(1);
   const completedClasses = classes.filter(c => c.status === 'completed');
@@ -379,7 +407,11 @@ export default function BookingView({
 
   const handleJoinClass = (classLink?: string) => {
     if (!classLink) {
-      showError('Enlace de la clase no disponible.');
+      const when = joinUnlockAt ? joinUnlockAt.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : null;
+      showError(when
+        ? `El enlace aún no está disponible. Se activará alrededor de las ${when}.`
+        : 'El enlace aún no está disponible. Intenta de nuevo cerca del inicio.'
+      );
       return;
     }
     try {
@@ -464,8 +496,12 @@ export default function BookingView({
                       </button>
                       <button 
                         className="btn-unirse"
-                        disabled={!joinEnabled || !nextClass.class_link}
-                        title={!joinEnabled && joinUnlockAt ? `Disponible a las ${joinUnlockAt.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}` : undefined}
+                        disabled={!joinEnabled}
+                        title={
+                          !joinEnabled && joinUnlockAt
+                            ? `Disponible a las ${joinUnlockAt.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`
+                            : (!nextClass.class_link ? 'El enlace aún no está disponible; se activará al inicio' : undefined)
+                        }
                         onClick={() => handleJoinClass(nextClass.class_link)}
                       >
                         <Video size={16} />

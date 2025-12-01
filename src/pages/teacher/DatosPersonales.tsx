@@ -12,7 +12,7 @@ import LoadingOverlay from '../../components/shared/LoadingOverlay';
 export default function DocenteDatosPersonales() {
   const { user, setUser } = useAuthContext();
   const { updateUserName, loading, error } = useUpdateProfile();
-  const { getMyVideos, updateMyVideo } = useVideosApi();
+  const { getMyVideos, updateMyVideo, getMyVideoUrl } = useVideosApi();
   const navigate = useNavigate();
 
   const fullName = user ? `${user.first_name} ${user.last_name}`.trim() : '—';
@@ -92,26 +92,31 @@ export default function DocenteDatosPersonales() {
     return () => { cancelled = true; };
   }, [newId]);
 
-  // Load user videos on mount
+  // Load user video on mount (prefer single URL endpoint like Profile)
   useEffect(() => {
-    const loadVideos = async () => {
+    const load = async () => {
       setLoadingVideos(true);
       setVideoError(null);
-      const response = await getMyVideos();
-      if (response.success && response.data) {
-        setUserVideos(response.data);
-        // Set current video to the first one if exists
-        if (response.data.length > 0) {
-          setCurrentVideoUrl(response.data[0].original_url);
-          setCurrentVideoTitle(response.data[0].title);
+      try {
+        const single = await getMyVideoUrl();
+        if (single?.success && single.data) {
+          setCurrentVideoUrl(single.data.original_url);
+        } else {
+          const response = await getMyVideos();
+          if (response.success && response.data && response.data.length > 0) {
+            setUserVideos(response.data);
+            setCurrentVideoUrl(response.data[0].original_url);
+            setCurrentVideoTitle(response.data[0].title || '');
+          } else {
+            setVideoError(single?.message || response.message || 'No se pudo obtener el video');
+          }
         }
-      } else {
-        setVideoError(response.message);
+      } finally {
+        setLoadingVideos(false);
       }
-      setLoadingVideos(false);
     };
-    loadVideos();
-  }, []);
+    load();
+  }, [getMyVideoUrl, getMyVideos]);
 
   const handlePersonalDataSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

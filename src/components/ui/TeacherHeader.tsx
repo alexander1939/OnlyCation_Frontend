@@ -391,7 +391,7 @@ const TeacherHeader: React.FC<TeacherHeaderProps> = ({ user, onLogout }) => {
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
             borderRadius: '0 0 20px 20px',
             padding: '20px',
-            zIndex: 40,
+            zIndex: 120, // above catalog filters (101) and sticky headers (40)
             maxHeight: isMenuOpen ? '80vh' : '0',
             overflowY: 'auto',
             opacity: isMenuOpen ? 1 : 0,

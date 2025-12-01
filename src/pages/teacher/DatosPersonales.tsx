@@ -15,6 +15,16 @@ import LoadingOverlay from '../../components/shared/LoadingOverlay';
 let myVideoInfoPromise: Promise<{ original: string; embed: string } | null> | null = null;
 const SS_KEY_VIDEO_INFO = 'oc_my_video_info';
 
+// Parseo seguro para evitar errores por contenidos no-JSON (HTML, vacío, etc.)
+const safeParseJSON = <T = any>(raw: string | null): T | null => {
+  if (!raw || typeof raw !== 'string') return null;
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    return null;
+  }
+};
+
 export default function DocenteDatosPersonales() {
   const { user, setUser } = useAuthContext();
   const { updateUserName, loading, error } = useUpdateProfile();
@@ -77,8 +87,9 @@ export default function DocenteDatosPersonales() {
     try {
       const res = await fetch(`https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(watchUrl)}`);
       if (!res.ok) return null;
-      const j = await res.json();
-      return typeof j?.title === 'string' ? j.title : null;
+      const text = await res.text();
+      const j = safeParseJSON<{ title?: string }>(text);
+      return j && typeof j.title === 'string' ? j.title : null;
     } catch {
       return null;
     }
@@ -110,17 +121,14 @@ export default function DocenteDatosPersonales() {
 
     // 1) Cache en sessionStorage para evitar llamadas repetidas
     try {
-      const cachedRaw = sessionStorage.getItem(SS_KEY_VIDEO_INFO);
-      if (cachedRaw) {
-        const cached = JSON.parse(cachedRaw) as { original?: string; embed?: string };
-        if (cached && (cached.original || cached.embed)) {
-          setCurrentVideoUrl(cached.original || '');
-          setCurrentVideoEmbedUrl(cached.embed || '');
-          setLoadingVideos(false);
-          return () => { active = false; };
-        }
+      const cached = safeParseJSON<{ original?: string; embed?: string }>(sessionStorage.getItem(SS_KEY_VIDEO_INFO));
+      if (cached && (cached.original || cached.embed)) {
+        setCurrentVideoUrl(cached.original || '');
+        setCurrentVideoEmbedUrl(cached.embed || '');
+        setLoadingVideos(false);
+        return () => { active = false; };
       }
-    } catch { }
+    } catch {}
 
     if (!myVideoInfoPromise) {
       myVideoInfoPromise = (async () => {
@@ -130,11 +138,13 @@ export default function DocenteDatosPersonales() {
           // No usamos credentials para evitar duplicar con cookies; backend acepta Bearer
         });
         if (!res.ok) throw new Error('No se pudo obtener el video');
-        const j = await res.json();
+        const text = await res.text();
+        const j = safeParseJSON<any>(text);
+        if (!j || typeof j !== 'object') return null;
         const original = j?.data?.original_url || '';
         const embed = j?.data?.embed_url || '';
         if (!original && !embed) return null;
-        try { sessionStorage.setItem(SS_KEY_VIDEO_INFO, JSON.stringify({ original, embed })); } catch { }
+        try { sessionStorage.setItem(SS_KEY_VIDEO_INFO, JSON.stringify({ original, embed })); } catch {}
         return { original, embed };
       })();
     }
@@ -263,7 +273,13 @@ export default function DocenteDatosPersonales() {
           original: response.data.data.original_url,
           embed: response.data.data.embed_url || ''
         }));
-      } catch { }
+      } catch {}
+
+      // Refresca la promesa global con el nuevo valor para que otras monturas lo lean sin re-fetch
+      myVideoInfoPromise = Promise.resolve({
+        original: response.data.data.original_url,
+        embed: response.data.data.embed_url || ''
+      });
 
       // Show success message
       setVideoError(null);

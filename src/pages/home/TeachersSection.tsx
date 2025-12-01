@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTeachersContext } from '../../context/teachers/TeachersContext';
 import '../../styles/teacher-catalog.css';
 
@@ -17,6 +17,7 @@ type TeacherItem = {
 
 const TeachersSection: React.FC = () => {
   const { teachers, loading, getTeachers } = useTeachersContext();
+  const navigate = useNavigate();
   const [showVideo, setShowVideo] = useState(false);
   const [videoEmbed, setVideoEmbed] = useState<string>('');
 
@@ -127,8 +128,7 @@ const TeachersSection: React.FC = () => {
   };
 
   const handleCardClick = (teacherId: string) => {
-    console.log('Navigate to teacher profile:', teacherId);
-    // TODO: Navegar al perfil del profesor
+    navigate(`/teachers/${teacherId}`);
   };
 
   return (
@@ -194,7 +194,7 @@ const TeachersSection: React.FC = () => {
                       </div>
                       <Link 
                         className="link-profile"
-                        to={`/catalog/teachers/${t.id}`}
+                        to={`/teachers/${t.id}`}
                         onClick={(e) => {
                           e.preventDefault();
                           handleCardClick(t.id);

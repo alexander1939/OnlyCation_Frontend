@@ -5,20 +5,27 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/auth';
 import { useUpdateProfile } from '../../hooks/auth/useUpdateProfile';
 import { useVideosApi } from '../../hooks/videos/useVideosApi';
+import { useAuthToken } from '../../hooks/auth/useAuthToken';
 import type { VideoData } from '../../context/videos/types';
 import '../../styles/docente-datos.css';
 import LoadingOverlay from '../../components/shared/LoadingOverlay';
+
+// Evita peticiones duplicadas (StrictMode monta/desmonta dos veces en dev):
+// compartimos la misma promesa entre montajes para que solo haya 1 request real.
+let myVideoInfoPromise: Promise<{ original: string; embed: string } | null> | null = null;
 
 export default function DocenteDatosPersonales() {
   const { user, setUser } = useAuthContext();
   const { updateUserName, loading, error } = useUpdateProfile();
   const { updateMyVideo } = useVideosApi();
   const navigate = useNavigate();
+  const { getAccessToken } = useAuthToken();
 
   const fullName = user ? `${user.first_name} ${user.last_name}`.trim() : '—';
   const [firstName, setFirstName] = useState<string>(user?.first_name ?? '');
   const [lastName, setLastName] = useState<string>(user?.last_name ?? '');
   const [currentVideoUrl, setCurrentVideoUrl] = useState<string>('');
+  const [currentVideoEmbedUrl, setCurrentVideoEmbedUrl] = useState<string>('');
   const [newVideoUrl, setNewVideoUrl] = useState<string>('');
   const [showCurrentPreview, setShowCurrentPreview] = useState(false);
   const [showNewPreview, setShowNewPreview] = useState(false);
@@ -56,6 +63,7 @@ export default function DocenteDatosPersonales() {
   const newThumb = newId ? `https://img.youtube.com/vi/${newId}/sddefault.jpg` : '';
   const currentEmbed = currentId ? `https://www.youtube.com/embed/${currentId}` : '';
   const newEmbed = newId ? `https://www.youtube.com/embed/${newId}` : '';
+  const currentEmbedFinal = currentVideoEmbedUrl || currentEmbed;
 
   const fetchYouTubeTitle = async (watchUrl: string): Promise<string | null> => {
     try {
@@ -84,30 +92,50 @@ export default function DocenteDatosPersonales() {
     return () => { cancelled = true; };
   }, [newId]);
 
+  // Cargar el video una sola vez y compartir la promesa entre montajes
   useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      setLoadingVideos(true);
-      setVideoError(null);
-      try {
-        const res = await fetch('/api/videos/my-video-url/', { credentials: 'include' });
+    let active = true;
+    setLoadingVideos(true);
+    setVideoError(null);
+    const token = getAccessToken();
+    const endpoint = `/api/videos/my-video-url/`;
+
+    if (!myVideoInfoPromise) {
+      myVideoInfoPromise = (async () => {
+        const res = await fetch(endpoint, {
+          method: 'GET',
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+          // No usamos credentials para evitar duplicar con cookies; backend acepta Bearer
+        });
         if (!res.ok) throw new Error('No se pudo obtener el video');
         const j = await res.json();
-        if (cancelled) return;
-        const url = j?.data?.original_url;
-        if (typeof url === 'string' && url.length > 0) {
-          setCurrentVideoUrl(url);
+        const original = j?.data?.original_url || '';
+        const embed = j?.data?.embed_url || '';
+        if (!original && !embed) return null;
+        return { original, embed };
+      })();
+    }
+
+    myVideoInfoPromise
+      .then((info) => {
+        if (!active) return;
+        if (info) {
+          setCurrentVideoUrl(info.original || '');
+          setCurrentVideoEmbedUrl(info.embed || '');
         } else {
-          setVideoError(j?.message || 'No hay video configurado');
+          setVideoError('No hay video configurado');
         }
-      } catch (e: any) {
-        if (!cancelled) setVideoError(e?.message || 'Error al obtener el video');
-      } finally {
-        if (!cancelled) setLoadingVideos(false);
-      }
-    };
-    load();
-    return () => { cancelled = true; };
+      })
+      .catch((e: any) => {
+        if (!active) return;
+        setVideoError(e?.message || 'Error al obtener el video');
+      })
+      .finally(() => {
+        if (!active) return;
+        setLoadingVideos(false);
+      });
+
+    return () => { active = false; };
   }, []);
 
   const handlePersonalDataSubmit = async (e: React.FormEvent) => {
@@ -337,7 +365,7 @@ export default function DocenteDatosPersonales() {
                       </button>
                     ) : (
                       <div className="datos-embed-wrap">
-                        <iframe src={`${currentEmbed}?autoplay=1`} title="Video actual" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+                        <iframe src={`${currentEmbedFinal}?autoplay=1`} title="Video actual" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
                       </div>
                     )}
                   </div>

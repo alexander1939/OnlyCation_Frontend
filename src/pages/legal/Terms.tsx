@@ -1,21 +1,37 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Terms: React.FC = () => {
+  const navigate = useNavigate();
+  const handleBack = () => {
+    try {
+      if (window.history.length > 1) navigate(-1);
+      else navigate('/login');
+    } catch {
+      navigate('/login');
+    }
+  };
+
   return (
     <div className="w-full" style={{margin: 0, padding: 0}}>
       <main style={{paddingTop: '120px', paddingBottom: '64px'}}>
-        <div className="max-w-4xl mx-auto px-8 md:px-12 lg:px-16" style={{padding:502}}>
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 md:px-8">
+          <div className="mb-4 sm:mb-6">
+            <button onClick={handleBack} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white" style={{ backgroundColor: '#68B2C9' }}>
+              ← Volver
+            </button>
+          </div>
           <div className="text-center mb-12">
-            <h1 className="text-5xl font-bold mb-6" style={{color: '#294954'}}>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6" style={{color: '#294954'}}>
               Términos y Condiciones
             </h1>
-            <p className="text-xl" style={{color: '#6B7280'}}>
+            <p className="text-base sm:text-lg" style={{color: '#6B7280'}}>
               Términos de servicio de OnlyCation
             </p>
             <div className="w-24 h-1 rounded-full mx-auto mt-6" style={{backgroundColor: '#68B2C9'}}></div>
           </div>
           
-          <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 lg:p-16" style={{border: '1px solid #E5E7EB', margin: '0 16px'}}>
+          <div className="bg-white rounded-3xl shadow-xl p-4 sm:p-6 md:p-10" style={{border: '1px solid #E5E7EB', margin: '0 8px'}}>
             <div className="prose max-w-none">
               
               <section className="mb-12">

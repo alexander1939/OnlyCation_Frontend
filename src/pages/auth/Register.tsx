@@ -35,6 +35,26 @@ function Register() {
   const navigate = useNavigate();
   const { registerStudent, registerTeacher } = useRegisterAuthContext();
 
+  // Persist UI state so returning from Terms/Privacy keeps the same selection
+  const UI_STORAGE_KEY = 'register_ui_state';
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(UI_STORAGE_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw) as { userType?: UserType; showForm?: boolean };
+        if (saved.userType === 'student' || saved.userType === 'teacher') {
+          setUserType(saved.userType);
+          setShowForm(Boolean(saved.showForm));
+        }
+      }
+    } catch {}
+  }, []);
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(UI_STORAGE_KEY, JSON.stringify({ userType, showForm }));
+    } catch {}
+  }, [userType, showForm]);
+
   // Visibilidad para animar el título y subtítulo al montar
   const [isVisible, setIsVisible] = useState(false);
   useEffect(() => {
@@ -93,6 +113,12 @@ function Register() {
       if (response.success) {
         setRegisteredUser({ email: registerData.email, first_name: registerData.first_name, last_name: registerData.last_name });
         setSuccess(true);
+        // Limpiar datos persistidos tras registro exitoso
+        try {
+          sessionStorage.removeItem('register_form_student');
+          sessionStorage.removeItem('register_form_teacher');
+          sessionStorage.removeItem(UI_STORAGE_KEY);
+        } catch {}
       }
     } catch (error: any) {
       setError(error.message || `Error al registrar ${userType === 'student' ? 'estudiante' : 'docente'}`);

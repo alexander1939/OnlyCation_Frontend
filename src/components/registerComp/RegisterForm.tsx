@@ -597,9 +597,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ userType, onSubmit, isLoadi
             lineHeight: '1.5',
             fontFamily: 'Inter, sans-serif'
           }}>
-            Acepto la <Link to="/privacy" style={{ color: '#68B2C9', textDecoration: 'underline' }}>
+            Acepto la <Link to="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#68B2C9', textDecoration: 'underline' }}>
               política de privacidad
-            </Link> y los <Link to="/terms" style={{ color: '#68B2C9', textDecoration: 'underline' }}>
+            </Link> y los <Link to="/terms" target="_blank" rel="noopener noreferrer" style={{ color: '#68B2C9', textDecoration: 'underline' }}>
               términos de servicio
             </Link> de OnlyCation *
           </label>

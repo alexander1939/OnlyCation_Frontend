@@ -408,7 +408,7 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({ user, onLogout }) => {
             transition: 'all 300ms ease',
             pointerEvents: isMenuOpen ? 'auto' : 'none',
             WebkitOverflowScrolling: 'touch',
-            zIndex: 40
+            zIndex: 120 // above catalog filters (101) and sticky headers (40)
           }}
         >
           <nav className="flex flex-col" style={{ gap: '0', maxWidth: '600px', margin: '0 auto' }}>

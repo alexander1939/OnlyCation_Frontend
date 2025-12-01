@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import Header from '../../components/ui/Header';
 import Footer from '../../components/ui/Footer';
 import DispAgenda from '../../components/DispAgenda';
@@ -94,9 +94,13 @@ const AgendaContent: React.FC = () => {
     setLoading(false);
   }, [fetchAvailabilityList, loadFromAgenda]);
 
+  // Evitar doble carga en recarga o montajes repetidos (dev/HMR)
+  const loadedOnceRef = useRef(false);
   React.useEffect(() => {
+    if (loadedOnceRef.current) return;
+    loadedOnceRef.current = true;
     loadAvailabilities();
-  }, []);
+  }, [loadAvailabilities]);
 
   const handleAvailabilityAdded = React.useCallback(() => {
     console.log('✅ Disponibilidad agregada, recargando agenda...');

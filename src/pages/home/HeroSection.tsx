@@ -1,6 +1,8 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const HeroSection: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <section className="w-full snap-start" style={{backgroundColor: '#FAF9F5'}}>
       <div className="max-w-[1600px] py-[100px] mx-auto px-4 h-full flex items-center">
@@ -16,7 +18,7 @@ const HeroSection: React.FC = () => {
               El destino final para todos los educadores. Sumérgete en un mundo de aventuras educacionales, acción, desarrollo y emoción sin límites.
             </p>
             
-            <button className="text-[18px] font-semibold tracking-[0.5px] self-start transition-colors" style={{marginLeft: '40px', marginTop: '20px', backgroundColor: '#294954', color: '#FAF9F5', padding: '10px', borderRadius: '20px', border: '2px solid #294954', fontFamily: 'Roboto, sans-serif'}} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1e3a42'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#294954'}>
+            <button className="text-[18px] font-semibold tracking-[0.5px] self-start transition-colors" style={{marginLeft: '40px', marginTop: '20px', backgroundColor: '#294954', color: '#FAF9F5', padding: '10px', borderRadius: '20px', border: '2px solid #294954', fontFamily: 'Roboto, sans-serif'}} onClick={() => navigate('/catalog/teachers')} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1e3a42'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#294954'}>
               Descubre ahora
             </button>
           </div>

@@ -1,6 +1,8 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const CallToActionSections: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <>
       {/* Sección Quiero ser docente */}
@@ -44,7 +46,7 @@ const CallToActionSections: React.FC = () => {
                 {/* Botón Ver más centrado */}
                 <div className="text-center">
                   <button 
-                    onClick={() => window.location.href = '/ver-mas'}
+                    onClick={() => navigate('/be-teacher')}
                     className="text-[18px] font-semibold tracking-[0.5px] transition-colors" 
                     style={{
                       backgroundColor: '#294954', 
@@ -99,7 +101,7 @@ const CallToActionSections: React.FC = () => {
                 {/* Botón Ver más centrado */}
                 <div className="text-center">
                   <button 
-                    onClick={() => window.location.href = '/estudiante'}
+                    onClick={() => navigate('/register')}
                     className="text-[18px] font-semibold tracking-[0.5px] transition-colors" 
                     style={{
                       backgroundColor: '#294954', 

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import '../styles/docente-agenda.css';
 import { useSchedule } from '../context/availability/ScheduleContext';
 import type { DayKey } from '../context/availability/ScheduleContext';
@@ -15,6 +15,29 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityA
   const { deleteAvailability, createAvailability, fetchWeeklyAgenda } = useAgendaApi();
   const { showSuccess, showError, showWarning } = useNotificationContext();
   const weekKeys = useMemo<DayKey[]>(() => ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'], []);
+
+  // Mobile-only collapse/expand per day (no changes on desktop)
+  const [isMobile, setIsMobile] = useState<boolean>(typeof window !== 'undefined' ? window.innerWidth <= 768 : false);
+  const [expandedDays, setExpandedDays] = useState<Record<DayKey, boolean>>({} as Record<DayKey, boolean>);
+
+  React.useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  React.useEffect(() => {
+    // Initialize keys to collapsed by default on mobile
+    setExpandedDays(prev => {
+      const next: Record<DayKey, boolean> = { ...prev } as Record<DayKey, boolean>;
+      weekKeys.forEach(k => { if (typeof next[k] === 'undefined') next[k] = false; });
+      return next;
+    });
+  }, [weekKeys]);
+
+  const toggleDayPanel = (day: DayKey) => {
+    setExpandedDays(prev => ({ ...prev, [day]: !prev[day] }));
+  };
 
   // Modal local state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -209,7 +232,28 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityA
           return (
             <div key={key} className={`agenda-day ${!isEnabled ? 'agenda-day-disabled' : ''}`}>
               <div className="agenda-day-header">
-                <div className="agenda-day-name">{dayLabels[key]}</div>
+                <div className="agenda-day-name" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span>{dayLabels[key]}</span>
+                  {isMobile && (
+                    <button
+                      type="button"
+                      aria-label={expandedDays[key] ? 'Ocultar horarios' : 'Mostrar horarios'}
+                      onClick={() => toggleDayPanel(key)}
+                      style={{
+                        marginLeft: 8,
+                        border: '1px solid rgba(104,178,201,.35)',
+                        borderRadius: 8,
+                        background: 'transparent',
+                        padding: '2px 8px',
+                        color: '#294954',
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {expandedDays[key] ? '▲' : '☰'}
+                    </button>
+                  )}
+                </div>
                 <button
                   className={`day-toggle ${isEnabled ? 'day-toggle-active' : ''}`}
                   onClick={() => handleToggleDay(key)}
@@ -223,27 +267,30 @@ const AvailabilityConfig: React.FC<AvailabilityConfigProps> = ({ onAvailabilityA
                 <div className="agenda-disabled-message">Día deshabilitado</div>
               ) : (
                 <>
-                  <div className="agenda-slots">
-                    {slots[key].map((slot) => {
-                      const dayIndex = dayKeyToIndex[key];
-                      const hasBooking = availableSlots.some(s => s.isBooked && s.start.getDay() === dayIndex);
-                      return (
-                        <div key={slot.id} className={`agenda-chip ${hasBooking ? 'has-booking' : ''}`}>
-                          <span>{slot.hour} {hasBooking ? '🔒' : ''}</span>
-                          <button
-                            aria-label="remove"
-                            className="chip-remove"
-                            onClick={() => handleRemove(key, slot.id)}
-                            title={hasBooking ? 'Esta hora tiene clases reservadas' : 'Eliminar hora'}
-                          >
-                            ×
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <button className="agenda-add" onClick={() => openAddModal(key)}>+ Agregar horario</button>
+                  {(!isMobile || expandedDays[key]) && (
+                    <>
+                      <div className="agenda-slots">
+                        {slots[key].map((slot) => {
+                          const dayIndex = dayKeyToIndex[key];
+                          const hasBooking = availableSlots.some(s => s.isBooked && s.start.getDay() === dayIndex);
+                          return (
+                            <div key={slot.id} className={`agenda-chip ${hasBooking ? 'has-booking' : ''}`}>
+                              <span>{slot.hour} {hasBooking ? '🔒' : ''}</span>
+                              <button
+                                aria-label="remove"
+                                className="chip-remove"
+                                onClick={() => handleRemove(key, slot.id)}
+                                title={hasBooking ? 'Esta hora tiene clases reservadas' : 'Eliminar hora'}
+                              >
+                                ×
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <button className="agenda-add" onClick={() => openAddModal(key)}>+ Agregar horario</button>
+                    </>
+                  )}
                 </>
               )}
             </div>

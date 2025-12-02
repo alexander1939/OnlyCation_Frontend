@@ -445,4 +445,18 @@
   .stat-label {
     font-size: 0.6rem;
   }
+  
+  /* In week-view grid, replace 'Ocupado' text with 'X' on mobile only */
+  .week-view .time-slot.booked .student-name {
+    font-size: 0; /* hide original text */
+    line-height: 0;
+  }
+  .week-view .time-slot.booked .student-name::after {
+    content: 'X';
+    font-size: 1rem;
+    line-height: 1;
+    font-weight: 800;
+    color: inherit; /* keep contrast on booked cell */
+    display: inline-block;
+  }
 }

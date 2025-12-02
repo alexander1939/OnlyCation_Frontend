@@ -262,7 +262,11 @@ export default function PublicTeacherProfile() {
                   <article key={r.id} className="review-card">
                     <div className="review-top">
                       <div className="review-user">
-                        <div className="review-avatar" style={{ background: '#E5E7EB', width: 40, height: 40, borderRadius: '50%' }} />
+                        <div className="review-avatar">
+                          <span className="review-avatar-initials">
+                            {(r.student_name?.trim()?.[0] || 'U').toUpperCase()}
+                          </span>
+                        </div>
                         <div>
                           <p className="review-name">{r.student_name}</p>
                           <p className="review-date">{new Date(r.created_at).toLocaleString()}</p>

@@ -206,24 +206,6 @@ const TeacherHome: React.FC = () => {
 
       </div>
       <Footer />
-      <div style={{ position: "fixed", right: 16, bottom: 16, zIndex: 50 }}>
-        <HintBadge text="Tutorial de ayuda" intervalMs={20000} showDurationMs={15000} offsetY={40}>
-          <button
-            style={{
-              background: "#294954",
-              color: "#fff",
-              border: "none",
-              borderRadius: "9999px",
-              padding: "10px 14px",
-              boxShadow: "0 6px 14px rgba(41,73,84,0.22)",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            ¿Necesitas ayuda?
-          </button>
-        </HintBadge>
-      </div>
       <LoadingOverlay
         open={Boolean(walletLoading || walletCreating)}
         message="Preparando tu experiencia..."

@@ -1,4 +1,5 @@
 /* Nuevo diseño de asesorías */
+
 .asesorias-container {
   max-width: 1100px;
   margin: 0 auto;
@@ -152,6 +153,30 @@
   background: #d1d5db;
   transform: none;
   box-shadow: none;
+}
+
+/* Importante (ayuda) - botón que abre el carrusel */
+.btn-important-help {
+  background: #f59e0b;
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.btn-important-help:hover {
+  background: #e49a0a;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(245, 158, 11, 0.35);
 }
 
 /* Secciones de lista */
@@ -539,6 +564,15 @@
   .btn-unirse {
     flex: 1;
     justify-content: center;
+  }
+
+  /* En móvil el botón de ayuda baja a una nueva fila y crece un poco */
+  .btn-important-help {
+    flex-basis: 100%;
+    margin-left: 0;
+    margin-top: 8px;
+    padding: 12px 16px;
+    font-size: 1rem;
   }
 
   .asesoria-item {

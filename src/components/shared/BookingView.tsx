@@ -48,9 +48,10 @@ import {
   LineChart,
   Search,
 } from 'lucide-react';
+import CarouselModalButton from '../ui/CarouselModalButton';
 
 // Normaliza cadenas de fecha/hora a un formato parseable en todos los navegadores.
-// Acepta formatos tipo "YYYY-MM-DD HH:mm:ss" (los convierte a "YYYY-MM-DDTHH:mm:ss").
+// Acepta formatos tipo "YYYY-MM-DD HH:mm:ss" (los convierten a "YYYY-MM-DDTHH:mm:ss").
 // Si aún es inválido, intenta con sufijo Z como fallback.
 const parseDateTime = (s: string): Date => {
   try {
@@ -440,6 +441,35 @@ export default function BookingView({
     alert(`Confirmar asistencia para reserva ${bookingId}`);
   };
 
+  // Slides del carrusel de ayuda para "Clases Asistidas"
+  const assistedHelpSlides = useMemo(() => [
+    {
+      src: '/1-Inicio-confirmacion.jpeg',
+      alt: 'Paso 1: Inicio de confirmación',
+      caption: '1. En el apartado de "Confirmables ahora" verás las clases pendientes por confirmar, haz click en "Confirmar ahora" para abrir el modal y cargar tus evidencias.'
+    },
+    {
+      src: '/2-modal-evidencias.jpeg',
+      alt: 'Paso 2: Abrir modal de evidencias',
+      caption: '2. Una vez abierto el modal hay dos campos que debes completar: "Descripción" y "Evidencia".'
+    },
+    {
+      src: '/3-rellenar-campos-evidencias.jpeg',
+      alt: 'Paso 3: Rellenar campos y adjuntar evidencias',
+      caption: '3. Adjunta tu archivo de evidencia e ingresa una breve descripción de la clase.'
+    },
+    {
+      src: '/4-Enviar-confirmacion.jpeg',
+      alt: 'Paso 4: Enviar confirmación',
+      caption: '4. Una vez presiones "Enviar confirmación" te preguntarás si deseas enviar la confirmación, presiona "Sí" para enviarla.'
+    },
+    {
+      src: '/5-Confirmacion-realizada.jpeg',
+      alt: 'Paso 5: Confirmación realizada',
+      caption: '5. Si seguiste los pasos anteriores tu confirmación de debio haber realizado exitosamente'
+    }
+  ], []);
+
   return (
     <div className="min-h-screen flex flex-col page-container">
       <Header />
@@ -584,7 +614,7 @@ export default function BookingView({
 
               {/* Botón Ver todas */}
               {showViewAllButton && (upcomingClasses.length > 0 || completedClasses.length > 0) && (
-                <div style={{ marginTop: '32px', textAlign: 'center' }}>
+                <div style={{ marginTop: '32px', marginBottom: '20px', textAlign: 'center' }}>
                   <Link to={allBookingsPath} className="view-all-btn-header" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
                     <ClipboardList size={16} />
                     Ver todas las reservas
@@ -593,8 +623,15 @@ export default function BookingView({
               )}
 
               {/* CLASES ASISTIDAS */}
-              <div className="asesorias-section">
-                <h2 className="asesorias-section-title">Clases Asistidas</h2>
+              <div className="asesorias-section" style={{ marginTop: 40 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, marginBottom: 10 }}>
+                  <h2 className="asesorias-section-title" style={{ margin: 0 }}>Clases Asistidas</h2>
+                  <CarouselModalButton
+                    label="Como confirmar reservas"
+                    slides={assistedHelpSlides}
+                    buttonStyle={{ padding: '8px 12px', borderRadius: 10, fontWeight: 600, background: '#294954' }}
+                  />
+                </div>
 
                 {/* Confirmables ahora (según rol) */}
                 {(user?.role === 'teacher' || user?.role === 'student') && (

@@ -7,6 +7,7 @@ import { useCreateBookingContext } from '../../context/booking';
 import { useAuthToken } from '../../hooks/auth/useAuthToken';
 import type { TimeSlot } from '../../context/availability/types';
 import { useNavigate } from 'react-router-dom';
+import { useNotificationContext } from '../NotificationProvider';
 
 export interface PublicTeacherInfo {
   name: string;
@@ -66,6 +67,7 @@ export default function PublicBookLessonModal({ isOpen, onClose, teacherId, teac
   } = useCreateBookingContext();
   const { getAccessToken } = useAuthToken();
   const navigate = useNavigate();
+  const { showWarning } = useNotificationContext();
 
   const [visibleMonth, setVisibleMonth] = useState<Date>(() => {
     const today = new Date();
@@ -335,7 +337,7 @@ export default function PublicBookLessonModal({ isOpen, onClose, teacherId, teac
     setValidationError(null);
     const token = getAccessToken();
     if (!token) {
-      alert('Debes iniciar sesión para reservar.');
+      showWarning('Debes iniciar sesión para reservar.', 5000);
       onClose();
       navigate('/login');
       return;

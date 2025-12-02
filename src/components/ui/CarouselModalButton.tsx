@@ -17,6 +17,7 @@ export interface CarouselModalButtonProps {
   slides: CarouselSlide[];
   initialIndex?: number;
   buttonStyle?: React.CSSProperties;
+  buttonClassName?: string;
   onOpen?: () => void;
   onClose?: () => void;
 }
@@ -38,6 +39,7 @@ const CarouselModalButton: React.FC<CarouselModalButtonProps> = ({
   slides,
   initialIndex = 0,
   buttonStyle,
+  buttonClassName,
   onOpen,
   onClose,
 }) => {
@@ -84,9 +86,13 @@ const CarouselModalButton: React.FC<CarouselModalButtonProps> = ({
   // Avoid SSR issues with portals (Vite dev ok, but guard anyway)
   const portalRoot = typeof document !== 'undefined' ? document.body : null;
 
+  const computedBtnStyle: React.CSSProperties = buttonClassName
+    ? (buttonStyle || {})
+    : { ...defaultBtnStyle, ...buttonStyle };
+
   return (
     <>
-      <button onClick={openModal} style={{ ...defaultBtnStyle, ...buttonStyle }}>
+      <button onClick={openModal} className={buttonClassName} style={computedBtnStyle}>
         {label}
       </button>
 

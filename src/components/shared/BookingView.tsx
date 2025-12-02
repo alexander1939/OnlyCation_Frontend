@@ -548,6 +548,11 @@ export default function BookingView({
                         <Video size={16} />
                         {joinFetching ? 'Entrando…' : 'Unirse a la llamada'}
                       </button>
+                      <CarouselModalButton
+                        label="⚠ Importante"
+                        slides={assistedHelpSlides}
+                        buttonClassName="btn-important-help"
+                      />
                     </div>
                   </div>
                 ) : (

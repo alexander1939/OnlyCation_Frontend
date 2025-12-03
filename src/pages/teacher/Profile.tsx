@@ -14,7 +14,6 @@ import { Play, Star, BadgeDollarSign } from 'lucide-react';
 import '../../styles/docente-general.css';
 import '../../styles/docente-profile.css';
 import '../../styles/prices.css';
-import ScheduleButton from '../../components/booking/ScheduleButton';
 import { PriceAvailabilityProvider, usePriceAvailabilityContext } from '../../context/catalogs/PriceAvailabilityContext';
 import { useNotificationContext } from '../../components/NotificationProvider';
 import ConfirmDialog from '../../components/shared/ConfirmDialog';
@@ -476,7 +475,7 @@ function PriceEditSection() {
         <div style={{ display: 'flex', gap: 12, alignItems: 'baseline' }}>
           <div className="stat" style={{ margin: 0 }}>
             <BadgeDollarSign color="#68B2C9" width={20} height={20} />
-            <span className="stat-value">${myPrice ?? '—'}</span>
+            <span className="stat-value">${myPrice || '—'}</span>
             <span className="stat-label">/ hora</span>
           </div>
           {availError && <span className="text-red-600 text-sm">{availError}</span>}
@@ -705,15 +704,7 @@ export default function DocenteProfile() {
                         <div className="avail-card" style={{ marginTop: 12 }}>
                           <WeeklyAgendaProvider>
                             <DispAgenda />
-                            <ScheduleButton 
-                              teacher={{ 
-                                name: fullName, 
-                                subject: profile.subject, 
-                                level: profile.level, 
-                                hourlyRate: profile.hourlyRate,
-                                rating: profile.rating
-                              }} 
-                            />
+                            {/* 'Agendar' button removed on /teacher/profile */}
                           </WeeklyAgendaProvider>
                         </div>
 

@@ -45,7 +45,7 @@ const LoginForm: React.FC<Props> = ({ onSubmit, isLoading = false }) => {
         <input
           type="email"
           className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 transition ${
-            emailError ? "border-red-500 focus:ring-red-300" : "border-gray-300 focus:ring-sky-blue"
+            emailError ? "border-red-500 focus:ring-red-300 input-error" : "border-gray-300 focus:ring-sky-blue"
           }`}
           value={email}
           onChange={(e) => {
@@ -58,7 +58,7 @@ const LoginForm: React.FC<Props> = ({ onSubmit, isLoading = false }) => {
           required
         />
         {emailError && (
-          <p className="text-red-500 text-xs mt-1">{emailError}</p>
+          <p className="field-error">{emailError}</p>
         )}
       </div>
 

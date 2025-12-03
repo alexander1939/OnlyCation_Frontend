@@ -49,7 +49,24 @@
 .login-page .login-card-right label{font-family:'Roboto',sans-serif;font-size:0.9rem;font-weight:500;color:#0f172a;} 
 /* --- 🔹 Responsividad agregada 🔹 --- */ 
 @media(max-width:900px){.login-page .login-card{max-width:95%;flex-direction:column;border-radius:1.5rem;}.login-page .login-card-left{display:none;}.login-page .login-card-right{padding:2rem 1.5rem;}} 
-@media(max-width:600px){.login-page .login-card-right{padding:1.5rem 1rem;}.login-page .login-card-right input,.login-page .login-card-right button{font-size:0.9rem;}.login-page .login-card-right .info-text,.login-page .login-card-right .login-link{font-size:0.8rem;}}
+@media(max-width:600px){.login-page .login-card-right{padding:1.5rem 1rem;}.login-page .login-card-right input,.login-page .login-card-right button{font-size:0.9rem;}.login-page .login-card-right .info-text,.login-page .login-card-right .login-link{font-size:0.8rem;}} 
+
+/* Inline field error for email (LoginForm) */
+.login-page .login-card-right .field-error{
+  color:#dc2626; /* red-600 */
+  font-size:0.75rem; /* 12px similar to text-xs */
+  margin-top:0.25rem;
+}
+
+/* Force input error border and subtle ring */
+.login-page .login-card-right input.input-error{
+  border-color:#dc2626 !important;
+  box-shadow:0 0 0 3px rgba(220,38,38,0.18);
+}
+.login-page .login-card-right input.input-error:focus{
+  border-color:#dc2626 !important;
+  box-shadow:0 0 0 3px rgba(220,38,38,0.28);
+}
 
 /* --- Volver al inicio (pill) --- */
 .login-page .login-card-right .back-home{position:absolute;top:12px;left:12px;z-index:5;}

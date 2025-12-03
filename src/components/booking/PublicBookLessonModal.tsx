@@ -73,7 +73,11 @@ export default function PublicBookLessonModal({ isOpen, onClose, teacherId, teac
     const today = new Date();
     return new Date(today.getFullYear(), today.getMonth(), 1);
   });
-  const [focusedDate, setFocusedDate] = useState<Date | null>(null);
+  const [focusedDate, setFocusedDate] = useState<Date | null>(() => {
+    const t = new Date();
+    t.setHours(0, 0, 0, 0);
+    return t;
+  });
   const [selectedByDate, setSelectedByDate] = useState<Record<string, Set<string>>>({});
 
   // Disponibilidad local (prop + lo que se cargue por mes)
@@ -441,6 +445,15 @@ export default function PublicBookLessonModal({ isOpen, onClose, teacherId, teac
     return () => {
       document.body.style.overflow = original;
     };
+  }, [isOpen]);
+
+  // Al abrir el modal, forzar que el mes visible sea el actual y la fecha enfocada sea hoy
+  useEffect(() => {
+    if (!isOpen) return;
+    const t = new Date();
+    t.setHours(0, 0, 0, 0);
+    setVisibleMonth(new Date(t.getFullYear(), t.getMonth(), 1));
+    setFocusedDate(t);
   }, [isOpen]);
 
   // Formatear política de precios en español

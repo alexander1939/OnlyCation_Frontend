@@ -41,6 +41,26 @@ const AgendaPage: React.FC = () => {
     };
   }, [logout, navigate]);
 
+  // Route-specific modal: must acknowledge importance of completing wallet setup.
+  const [showWalletModal, setShowWalletModal] = React.useState<boolean>(true);
+  const [secondsLeft, setSecondsLeft] = React.useState<number>(5);
+
+  React.useEffect(() => {
+    // Show modal on mount and start 5s countdown for the OK button
+    setShowWalletModal(true);
+    setSecondsLeft(5);
+    const id = window.setInterval(() => {
+      setSecondsLeft((prev) => {
+        if (prev <= 1) {
+          window.clearInterval(id);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, []);
+
   return (
     <div className="agenda-page agenda-container">
       <div className="agenda-wrap">
@@ -115,6 +135,61 @@ const AgendaPage: React.FC = () => {
       <div className="onboarding-mascot">
         <img src="/Activar_cuenta.png" alt="activar cuenta" />
       </div>
+      {showWalletModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="wallet-modal-title"
+          aria-describedby="wallet-modal-desc"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: 16,
+          }}
+        >
+          <div
+            style={{
+              background: '#fff',
+              borderRadius: 16,
+              border: '1px solid rgba(104,178,201,0.25)',
+              boxShadow: '0 14px 44px rgba(41,73,84,0.25)',
+              width: '100%',
+              maxWidth: 520,
+              padding: 20,
+            }}
+          >
+            <h2 id="wallet-modal-title" style={{ margin: 0, color: '#294954', fontWeight: 800, fontSize: 20 }}>
+              Completa este paso
+            </h2>
+            <p id="wallet-modal-desc" style={{ color: '#35586a', lineHeight: 1.6, marginTop: 10 }}>
+              Es importante completar la configuración de tu cartera (Stripe Connect) para gestionar tus ingresos en la plataforma y poder retirarlos a tu tarjeta o cuenta bancaria.
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 16 }}>
+              <button
+                type="button"
+                disabled={secondsLeft > 0}
+                onClick={() => setShowWalletModal(false)}
+                style={{
+                  padding: '10px 16px',
+                  borderRadius: 10,
+                  fontWeight: 700,
+                  border: '1px solid rgba(104,178,201,0.35)',
+                  background: secondsLeft > 0 ? '#f3f4f6' : '#68B2C9',
+                  color: secondsLeft > 0 ? '#9ca3af' : '#FAF9F5',
+                  cursor: secondsLeft > 0 ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {secondsLeft > 0 ? `OK (${secondsLeft})` : 'OK'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

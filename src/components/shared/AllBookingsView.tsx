@@ -283,15 +283,6 @@ export default function AllBookingsView({
                 >
                   <div className="clase-top">
                     <span className="clase-fecha">{formatDateTimeRange(clase.start_time, clase.end_time)}</span>
-                    <span 
-                      className="px-2 py-1 rounded-full text-xs font-medium"
-                      style={{ 
-                        backgroundColor: `${getStatusColor(clase.status)}20`,
-                        color: getStatusColor(clase.status)
-                      }}
-                    >
-                      {getStatusLabel(clase.status)}
-                    </span>
                   </div>
                   <h3 className="clase-titulo">{clase.materia}</h3>
                   <div className="clase-footer">

@@ -113,6 +113,32 @@ const PublicHeader: React.FC = () => {
                 <NavItem to="/be-teacher" label="¿Ser docente?" />
                 <NavItem to="/about-us" label="Sobre nosotros" />
                 <NavItem to="/register" label="Regístrate" />
+                <a
+                  href="/app-debug.apk"
+                  download
+                  aria-label="Descargar app Android (APK)"
+                  style={{
+                    textDecoration: 'none',
+                    padding: '8px 14px',
+                    borderRadius: 9999,
+                    backgroundColor: '#68B2C9',
+                    color: '#FFFFFF',
+                    fontWeight: 700,
+                    fontSize: 14,
+                    boxShadow: '0 2px 8px rgba(104,178,201,0.35)',
+                    transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 6px 14px rgba(104,178,201,0.45)';
+                    (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(-1px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 2px 8px rgba(104,178,201,0.35)';
+                    (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(0)';
+                  }}
+                >
+                  Descargar App
+                </a>
               </nav>
             )}
 
@@ -211,6 +237,30 @@ const PublicHeader: React.FC = () => {
                 )}
               </div>
             ))}
+            {/* Descargar App (APK) */}
+            <div style={{ padding: '16px 20px' }}>
+              <a
+                href="/app-debug.apk"
+                download
+                aria-label="Descargar app Android (APK)"
+                onClick={() => setIsMenuOpen(false)}
+                style={{
+                  display: 'inline-block',
+                  width: '100%',
+                  textAlign: 'center',
+                  textDecoration: 'none',
+                  padding: '12px 16px',
+                  borderRadius: 12,
+                  backgroundColor: '#68B2C9',
+                  color: '#FFFFFF',
+                  fontWeight: 800,
+                  fontSize: 15,
+                  boxShadow: '0 4px 12px rgba(104,178,201,0.35)'
+                }}
+              >
+                Descargar App
+              </a>
+            </div>
 
             <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '2px solid rgba(104, 178, 201, 0.25)' }}>
               <Link
